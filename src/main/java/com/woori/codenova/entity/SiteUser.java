@@ -1,0 +1,49 @@
+package com.woori.codenova.entity;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity
+public class SiteUser {
+
+	// pk선언 및 id 순번 부여
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	// 사용자ID
+	@Column(unique = true)
+	private String userId;
+
+	// 비밀번호
+	private String password;
+
+	// 이메일주소
+	@Column(unique = true)
+	private String email;
+
+	// 가입일
+	// 업데이트를 해도 수정이 안되며 db에서 수정해야함
+	@Column(updatable = false)
+	private LocalDateTime careteDate;
+
+	// 수정일
+	// 마이페이지 구현되어야 사용가능
+	private LocalDateTime modifyDate;
+
+//	// 사용자 여부 구별
+//	private boolean isUser;
+
+//	String = varchar
+// Integer = int
+// Long = bigint
+}
