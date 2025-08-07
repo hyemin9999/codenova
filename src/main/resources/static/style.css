@@ -1,0 +1,9 @@
+textarea {
+	width: 100%;
+}
+
+input[type=submit] {
+	margin-top: 10px;
+}
+
+/* 이 아래는 주석 */
