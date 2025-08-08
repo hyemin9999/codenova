@@ -1,4 +1,4 @@
-git push 방법
+
 
 1. git branch로 현재 f/user인지 확인할 것
 2. git status / git add .

@@ -1,4 +1,4 @@
-package com.woori.codenova;
+package com.woori.codenova.form;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserCreateForm {
+public class UserForm {
 
 	@Size(min = 3, max = 25, message = "아이디는 3글자 이상 25글자 이하만 가능합니다.")
 	@NotEmpty(message = "사용자ID는 필수항목입니다.")
