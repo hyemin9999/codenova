@@ -16,6 +16,12 @@
 <!-- 사용자 정의 스타일 (static/style.css 참조) -->
 <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
 
+<!-- Editor's Style -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+
 <!-- 탭 TEXT -->
 <title>CodeNova</title>
 </head>
@@ -25,8 +31,8 @@
 	<nav th:replace="~{navbar :: navbarFragment}"></nav>
 
 	<!-- 페이지별 개별 콘텐츠가 삽입되는 영역 S -->
-	<!-- 각 페이지에서 layout:fragment="contents" 로 지정한 내용이 여기에 렌더링됨 -->
-	<th:block layout:fragment="contents"></th:block>
+	<!-- 각 페이지에서 layout:fragment="content" 로 지정한 내용이 여기에 렌더링됨 -->
+	<th:block layout:fragment="content"></th:block>
 
 	<!-- Bootstrap JS -->
 	<script th:src="@{/bootstrap.min.js}"></script>

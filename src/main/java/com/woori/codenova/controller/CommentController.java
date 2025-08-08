@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.form.CommentForm;
 import com.woori.codenova.service.BoardService;
 import com.woori.codenova.service.CommentService;
 

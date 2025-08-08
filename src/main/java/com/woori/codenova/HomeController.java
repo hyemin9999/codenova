@@ -1,4 +1,4 @@
-package com.woori.codenova.controller;
+package com.woori.codenova;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
