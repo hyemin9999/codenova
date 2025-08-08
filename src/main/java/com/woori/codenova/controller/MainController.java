@@ -21,4 +21,11 @@ public class MainController {
 		return "main";
 	}
 
+	// 회원가입 축하 메세지 확인중
+	// http://localhost:8080/signupsuccess_form
+	@GetMapping("/signupsuccess_form")
+	public String signupsuccess() {
+		return "signupsuccess_form";
+	}
+
 }
