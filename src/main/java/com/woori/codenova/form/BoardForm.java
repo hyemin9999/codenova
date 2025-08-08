@@ -1,4 +1,4 @@
-package com.woori.codenova.controller;
+package com.woori.codenova.form;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

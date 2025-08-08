@@ -1,4 +1,4 @@
-package com.woori.codenova.controller;
+package com.woori.codenova.form;
 
 import jakarta.validation.constraints.NotEmpty; // 빈 문자열 또는 null을 허용하지 않도록 검증
 import lombok.Getter; // Lombok: Getter 메서드 자동 생성

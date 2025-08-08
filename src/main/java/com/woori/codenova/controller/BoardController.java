@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.form.BoardForm;
+import com.woori.codenova.form.CommentForm;
 import com.woori.codenova.service.BoardService;
 
 import jakarta.validation.Valid;
