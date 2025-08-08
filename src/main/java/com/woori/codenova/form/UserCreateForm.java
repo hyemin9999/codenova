@@ -1,4 +1,4 @@
-package com.woori.codenova;
+package com.woori.codenova.form;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
