@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <!-- 한글 인코딩 설정 -->
+    <meta charset="utf-8">
+
+    <!-- 모바일 반응형을 위한 뷰포트 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS 적용 (static/bootstrap.min.css 참조) -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+
+    <!-- 사용자 정의 스타일 (static/style.css 참조) -->
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+
+    <!-- 페이지 제목 -->
+    <title>Hello, sbb!</title>
+</head>
+
+<body>
+
+    <!-- 페이지별 개별 콘텐츠가 삽입되는 영역 -->
+    <!-- 각 페이지에서 layout:fragment="contents" 로 지정한 내용이 여기에 렌더링됨 -->
+    <th:block layout:fragment="contents"></th:block>
+
+</body>
+</html>
