@@ -1,6 +1,7 @@
 package com.woori.codenova.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,6 +53,15 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(password));
 		this.userRepository.save(user);
 		return user;
+	}
+
+	public SiteUser find_id(String email) {
+		Optional<SiteUser> siteUserOptional = userRepository.findByEmail(email);
+		if (siteUserOptional.isEmpty()) {
+			throw new IllegalArgumentException("이메일 주소를 다시 확인해주세요");
+		}
+
+		return siteUserOptional.get();
 	}
 
 //	public SiteUser getUser(String userid) {

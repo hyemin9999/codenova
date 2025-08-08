@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div layout:fragment="content" class="container my-3">
+    <p class="fw-bold">네이놈 이메일이 무엇이더냐</p>
+
+
+<!-- action으로 post 경로로 정보를 보내고 -->
+<!-- object userFindIdForm의 양식을 따라서 정보를 이동시밈 -->
+<!-- object는 해당 클래스내 모든 파일을 검사함으로 따로 만들어서 email 하나만 만들어야함 -->
+    <form th:action="@{/user/findid}" th:object="${userFindIdForm}" method="post">
+        <div class="mb-3">
+            <label for="email" class="form-label">이메일 입력</label> 
+            <input type="email" th:field="*{email}" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">아이디 찾기</button>
+    </form>
+</div>
+</html>
