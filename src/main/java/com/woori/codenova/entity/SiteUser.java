@@ -22,7 +22,7 @@ public class SiteUser {
 
 	// 사용자ID
 	@Column(unique = true)
-	private String userId;
+	private String username;
 
 	// 비밀번호
 	private String password;

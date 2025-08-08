@@ -27,7 +27,7 @@ public class UserSecurityService implements UserDetailsService {
 	// username으로 선언해야 로그인 가능 (String userId)하면 실행불가함
 	// 또한 여기 정보는 login_form에서 가져오는 거니 참고할것
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<SiteUser> _siteUser = this.userRepository.findByUserId(username);
+		Optional<SiteUser> _siteUser = this.userRepository.findByUsername(username);
 		if (_siteUser.isEmpty()) {
 			throw new UsernameNotFoundException("사용자를 찾을 수 없습니다");
 		}
@@ -41,6 +41,6 @@ public class UserSecurityService implements UserDetailsService {
 			authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
 		}
 		// 새로운 User권한을 주며 기록함
-		return new User(siteUser.getUserId(), siteUser.getPassword(), authorities);
+		return new User(siteUser.getUsername(), siteUser.getPassword(), authorities);
 	}
 }
