@@ -2,11 +2,14 @@ package com.woori.codenova.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,19 +24,27 @@ public class Comment {
 	// auto_increment 전략: DB에서 자동 증가
 	private Integer id;
 
-	@Column(columnDefinition = "TEXT")
+	@Column(columnDefinition = "TEXT", nullable = false)
 	// 긴 텍스트 저장을 위한 설정 (VARCHAR 대신 TEXT 사용)
 	private String contents; // 댓글 내용
 
-	private LocalDateTime createDate; // 생성일시
+	@Column(nullable = false)
+	private LocalDateTime createDate; // 생성(작성)일시
 
 	private LocalDateTime modifyDate; // 수정일시
 
+	@Column(nullable = false)
+	@ColumnDefault("false")
 	private boolean isDelete; // 삭제 여부 (true면 삭제된 댓글)
 
 	private LocalDateTime deleteDate; // 삭제된 시간
 
 	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private SiteUser author;
+
+	@ManyToOne
+	@JoinColumn(name = "board_id")
 	// 다대일 관계: 여러 개의 댓글(Comment)이 하나의 게시글(Board)에 속함
 	private Board board; // 어떤 게시글에 달린 댓글인지 연결
 }
