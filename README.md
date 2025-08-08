@@ -1,5 +1,5 @@
-git push 방법
 
+<<<<<<< HEAD
 1. git branch로 현재 f/user인지 확인할 것
 2. git status / git add .
 3. git commit  -m "설명"
@@ -14,3 +14,5 @@ git push 방법
 
 
 이메일 유효성 검사 테스트가 좀더 필요함
+=======
+>>>>>>> 112cfb886e7d51cd48515434b10f07347d1daa0f
