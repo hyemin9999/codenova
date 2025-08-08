@@ -1,36 +1,50 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
 <!-- Required meta tags -->
+<!-- 한글 인코딩 설정 -->
 <meta charset="utf-8">
+
+<!-- 모바일 반응형을 위한 뷰포트 설정 -->
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<!-- Bootstrap CSS -->
+<!-- Bootstrap CSS 적용 (static/bootstrap.min.css 참조) -->
 <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
 
-<!-- sbb CSS -->
+<!-- 사용자 정의 스타일 (static/style.css 참조) -->
 <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
 
-<title>Hello, sbb!</title>
-</head>
-<body>
+<!-- Editor's Style -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 
+<!-- 탭 TEXT -->
+<title>CodeNova</title>
+</head>
+
+<body>
+	<!-- 메뉴 -->
 	<!-- 네비게이션바 -->
-    <nav th:replace="~{navbar :: navbarFragment}"></nav>
+	<nav th:replace="~{navbar :: navbarFragment}"></nav>
 
 	<!-- 기본 템플릿 안에 삽입될 내용 Start -->
 
-<!-- 이게 부모 파일이며 자식파일에서 선언된 경우 자식꺼가 출력 -->
-<!-- 아니면 공백처리로 안보이게됨 주의 -->
+	<!-- 이게 부모 파일이며 자식파일에서 선언된 경우 자식꺼가 출력 -->
+	<!-- 아니면 공백처리로 안보이게됨 주의 -->
+
+	<!-- 페이지별 개별 콘텐츠가 삽입되는 영역 S -->
+	<!-- 각 페이지에서 layout:fragment="content" 로 지정한 내용이 여기에 렌더링됨 -->
+
 	<th:block layout:fragment="content"></th:block>
-	<!-- 기본 템플릿 안에 삽입될 내용 End -->
 
 	<!-- Bootstrap JS -->
 	<script th:src="@{/bootstrap.min.js}"></script>
-	
-<!-- 	자바스크립트 Start -->
-<th:block layout:fragment="script"></th:block>
-<!-- 자바스크립트 end -->
+
+	<!-- 	자바스크립트 영역 -->
+	<th:block layout:fragment="script"></th:block>
 </body>
 </html>

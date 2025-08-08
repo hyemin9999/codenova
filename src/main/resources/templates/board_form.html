@@ -1,0 +1,34 @@
+<!-- 기본 레이아웃(layout.html)을 상속 -->
+<html layout:decorate="~{layout}">
+
+<!-- 콘텐츠 본문 영역 정의 -->
+<div layout:fragment="content" class="container">
+
+    <!-- 폼 제목 -->
+    <h5 class="my-3 border-bottom pb-2">질문등록</h5>
+
+    <!-- 게시글 작성/수정을 위한 폼 -->
+    <!-- boardForm 객체를 바인딩하여 데이터를 주고받음 -->
+    <form th:object="${boardForm}" method="post">
+
+        <!-- 유효성 검사 오류 표시 영역 -->
+        <!-- form_errors.html 파일의 formErrorsFragment 조각을 삽입 -->
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+        <!-- 제목 입력 필드 -->
+        <div class="mb-3">
+            <label for="subject" class="form-label">제목</label>
+            <input type="text" th:field="*{subject}" class="form-control">
+        </div>
+
+        <!-- 내용 입력 필드 -->
+        <div class="mb-3">
+            <label for="contents" class="form-label">내용</label>
+            <textarea th:field="*{contents}" class="form-control" rows="10"></textarea>
+        </div>
+
+        <!-- 제출 버튼 -->
+        <input type="submit" value="저장하기" class="btn btn-primary my-2">
+    </form>
+</div>
+</html>
