@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.woori.codenova.UserCreateForm;
 import com.woori.codenova.UserFindIdForm;
 import com.woori.codenova.entity.SiteUser;
+import com.woori.codenova.form.UserForm;
 import com.woori.codenova.service.UserService;
 
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ public class UserController {
 
 	// 회원가입 링크로 보내버림
 	@GetMapping("/signup")
-	public String signup(UserCreateForm userCreateForm) {
+	public String signup(UserForm userForm) {
 		return "signup_form";
 	}
 
@@ -34,15 +34,14 @@ public class UserController {
 	// email 하나만 찾을려면 새로운 클래스를 만드는 방법 뿐이라 부득이 하게 새로 추가함
 
 	@PostMapping("/signup")
-//	public String signup(@Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
-	public String signup(@Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
+	public String signup(@Valid UserForm userForm, BindingResult bindingResult) {
 
 		// 유효성 오류 발생시 돌려보냄
 		if (bindingResult.hasErrors()) {
 			return "signup_form";
 		}
 		// 비밀번호와 비번확인 검증 시나리오
-		if (!userCreateForm.getPassword1().equals(userCreateForm.getPassword2())) {
+		if (!userForm.getPassword1().equals(userForm.getPassword2())) {
 			bindingResult.rejectValue("password2", "passwordInCorrect", "2개의 패스워드가 일치하지 않습니다.");
 			return "signup_form";
 		}
@@ -51,7 +50,7 @@ public class UserController {
 //		userService.createUserTest(userCreateForm.getUserid(), userCreateForm.getEmail());
 
 		try {
-			userService.create(userCreateForm.getUsername(), userCreateForm.getPassword1(), userCreateForm.getEmail());
+			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail());
 			// 서비스 계층에서 중복사용자 걸러내는 로직 추가해보았음
 //	} catch (DataIntegrityViolationException e) {
 //			e.printStackTrace();

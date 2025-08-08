@@ -1,4 +1,6 @@
+<!-- form_errors.html 내부 조각: 폼 유효성 검증 실패 시 오류 메시지를 표시하는 템플릿 fragment -->
 <div th:fragment="formErrorsFragment" class="alert alert-danger" 
     role="alert" th:if="${#fields.hasAnyErrors()}">
+    <!-- 모든 필드의 에러 메시지를 반복 출력 -->
     <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
 </div>

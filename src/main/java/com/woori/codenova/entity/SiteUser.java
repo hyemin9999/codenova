@@ -1,12 +1,14 @@
 package com.woori.codenova.entity;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,14 +23,15 @@ public class SiteUser {
 	private Long id;
 
 	// 사용자ID
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	private String username;
 
 	// 비밀번호
+	@Column(nullable = false)
 	private String password;
 
 	// 이메일주소
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	private String email;
 
 	// 가입일
@@ -42,6 +45,10 @@ public class SiteUser {
 
 //	// 사용자 여부 구별
 //	private boolean isUser;
+
+	// 권한
+	@ManyToMany
+	Set<Role> authority;
 
 //	String = varchar
 // Integer = int

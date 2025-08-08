@@ -15,17 +15,4 @@ public class MainController {
 		return "redirect:/main";
 	}
 
-	// 이것이 선언되어야 redirect:/main 이 사용 가능해짐
-	@GetMapping("/main")
-	public String Main1() {
-		return "main";
-	}
-
-	// 회원가입 축하 메세지 확인중
-	// http://localhost:8080/signupsuccess_form
-	@GetMapping("/signupsuccess_form")
-	public String signupsuccess() {
-		return "signupsuccess_form";
-	}
-
 }
