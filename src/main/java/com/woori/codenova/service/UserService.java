@@ -33,16 +33,16 @@ public class UserService {
 //	}
 
 	// 만들기로 가져옴
-	public SiteUser create(String userId, String password, String email) {
+	public SiteUser create(String username, String password, String email) {
 		// 이메일, 아이디 중복 사용자 확인중
-		if (userRepository.findByUserId(userId).isPresent()) {
+		if (userRepository.findByUsername(username).isPresent()) {
 			throw new IllegalArgumentException("이미 사용중인 사용자ID입니다.");
 		}
 		if (userRepository.findByEmail(email).isPresent()) {
 			throw new IllegalArgumentException("이미 사용중인 이메일입니다..");
 		}
 		SiteUser user = new SiteUser();
-		user.setUserId(userId);
+		user.setUsername(username);
 		user.setEmail(email);
 		user.setCareteDate(LocalDateTime.now());
 		// user.setPassword(password);
