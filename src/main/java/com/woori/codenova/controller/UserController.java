@@ -42,7 +42,7 @@ public class UserController {
 //		userService.createUserTest(userCreateForm.getUserid(), userCreateForm.getEmail());
 
 		try {
-			userService.create(userCreateForm.getUserId(), userCreateForm.getPassword1(), userCreateForm.getEmail());
+			userService.create(userCreateForm.getUsername(), userCreateForm.getPassword1(), userCreateForm.getEmail());
 			// 서비스 계층에서 중복사용자 걸러내는 로직 추가해보았음
 //	} catch (DataIntegrityViolationException e) {
 //			e.printStackTrace();

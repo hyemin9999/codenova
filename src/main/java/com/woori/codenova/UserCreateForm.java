@@ -13,7 +13,7 @@ public class UserCreateForm {
 
 	@Size(min = 3, max = 25, message = "아이디는 3글자 이상 25글자 이하만 가능합니다.")
 	@NotEmpty(message = "사용자ID는 필수항목입니다.")
-	private String userId;
+	private String username;
 
 	@NotEmpty(message = "비밀번호는 필수항목입니다.")
 	@Size(min = 4, message = "비밀번호는 4자 이상이어야 합니다.")
