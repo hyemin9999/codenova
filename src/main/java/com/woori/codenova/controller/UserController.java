@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.woori.codenova.UserCreateForm;
+import com.woori.codenova.form.UserCreateForm;
 import com.woori.codenova.service.UserService;
 
 import jakarta.validation.Valid;
