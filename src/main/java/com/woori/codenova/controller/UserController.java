@@ -3,11 +3,17 @@ package com.woori.codenova.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.woori.codenova.InvalidUuidException;
+import com.woori.codenova.NonExistentMemberException;
 import com.woori.codenova.UserFindIdForm;
+import com.woori.codenova.ApiTest.ResetPasswordReq;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.UserForm;
 import com.woori.codenova.service.UserService;
@@ -120,4 +126,58 @@ public class UserController {
 //		return "find_id";
 	}
 
+	// 아이디 찾기 이메일 검증 테스트중 ======================
+	// =======================================================
+
+//	@getmapping
+
+	// =================================================================
+	// =============비밀번호 테스트중=============
+
+	@GetMapping("/resetpassword")
+	public String restepassword() {
+		return "resetPasswordForm";
+	}
+
+	@GetMapping("/reset-password/{uuid}")
+	public String showResetPasswordForm(@PathVariable("uuid") String uuid, Model model) {
+		// UUID는 UserService에서 검증하므로, 여기서는 폼을 보여주기만 합니다.
+		// 유효하지 않은 UUID라면 UserService.resetPassword() 호출 시 예외가 발생합니다.
+		model.addAttribute("uuid", uuid);
+		model.addAttribute("resetPasswordReq", new ResetPasswordReq());
+		return "resetPassword";
+	}
+
+	@PostMapping("/reset-password/setting/{uuid}")
+	public String resetPassword(@PathVariable("uuid") String uuid, @Validated ResetPasswordReq resetPasswordReq,
+			BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+		// 1. 유효성 검사 실패 시 처리
+		if (bindingResult.hasErrors()) {
+			// 오류를 플래시 속성에 담아 리다이렉트
+			redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
+			return "redirect:/reset-password/" + uuid;
+		}
+
+		// 2. 비밀번호와 비밀번호 확인 일치 여부 확인
+		if (!resetPasswordReq.getNewPassword().equals(resetPasswordReq.getNewPasswordConfirm())) {
+			bindingResult.rejectValue("newPasswordConfirm", "passwordMismatch", "비밀번호가 일치하지 않습니다.");
+			redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
+			return "redirect:/reset-password/" + uuid;
+		}
+
+		try {
+			// 3. UserService를 통해 비밀번호 재설정 로직 실행
+			userService.resetPassword(uuid, resetPasswordReq.getNewPassword());
+		} catch (InvalidUuidException | NonExistentMemberException e) {
+			// 4. UUID 또는 회원 정보 오류 발생 시 처리
+			bindingResult.reject("resetPasswordError", e.getMessage());
+			redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
+			return "redirect:/reset-password/" + uuid;
+		}
+
+		// 5. 성공 시 로그인 페이지로 리다이렉트
+		redirectAttributes.addFlashAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+		return "redirect:/user/login";
+	}
 }
