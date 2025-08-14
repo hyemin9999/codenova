@@ -53,4 +53,13 @@ public class SiteUser {
 //	String = varchar
 // Integer = int
 // Long = bigint
+
+//	/**
+//	 * 암호화된 새 비밀번호로 비밀번호를 업데이트하는 메서드
+//	 * 
+//	 * @param newEncodedPassword 새로 암호화된 비밀번호
+//	 */
+	public void updatePassword(String newEncodedPassword) {
+		this.password = newEncodedPassword;
+	}
 }
