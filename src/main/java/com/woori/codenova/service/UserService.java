@@ -1,11 +1,13 @@
 package com.woori.codenova.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.UserRepository;
 
@@ -54,12 +56,12 @@ public class UserService {
 		return user;
 	}
 
-//	public SiteUser getUser(String userid) {
-//		Optional<SiteUser> User = this.userRepository.findByUserId(userid);
-//		if (User.isPresent()) {
-//			return User.get();
-//		} else {
-//			throw new DataNotFoundException("siteuser not found");
-//		}
-//	}
+	public SiteUser getUser(String username) {
+		Optional<SiteUser> User = this.userRepository.findByUsername(username);
+		if (User.isPresent()) {
+			return User.get();
+		} else {
+			throw new DataNotFoundException("siteuser not found");
+		}
+	}
 }
