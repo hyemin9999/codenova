@@ -1,50 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
-<!-- Required meta tags -->
-<!-- 한글 인코딩 설정 -->
+<!-- 필수 메타 태그 -->
+<!-- 문서 인코딩 -->
 <meta charset="utf-8">
 
-<!-- 모바일 반응형을 위한 뷰포트 설정 -->
+<!-- 반응형 레이아웃을 위한 뷰포트 설정 -->
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<!-- Bootstrap CSS 적용 (static/bootstrap.min.css 참조) -->
+<!-- 정적 리소스: Bootstrap CSS
+         - /src/main/resources/static/bootstrap.min.css 를 제공한다고 가정
+         - th:href="@{/bootstrap.min.css}" : 컨텍스트 경로를 고려한 URL 생성 -->
 <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
 
-<!-- 사용자 정의 스타일 (static/style.css 참조) -->
+<!-- 사용자 정의 스타일 -->
 <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
 
-<!-- Editor's Style -->
+<!-- Toast UI Editor 스타일 (CDN) -->
 <link rel="stylesheet"
 	href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 
-<!-- 탭 TEXT -->
+<!-- 브라우저 탭 제목 -->
 <title>CodeNova</title>
 </head>
 
 <body>
 	<!-- 메뉴 -->
-	<!-- 네비게이션바 -->
+	<!-- 상단 네비게이션
+         - navbar.html(또는 동명의 템플릿) 안의 'navbarFragment' 조각을 삽입합니다. -->
 	<nav th:replace="~{navbar :: navbarFragment}"></nav>
-
-	<!-- 기본 템플릿 안에 삽입될 내용 Start -->
 
 	<!-- 이게 부모 파일이며 자식파일에서 선언된 경우 자식꺼가 출력 -->
 	<!-- 아니면 공백처리로 안보이게됨 주의 -->
 
-	<!-- 페이지별 개별 콘텐츠가 삽입되는 영역 S -->
-	<!-- 각 페이지에서 layout:fragment="content" 로 지정한 내용이 여기에 렌더링됨 -->
-
+	<!-- 페이지별 개별 콘텐츠가 삽입되는 영역 == 개별 페이지에서 정의한 본문 콘텐츠가 삽입되는 자리 -->
+	<!-- 각 페이지에서 layout:fragment="content" 로 지정한 내용이 여기에 렌더링됨  -->
+	<!-- 각 페이지 템플릿에서 <div layout:fragment="content">로 정의한 부분이 여기 들어옵니다.  -->
 	<th:block layout:fragment="content"></th:block>
 
-	<!-- Bootstrap JS -->
+	<!-- Bootstrap JS (정적 리소스) -->
 	<script th:src="@{/bootstrap.min.js}"></script>
 
-	<!-- 	자바스크립트 영역 -->
+	<!-- Toast UI Editor 스크립트 (CDN) -->
+	<script
+		src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+	<!-- 페이지별 개별 스크립트 삽입 위치
+         - 각 페이지 템플릿에서 <script layout:fragment="script"> ... </script> 로 제공한 코드가
+           아래 블록에 주입됩니다. -->
 	<th:block layout:fragment="script"></th:block>
 </body>
 </html>
