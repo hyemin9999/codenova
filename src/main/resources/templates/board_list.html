@@ -1,75 +1,129 @@
-<!-- 기본 레이아웃 파일 상속 -->
+<!-- 기본 레이아웃 파일 상속: 이 문서의 content 조각이 layout.html의 지정 위치에 삽입됨 -->
 <html layout:decorate="~{layout}">
 
-<!-- 콘텐츠 본문 영역 -->
+<!-- 페이지별 본문 콘텐츠 조각 -->
 <div layout:fragment="content" class="container my-3">
+
+    <!-- 상단: 등록 버튼 + 검색창 행 -->
+    <div class="row my-3">
+        <div class="col-6">
+            <!-- 질문 등록 페이지로 이동 -->
+            <a th:href="@{/board/create}" class="btn btn-primary">질문 등록하기</a>
+        </div>
+        <div class="col-6">
+            <!-- 검색 입력창 + 버튼(페이지 전환은 아래 script에서 submit 처리) -->
+            <div class="input-group">
+                <!-- 서버에서 전달된 kw(현재 검색어)를 인풋의 초기값으로 표시 -->
+                <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 게시글 목록 테이블 -->
     <table class="table">
         <thead class="table-dark">
-            <tr>
+            <tr class="text-center">
                 <th>번호</th>
-                <th>제목</th>
+                <th style="width:50%">제목</th>
+                <th>글쓴이</th>
                 <th>작성일시</th>
             </tr>
         </thead>
         <tbody>
-            <!-- 게시글 목록 반복 출력 -->
-            <tr th:each="board, loop : ${paging}">
-                <!-- 번호 계산 (총 게시글 수 - 현재 페이지 첫 글 번호 - 인덱스) -->
+            <!-- 페이징 결과(paging)를 순회하면서 한 행씩 출력
+                 loop: 루프 상태 변수(인덱스 등 사용 가능) -->
+            <tr class="text-center" th:each="board, loop : ${paging}">
+                <!-- 목록 번호: 전체 개수 - (현재페이지 * 페이지크기) - 루프 인덱스
+                     → 페이지 하단일수록 번호가 작아지도록 계산 -->
                 <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
 
-                <!-- 게시글 제목 + 댓글 수 -->
-                <td>
-                    <!-- 제목 링크 -->
+                <!-- 제목 셀: 제목 클릭 시 상세로 이동, 댓글 수가 있으면 제목 옆에 표시 -->
+                <td class="text-start">
+                    <!-- 게시글 상세 링크 -->
                     <a th:href="@{|/board/detail/${board.id}|}"
                        th:text="${board.subject}"></a>
 
-                    <!-- 댓글 수 표시 (댓글이 하나 이상일 때만 출력) -->
+                    <!-- 댓글 수 배지: 댓글이 1개 이상일 때만 숫자 출력 -->
                     <span class="text-danger small ms-2"
                           th:if="${#lists.size(board.commentList) > 0}"
                           th:text="${#lists.size(board.commentList)}"></span>
                 </td>
 
-                <!-- 작성일 표시 -->
+                <!-- 글쓴이: author가 null이 아닐 때만 username 표시 -->
+                <td><span th:if="${board.author != null}" th:text="${board.author.username}"></span></td>
+
+                <!-- 작성일시: LocalDateTime 포맷팅 -->
                 <td th:text="${#temporals.format(board.createDate, 'yyyy-MM-dd HH:mm')}"></td>
             </tr>
         </tbody>
     </table>
 
-    <!-- ✅ 페이징 처리 시작 -->
+    <!-- 페이징 네비게이션: 페이지가 비어있지 않을 때만 표시 -->
     <div th:if="${!paging.isEmpty()}">
         <ul class="pagination justify-content-center">
 
-            <!-- 이전 버튼 -->
+            <!-- 이전 페이지 버튼: 이전 페이지가 없으면 disabled -->
             <li class="page-item"
                 th:classappend="${!paging.hasPrevious} ? 'disabled'">
-                <a class="page-link" th:href="@{|?page=${paging.number-1}|}">
+                <!-- data-page 에 이동 대상 페이지 인덱스를 넣고, 아래 스크립트에서 form submit -->
+                <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number-1}">
                     <span>이전</span>
                 </a>
             </li>
 
-            <!-- 페이지 번호 목록 -->
-            <li th:each="page: ${#numbers.sequence(1, paging.totalPages-1)}"
+            <!-- 페이지 번호 목록: 현재 페이지 기준 좌우 5페이지 범위만 노출 -->
+            <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
                 th:if="${page >= paging.number-5 and page <= paging.number+5}"
                 th:classappend="${page == paging.number} ? 'active'"
                 class="page-item">
-                <a th:text="${page}" class="page-link"
-                   th:href="@{|?page=${page}|}"></a>
+                <!-- data-page 로 실제 이동 페이지 인덱스를 전달 -->
+                <a th:text="${page+1}" class="page-link"
+                   href="javascript:void(0)" th:data-page="${page}"></a>
             </li>
 
-            <!-- 다음 버튼 -->
+            <!-- 다음 페이지 버튼: 다음 페이지가 없으면 disabled -->
             <li class="page-item"
                 th:classappend="${!paging.hasNext} ? 'disabled'">
-                <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
                     <span>다음</span>
                 </a>
             </li>
         </ul>
     </div>
-    <!-- ✅ 페이징 처리 끝 -->
+    <!-- 페이징 네비게이션 끝 -->
 
-    <!-- 게시글 등록 버튼 -->
+    <!-- 검색/페이지 폼: 실제로 서버로 요청을 보낼 숨김 폼
+         - 스크립트에서 page/kw 값을 세팅 후 submit -->
+    <form th:action="@{/board/list}" method="get" id="searchForm">
+        <!-- 검색어 hidden: 현재 검색어 유지/변경 -->
+        <input type="hidden" id="kw" name="kw" th:value="${kw}">
+        <!-- 현재 페이지 인덱스 hidden -->
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+    </form>
+
+    <!-- 하단에도 등록 버튼 한 번 더 제공 -->
     <a th:href="@{/board/create}" class="btn btn-primary">질문 등록하기</a>
 </div>
+
+<!-- 페이지 전용 스크립트: 페이지 이동 및 검색어 제출 처리 -->
+<script layout:fragment="script" type='text/javascript'>
+    // 모든 페이지 링크(.page-link)에 클릭 핸들러 등록
+    const page_elements = document.getElementsByClassName("page-link");
+    Array.from(page_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            // data-page 값을 hidden input(#page)에 넣고 폼 전송
+            document.getElementById('page').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+
+    // 찾기 버튼 클릭 시: 검색어를 hidden(#kw)에 넣고 0페이지부터 검색
+    const btn_search = document.getElementById("btn_search");
+    btn_search.addEventListener('click', function() {
+        document.getElementById('kw').value = document.getElementById('search_kw').value;
+        document.getElementById('page').value = 0;  // 검색 시 항상 첫 페이지부터
+        document.getElementById('searchForm').submit();
+    });
+</script>
 </html>

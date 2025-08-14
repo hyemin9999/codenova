@@ -165,7 +165,7 @@ class CodenovaApplicationTests {
 		for (int i = 1; i <= 300; i++) {
 			String subject = String.format("테스트 데이터입니다:[%03d]", i);
 			String contents = "내용무";
-			this.boardService.create(subject, contents);
+			this.boardService.create(subject, contents, null);
 		}
 	}
 }

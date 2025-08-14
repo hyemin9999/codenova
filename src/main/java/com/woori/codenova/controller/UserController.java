@@ -46,16 +46,8 @@ public class UserController {
 			return "signup_form";
 		}
 
-		// 서비스 계층 호출하려다남은 잔재
-//		userService.createUserTest(userCreateForm.getUserid(), userCreateForm.getEmail());
-
 		try {
 			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail());
-			// 서비스 계층에서 중복사용자 걸러내는 로직 추가해보았음
-//	} catch (DataIntegrityViolationException e) {
-//			e.printStackTrace();
-//			bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
-//			return "signup_form";
 		} catch (Exception e) {
 			e.printStackTrace();
 			bindingResult.reject("singupFailed", e.getMessage());
@@ -64,16 +56,7 @@ public class UserController {
 		}
 		// 회원가입 끝나면 메인화면에 연결된 곳으로 보내버림
 		return "redirect:/";
-		// 회원가입 축하페이지 테스트용 코드
-//		return "signupsuccess_form";
 	}
-
-	// url로 타고들어가기 연습중 /user/signupsuccess_form
-	// mainContorller에서 작업중이니 기억해둘것
-//	@GetMapping("/signupsuccess_form")
-//	public String signupsuccess() {
-//		return "signupsuccess_form";
-//	}
 
 	// 로그인폼으로 보내버림 -> 로그인 처리는 UserSecurityService 에서 처리함
 	@GetMapping("/login")
@@ -81,11 +64,8 @@ public class UserController {
 		return "login_form";
 	}
 
-	// 아이디 찾기 매핑 연결후 테스트중
 	@GetMapping("/findid")
-//	public String findId(Model model) { // Model 객체를 매개변수로 추가
 	public String findId(UserFindIdForm userFindIdForm) { // Model 객체를 매개변수로 추가
-//		model.addAttribute("userCreateForm", new UserCreateForm()); // 빈 객체를 모델에 담음
 		return "find_id";
 	}
 
@@ -98,7 +78,7 @@ public class UserController {
 
 			return "login_form";
 		}
-//		userService.find_id(userCreateForm.getEmail()); 
+
 		try {
 			// 1. 서비스에서 반환된 SiteUser 객체를 받습니다.
 			SiteUser siteUser = userService.find_id(userFindIdForm.getEmail());
@@ -117,7 +97,7 @@ public class UserController {
 			bindingResult.reject("emailNotFound", e.getMessage());
 			return "main"; // 다시 폼 페이지로 돌아감
 		}
-//		return "find_id";
+
 	}
 
 }
