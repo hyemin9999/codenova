@@ -10,11 +10,14 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.woori.codenova.entity.Board;
 import com.woori.codenova.entity.Comment;
+import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.BoardRepository;
 import com.woori.codenova.repository.CommentRepository;
+import com.woori.codenova.repository.UserRepository;
 import com.woori.codenova.service.BoardService;
 
 @SpringBootTest
@@ -28,6 +31,18 @@ class CodenovaApplicationTests {
 
 	@Autowired
 	private BoardService boardService;
+
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Test
+	void passwordChangeTest() {
+		SiteUser user = userRepository.findByEmail("user1@test.com").orElse(null);
+		user.setPassword(passwordEncoder.encode("!A1234"));
+		userRepository.save(user);
+	}
 
 //	 @Test
 	void testJpa_01() {
@@ -160,7 +175,7 @@ class CodenovaApplicationTests {
 	}
 
 	// 테스트 데이터 300개 생성
-	@Test
+//	@Test
 	void testJpa_12() {
 		for (int i = 1; i <= 300; i++) {
 			String subject = String.format("테스트 데이터입니다:[%03d]", i);
