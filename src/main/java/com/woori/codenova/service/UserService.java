@@ -3,7 +3,6 @@ package com.woori.codenova.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,6 @@ public class UserService {
 		// user.setPassword(password);
 		// 아랫줄에서 불러온것으로 대체됨
 		// 주석 처리한건 위에 final로 선언되어 가져온것
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		user.setPassword(passwordEncoder.encode(password));
 		this.userRepository.save(user);
 		return user;
