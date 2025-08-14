@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.UserRepository;
 
@@ -22,16 +23,6 @@ public class UserService {
 	private final UserRepository userRepository;
 
 	private final PasswordEncoder passwordEncoder;
-
-//	public UserEntity createUserTest(String userid, String email) {
-//		if (userRepository.findByuserid(userid).isPresent()) {
-//			throw new IllegalArgumentException("이미 사용중인 사용자ID입니다.");
-//		}
-//		if (userRepository.findByemail(email).isPresent()) {
-//			throw new IllegalArgumentException("이미 사용중인 이메일입니다..");
-//		}
-////		return null;
-//	}
 
 	// 만들기로 가져옴
 	public SiteUser create(String username, String password, String email) {
@@ -64,12 +55,12 @@ public class UserService {
 		return siteUserOptional.get();
 	}
 
-//	public SiteUser getUser(String userid) {
-//		Optional<SiteUser> User = this.userRepository.findByUserId(userid);
-//		if (User.isPresent()) {
-//			return User.get();
-//		} else {
-//			throw new DataNotFoundException("siteuser not found");
-//		}
-//	}
+	public SiteUser getUser(String username) {
+		Optional<SiteUser> User = this.userRepository.findByUsername(username);
+		if (User.isPresent()) {
+			return User.get();
+		} else {
+			throw new DataNotFoundException("siteuser not found");
+		}
+	}
 }
