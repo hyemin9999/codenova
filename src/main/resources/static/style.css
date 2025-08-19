@@ -26,6 +26,20 @@ input[type=submit] {
 	--bs-btn-active-color: var(--bs-white);
 }
 
+.btn-info-subtle {
+	--bs-btn-bg: var(--bs-info-border-subtle);
+	--bs-btn-color: var(--bs-white);
+	--bs-btn-hover-bg: var(--bs-info);
+	--bs-btn-hover-border-color: var(--bs-info);
+	--bs-btn-hover-color: var(--bs-white);
+	--bs-btn-active-color: var(--bs-white);
+	--bs-btn-border-color: var(--bs-info-border-subtle);
+}
+
+.btn-info-subtle.badge {
+	background-color: var(--bs-info) !important;
+}
+
 .btn-outline-info {
 	--bs-btn-hover-color: var(--bs-white);
 	--bs-btn-active-color: var(--bs-white);
@@ -47,6 +61,22 @@ input[type=submit] {
 	--bs-btn-active-color: var(--bs-white);
 }
 
+.btn-outline-info-subtle:hover .bg-info {
+	background-color: var(--bs-white) !important;
+}
+
+.btn-outline-info-subtle:hover .badge {
+	color: var(--bs-info) !important;
+}
+
+.align-r {
+	text-align: right;
+}
+
+.bg-info-custom {
+	background-color: rgba(88, 214, 243, var(--bs-bg-opacity)) !important;
+}
+
 .pagination {
 	--bs-pagination-active-bg: var(--bs-info);
 	--bs-pagination-active-border-color: var(--bs-info);
@@ -64,8 +94,8 @@ input[type=submit] {
 }
 
 .navbar-toggler:focus {
-	box-shadow: 0 0 0 .25rem rgba(13,202,240, 1);
-/* box-shadow: 0 0 0 .25rem rgba(var(--bs-info-rgb), 1); */
+	box-shadow: 0 0 0 .25rem rgba(13, 202, 240, 1);
+	/* box-shadow: 0 0 0 .25rem rgba(var(--bs-info-rgb), 1); */
 	/* 	box-shadow: 0 0 0 .25rem rgba(var(--bs-info-rgb), .25); */
 }
 
