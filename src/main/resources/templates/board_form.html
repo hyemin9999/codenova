@@ -4,97 +4,96 @@
 <!-- 콘텐츠 본문 영역 정의: 이 div의 내용이 layout.html의 layout:fragment="content" 위치에 주입됨 -->
 <div layout:fragment="content" class="container">
 
-    <!-- 폼 제목 -->
-    <h5 class="my-3 border-bottom pb-2">게시글 작성</h5>
+	<!-- 폼 제목 -->
+	<h5 class="my-3 border-bottom pb-2">게시글 작성</h5>
 
-    <!-- 게시글 작성/수정을 위한 폼
+	<!-- 게시글 작성/수정을 위한 폼
          - th:object 로 BoardForm를 바인딩하여 하위 th:field="*{...}"에서 접근 가능
          - method="post" : POST 전송 -->
-    <form th:object="${boardForm}" method="post">
-        <!-- CSRF 토큰: Spring Security 활성화 시 필수. 서버가 제공하는 파라미터/값을 그대로 숨김 필드에 주입 -->
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+	<form th:object="${boardForm}" method="post">
+		<!-- CSRF 토큰: Spring Security 활성화 시 필수. 서버가 제공하는 파라미터/값을 그대로 숨김 필드에 주입 -->
+		<input type="hidden" th:name="${_csrf.parameterName}"
+			th:value="${_csrf.token}" />
 
-        <!-- 유효성 검사 오류 표시 영역
+		<!-- 유효성 검사 오류 표시 영역
              - form_errors.html 의 formErrorsFragment를 포함
              - BindingResult가 존재하는 경우에만 내부에서 에러를 렌더링 -->
-        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
 
-        <!-- 제목 입력 필드 -->
-        <div class="mb-3">
-            <label for="subject" class="form-label">제목</label>
-            <!-- th:field="*{subject}" : boardForm.subject 와 양방향 바인딩 -->
-            <input type="text" th:field="*{subject}" class="form-control">
-        </div>
+		<!-- 제목 입력 필드 -->
+		<div class="mb-3">
+			<label for="subject" class="form-label">제목</label>
+			<!-- th:field="*{subject}" : boardForm.subject 와 양방향 바인딩 -->
+			<input type="text" th:field="*{subject}" class="form-control">
+		</div>
 
-        <!-- 내용 입력 필드 -->
-        <div class="mb-3">
-            <label for="content" class="form-label">내용</label>
+		<!-- 내용 입력 필드 -->
+		<div class="mb-3">
+			<label for="content" class="form-label">내용</label>
 
-            <!-- (기존 textarea 대체) Toast UI Editor를 붙일 컨테이너
+			<!-- (기존 textarea 대체) Toast UI Editor를 붙일 컨테이너
                  - 실제로는 이 div에 자바스크립트로 에디터 인스턴스를 생성하여 표시 -->
-            <!-- <textarea th:field="*{contents}" class="form-control" rows="10"></textarea> -->
-            <div id="content" name="content" class="form-control"></div>
+			<!-- <textarea th:field="*{contents}" class="form-control" rows="10"></textarea> -->
+			<div id="content" name="content" class="form-control"></div>
 
-            <!-- 서버 전송용 숨김 필드
+			<!-- 서버 전송용 숨김 필드
                  - 최종적으로 에디터의 마크다운 문자열을 이 input(name="contents")에 넣어
                    서버에서 boardForm.contents 로 받을 수 있게 함 -->
-            <input type="hidden" name="contents" id="ecp">
-        </div>
-
-        <!-- 제출 버튼: 클릭 시 폼 submit → script에서 에디터 내용을 hidden 필드에 세팅 후 전송 -->
-        <input type="submit" value="확인" class="btn btn-info my-2">
-    </form>
+			<input type="hidden" name="contents" id="ecp">
+		</div>
+		<div class="align-r">
+			<!-- 제출 버튼: 클릭 시 폼 submit → script에서 에디터 내용을 hidden 필드에 세팅 후 전송 -->
+			<input type="submit" value="확인" class="btn btn-info my-2">
+		</div>
+	</form>
 </div>
 
 <!-- 페이지 전용 스크립트 블록
      - th:inline="javascript" : [[...]] 등의 Thymeleaf 인라인 표현식이 JS 문자열로 안전하게 렌더링되도록 함 -->
-<script layout:fragment="script" type="text/javascript" th:inline="javascript">
-    // 서버에서 넘어온 기존 본문 값(수정 화면 등)을 에디터 초기값으로 세팅하기 위해 가져옴
-    // [[${boardForm.contents}]] : 서버의 문자열을 JS 리터럴로 이스케이프/인라인
-    var content = '[[${boardForm.contents}]]';
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+	// 서버에서 넘어온 기존 본문 값(수정 화면 등)을 에디터 초기값으로 세팅하기 위해 가져옴
+	// [[${boardForm.contents}]] : 서버의 문자열을 JS 리터럴로 이스케이프/인라인
+	var content = '[[${boardForm.contents}]]';
 
-    // null 문자열 처리: 템플릿 렌더링 상황에 따라 'null'이 문자열로 들어올 수 있어 빈 문자열로 보정
-    if (content == 'null') {
-        content = "";
-    } else {
-        // 따옴표로 감싸진 경우 앞뒤 따옴표 제거 (환경에 따라 이스케이프 결과가 다를 수 있음)
-        if (content.startsWith('"') && content.endsWith('"')) {
-            content = content.substr(1, content.length - 2);
-        }
-    }
+	// null 문자열 처리: 템플릿 렌더링 상황에 따라 'null'이 문자열로 들어올 수 있어 빈 문자열로 보정
+	if (content == 'null') {
+		content = "";
+	} else {
+		// 따옴표로 감싸진 경우 앞뒤 따옴표 제거 (환경에 따라 이스케이프 결과가 다를 수 있음)
+		if (content.startsWith('"') && content.endsWith('"')) {
+			content = content.substr(1, content.length - 2);
+		}
+	}
 
-    // Toast UI Editor 인스턴스 생성
-    // - el: 에디터를 붙일 DOM 요소
-    // - initialEditType: 초기 편집 모드(markdown 또는 wysiwyg)
-    // - initialValue: 초기 내용(빈 문자열로 시작 후 setMarkdown으로 다시 세팅)
-    // - previewStyle: 미리보기 레이아웃(tab/vertical)
-    // - toolbarItems: 보여줄 툴바 버튼 구성
-    const editor = new toastui.Editor({
-        el: document.querySelector('#content'), // 에디터 컨테이너
-        height: '500px',                        // 높이
-        initialEditType: 'markdown',            // 초기 모드
-        initialValue: '',                       // 초기 값(아래 setMarkdown으로 대체)
-        previewStyle: 'vertical',               // 프리뷰 스타일
-        addImageBlobHook: null,                 // 이미지 업로드 훅(현재 비활성화)
-        toolbarItems: [
-            ['heading', 'bold', 'italic', 'strike'],
-            ['hr', 'quote'],
-            ['ul', 'ol', 'task', 'indent', 'outdent'],
-            ['table', 'link'],
-            ['code', 'codeblock']
-        ]
-    });
+	// Toast UI Editor 인스턴스 생성
+	// - el: 에디터를 붙일 DOM 요소
+	// - initialEditType: 초기 편집 모드(markdown 또는 wysiwyg)
+	// - initialValue: 초기 내용(빈 문자열로 시작 후 setMarkdown으로 다시 세팅)
+	// - previewStyle: 미리보기 레이아웃(tab/vertical)
+	// - toolbarItems: 보여줄 툴바 버튼 구성
+	const editor = new toastui.Editor({
+		el : document.querySelector('#content'), // 에디터 컨테이너
+		height : '500px', // 높이
+		initialEditType : 'markdown', // 초기 모드
+		initialValue : '', // 초기 값(아래 setMarkdown으로 대체)
+		previewStyle : 'vertical', // 프리뷰 스타일
+		addImageBlobHook : null, // 이미지 업로드 훅(현재 비활성화)
+		toolbarItems : [ [ 'heading', 'bold', 'italic', 'strike' ],
+				[ 'hr', 'quote' ], [ 'ul', 'ol', 'task', 'indent', 'outdent' ],
+				[ 'table', 'link' ], [ 'code', 'codeblock' ] ]
+	});
 
-    // 서버에서 받은 기존 내용(마크다운)을 에디터에 세팅
-    editor.setMarkdown(content);
+	// 서버에서 받은 기존 내용(마크다운)을 에디터에 세팅
+	editor.setMarkdown(content);
 
-    // 폼 제출 직전, 에디터의 마크다운 문자열을 숨김 필드(#ecp)에 주입하여 서버로 전송
-    document.querySelector('form').addEventListener('submit', function(event) {
-        // 에디터의 현재 내용(Markdown) 추출
-        const content = editor.getMarkdown();
-        // 숨겨진 input(name="contents")에 설정(컨트롤러에서 BoardForm.contents로 수신)
-        // URL 인코딩하지 않고 그대로 전송(컨트롤러에서 URLDecoder 사용 시 이중 인코딩 주의)
-        document.querySelector('#ecp').value = content;
-    });
+	// 폼 제출 직전, 에디터의 마크다운 문자열을 숨김 필드(#ecp)에 주입하여 서버로 전송
+	document.querySelector('form').addEventListener('submit', function(event) {
+		// 에디터의 현재 내용(Markdown) 추출
+		const content = editor.getMarkdown();
+		// 숨겨진 input(name="contents")에 설정(컨트롤러에서 BoardForm.contents로 수신)
+		// URL 인코딩하지 않고 그대로 전송(컨트롤러에서 URLDecoder 사용 시 이중 인코딩 주의)
+		document.querySelector('#ecp').value = content;
+	});
 </script>
 </html>

@@ -3,13 +3,13 @@
 
 <!-- 페이지별 본문 콘텐츠 조각 -->
 <div layout:fragment="content" class="container my-3">
-
+	<h5 class="my-3 border-bottom pb-2">게시판</h5>
 	<!-- 상단: 등록 버튼 + 검색창 행 -->
 	<div class="row my-3">
 		<div class="col-6">
 			<!-- 질문 등록 페이지로 이동 -->
 			<!--             <a th:href="@{/board/create}" class="btn btn-primary"  data-bs-theme="info">질문 등록하기</a> -->
-			<a th:href="@{/board/create}" class="btn btn-info">작성하기</a>
+			<a th:href="@{/board/create}" class="btn btn-info">작성</a>
 		</div>
 		<div class="col-6">
 			<!-- 검색 입력창 + 버튼(페이지 전환은 아래 script에서 submit 처리) -->
@@ -18,7 +18,7 @@
 				<input type="text" id="search_kw" class="form-control"
 					th:value="${kw}">
 				<!--                 <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button> -->
-				<button class="btn btn-info" type="button" id="btn_search">찾기</button>
+				<button class="btn btn-info" type="button" id="btn_search">검색</button>
 			</div>
 		</div>
 	</div>
@@ -108,7 +108,7 @@
 	</form>
 
 	<!-- 하단에도 등록 버튼 한 번 더 제공 -->
-	<a th:href="@{/board/create}" class="btn btn-info">작성하기</a>
+	<a th:href="@{/board/create}" class="btn btn-info">작성</a>
 </div>
 
 <!-- 페이지 전용 스크립트: 페이지 이동 및 검색어 제출 처리 -->
