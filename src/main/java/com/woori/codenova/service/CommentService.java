@@ -1,6 +1,7 @@
 package com.woori.codenova.service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -114,7 +115,10 @@ public class CommentService {
 	 *                 체크/예외 처리 가능
 	 */
 	public void vote(Comment comment, SiteUser siteUser) {
-		comment.getVoter().add(siteUser);
+		boolean removed = comment.getVoter().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			comment.getVoter().add(siteUser);
+		}
 		this.commentRepository.save(comment);
 	}
 }
