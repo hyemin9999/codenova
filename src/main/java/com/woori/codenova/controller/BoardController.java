@@ -39,16 +39,15 @@ public class BoardController {
 	// 목록 페이지
 	// ===============================================================
 	@GetMapping("/list")
-	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page, // 0부터 시작하는 페이지 인덱스
-			@RequestParam(value = "kw", defaultValue = "") String kw) { // 검색 키워드(빈 문자열이면 전체)
-		// 지정한 페이지/키워드로 페이징 조회
-		Page<Board> paging = this.boardService.getList(page, kw);
+	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "kw", defaultValue = "") String kw,
+			@RequestParam(value = "field", defaultValue = "all") String field) {
 
-		// 뷰 템플릿에서 사용할 모델 속성 등록
+		Page<Board> paging = this.boardService.getList(page, kw, field);
+
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
-
-		// templates/board_list.html 렌더링
+		model.addAttribute("field", field); // ✅ 화면에서 선택값 유지
 		return "board_list";
 	}
 
