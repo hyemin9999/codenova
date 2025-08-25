@@ -61,15 +61,16 @@
     </div>
 
     <!-- 댓글 수 -->
-    <h5 class="border-bottom my-3 py-2 text-body"
-        th:text="|${#lists.size(board.commentList)}개의 답변이 있습니다.|"></h5>
+<h5 class="border-bottom my-3 py-2 text-body"
+    th:text="|${cpaging.totalElements}개의 답변이 있습니다.|"></h5>
+
 
     <!-- 댓글 리스트 (화이트) -->
-    <div class="card border-0 shadow-sm mb-3" th:each="comment : ${board.commentList}">
-        <a th:id="|comment_${comment.id}|"></a>
-        <div class="card-body bg-white">
-            <div class="card-text text-body"
-                 th:utext="${@commonUtil.markdown(comment.contents)}"></div>
+<div class="card border-0 shadow-sm mb-3" th:each="comment : ${cpaging.content}">
+    <a th:id="|comment_${comment.id}|"></a>
+    <div class="card-body bg-white">
+        <div class="card-text text-body"
+             th:utext="${@commonUtil.markdown(comment.contents)}"></div>
 
             <div class="d-flex justify-content-end mt-3">
                 <div th:if="${comment.modifyDate != null}"
@@ -133,7 +134,34 @@
 
         <input type="submit" value="답변등록" class="btn btn-dark my-2">
         <a th:href="@{/board/list}" class="btn btn-dark my-2">목록으로</a>
+        <div th:if="${!cpaging.isEmpty()}">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" th:classappend="${!cpaging.hasPrevious} ? 'disabled'">
+      <a class="page-link cpage-link" href="javascript:void(0)" th:data-page="${cpaging.number-1}">
+        <span>이전</span>
+      </a>
+    </li>
+
+    <li th:each="page: ${#numbers.sequence(0, cpaging.totalPages-1)}"
+        th:if="${page >= (cpaging.number - (cpaging.number % 10)) 
+            and page <= (cpaging.number - (cpaging.number % 10) + 9)}"
+        th:classappend="${page == cpaging.number} ? 'active'"
+        class="page-item">
+      <a th:text="${page+1}" class="page-link cpage-link"
+         href="javascript:void(0)" th:data-page="${page}"></a>
+    </li>
+
+    <li class="page-item" th:classappend="${!cpaging.hasNext} ? 'disabled'">
+      <a class="page-link cpage-link" href="javascript:void(0)" th:data-page="${cpaging.number+1}">
+        <span>다음</span>
+      </a>
+    </li>
+  </ul>
+</div>
     </form>
+    <form th:action="@{|/board/detail/${board.id}|}" method="get" id="cmtPageForm">
+  <input type="hidden" id="cpage" name="cpage" th:value="${cpaging.number}">
+</form>
 		
 
 </div>
@@ -159,6 +187,14 @@ Array.from(favorite_elements).forEach(function (element) {
   element.addEventListener("click", function (e) {
     e.preventDefault();                 // a/href 클릭 기본 이동 막기(선택)
     location.href = this.dataset.uri;   // 바로 토글 요청 보내기
+  });
+});
+
+const cpageLinks = document.getElementsByClassName("cpage-link");
+Array.from(cpageLinks).forEach(function (el) {
+  el.addEventListener('click', function () {
+    document.getElementById('cpage').value = this.dataset.page;
+    document.getElementById('cmtPageForm').submit();
   });
 });
 </script>

@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.BoardForm;
 import com.woori.codenova.form.CommentForm;
 import com.woori.codenova.service.BoardService;
+import com.woori.codenova.service.CommentService;
 import com.woori.codenova.service.UserService;
 
 import jakarta.validation.Valid;
@@ -34,6 +36,7 @@ public class BoardController {
 
 	private final BoardService boardService; // 게시글 도메인 서비스
 	private final UserService userService; // 사용자 조회/인증 관련 서비스
+	private final CommentService commentService;
 
 	// ===============================================================
 	// 목록 페이지
@@ -56,10 +59,14 @@ public class BoardController {
 	// ===============================================================
 	// BoardController.detail(...)
 	@GetMapping("/detail/{id}")
-	public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm) {
-		// 기존: Board board = this.boardService.getBoard(id);
-		Board board = this.boardService.viewBoard(id); // ✅ 조회수 +1
+	public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm,
+			@RequestParam(value = "cpage", defaultValue = "0") int cpage) { // ⬅️ 여기!
+
+		Board board = this.boardService.viewBoard(id); // 조회수 +1
+		Page<Comment> cpaging = this.commentService.getPageByBoard(board, cpage);
+
 		model.addAttribute("board", board);
+		model.addAttribute("cpaging", cpaging);
 		return "board_detail";
 	}
 
