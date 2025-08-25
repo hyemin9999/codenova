@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.Board;
 import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
@@ -139,4 +140,21 @@ public class BoardService {
 		}
 		this.boardRepository.save(board);
 	}
+
+	public void favorite(Board board, SiteUser siteUser) {
+		// 이미 내가 추천했으면 제거, 아니면 추가 (ID 기준 비교: equals/hashCode 미구현 대비)
+		boolean removed = board.getFavorite().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			board.getFavorite().add(siteUser);
+		}
+		this.boardRepository.save(board);
+	}
+
+	@Transactional
+	public Board viewBoard(Integer id) {
+		Board b = boardRepository.findById(id).orElseThrow(() -> new DataNotFoundException("board not found"));
+		b.setViewCount(b.getViewCount() + 1); // +1
+		return b; // 트랜잭션 커밋 시 UPDATE 발생
+	}
+
 }

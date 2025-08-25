@@ -121,4 +121,13 @@ public class CommentService {
 		}
 		this.commentRepository.save(comment);
 	}
+
+	public void favorite(Comment comment, SiteUser siteUser) {
+		// 이미 내가 추천했으면 제거, 아니면 추가 (ID 기준 비교: equals/hashCode 미구현 대비)
+		boolean removed = comment.getFavorite().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			comment.getFavorite().add(siteUser);
+		}
+		this.commentRepository.save(comment);
+	}
 }

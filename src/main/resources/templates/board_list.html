@@ -35,9 +35,11 @@
     <thead class="table-light">
       <tr class="text-center">
         <th>번호</th>
-        <th style="width:50%">제목</th>
+        <th>제목</th>
         <th>글쓴이</th>
         <th>작성일시</th>
+        <th>조회수</th>
+        <th>추천</th>
       </tr>
     </thead>
     <tbody class="table-group-divider">
@@ -58,6 +60,15 @@
         </td>
 
         <td class="text-body-secondary" th:text="${#temporals.format(board.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+		
+		<td>
+  			<span class="text-body-secondary" th:text="${board.viewCount}">0</span>
+		</td>
+		
+		<td>
+  			<span class="text-body-secondary" th:text="${#lists.size(board.voter)}">0</span>
+		</td>
+
       </tr>
     </tbody>
   </table>
@@ -112,10 +123,25 @@
   const fieldSelect = document.getElementById("search_field_select");
 
   btn_search.addEventListener('click', function () {
-    document.getElementById('kw').value = document.getElementById('search_kw').value;
-    document.getElementById('field').value = fieldSelect.value;   
-    document.getElementById('page').value = 0;                    
-    document.getElementById('searchForm').submit();
-  });
+	    // ✅ 최소 변경: 값 가져와서 trim, 비었으면 alert 후 return
+	    const inputEl = document.getElementById('search_kw');
+	    const trimmed = (inputEl.value || '').trim();
+	    if (!trimmed) {
+	      alert('검색어를 입력해주세요.');
+	      inputEl.focus();
+	      return;
+	    }
+
+	    document.getElementById('kw').value = trimmed; // trim된 값 전달
+	    document.getElementById('field').value = fieldSelect.value;
+	    document.getElementById('page').value = 0;
+	    document.getElementById('searchForm').submit();
+	  });
+  
+  window.addEventListener('pageshow', function (e) {
+	    if (e.persisted) {
+	      window.location.reload();
+	    }
+	  });
 </script>
 </html>

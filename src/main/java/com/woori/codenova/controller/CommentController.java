@@ -181,4 +181,13 @@ public class CommentController {
 		// 상세 페이지로 리다이렉트 + 해당 댓글 위치로 이동
 		return String.format("redirect:/board/detail/%s#comment_%s", comment.getBoard().getId(), comment.getId());
 	}
+
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/favorite/{id}")
+	public String commentFavorite(Principal principal, @PathVariable("id") Integer id) {
+		Comment comment = this.commentService.getComment(id);
+		SiteUser siteUser = this.userService.getUser(principal.getName());
+		this.commentService.favorite(comment, siteUser);
+		return String.format("redirect:/board/detail/%s", comment.getBoard().getId());
+	}
 }
