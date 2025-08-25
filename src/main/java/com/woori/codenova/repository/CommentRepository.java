@@ -1,7 +1,10 @@
 package com.woori.codenova.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.woori.codenova.entity.Board;
 import com.woori.codenova.entity.Comment;
 
 /**
@@ -33,4 +36,5 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 	// 예시:
 	// void deleteByBoard(Board board);
 	// → 게시글 단위로 댓글 일괄 삭제(연쇄 삭제를 코드로 처리하고 싶을 때)
+	Page<Comment> findByBoard(Board board, Pageable pageable);
 }
