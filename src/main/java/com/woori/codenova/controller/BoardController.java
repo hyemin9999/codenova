@@ -54,15 +54,12 @@ public class BoardController {
 	// ===============================================================
 	// 상세 페이지
 	// ===============================================================
+	// BoardController.detail(...)
 	@GetMapping("/detail/{id}")
 	public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm) {
-		// PathVariable 로 넘어온 id로 게시글 단건 조회
-		Board board = this.boardService.getBoard(id);
-
-		// 뷰에 전달
+		// 기존: Board board = this.boardService.getBoard(id);
+		Board board = this.boardService.viewBoard(id); // ✅ 조회수 +1
 		model.addAttribute("board", board);
-
-		// templates/board_detail.html 렌더링
 		return "board_detail";
 	}
 
@@ -199,4 +196,20 @@ public class BoardController {
 		return String.format("redirect:/board/detail/%s", id);
 	}
 
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/favorite/{id}")
+	public String boardFavorite(Principal principal, @PathVariable("id") Integer id) {
+		// 대상 조회
+		Board board = this.boardService.getBoard(id);
+
+		// 추천 사용자 조회
+		SiteUser siteUser = this.userService.getUser(principal.getName());
+
+		// 추천 처리
+		this.boardService.favorite(board, siteUser);
+
+		// 다시 상세로(앵커 등은 템플릿에서 처리)
+		return String.format("redirect:/board/detail/%s", id);
+
+	}
 }

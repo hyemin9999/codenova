@@ -37,7 +37,12 @@
                     <span class="badge text-bg-light ms-1"
                           th:text="${#lists.size(board.voter)}"></span>
                 </a>
-
+				<a href="javascript:void(0);" class="favorite btn btn-sm btn-outline-secondary"
+                	th:data-uri="@{|/board/favorite/${board.id}|}">
+                	★
+                	<span class="badge text-bg-light ms-1"
+                	th:text="${#lists.size(board.favorite)}"></span>
+            	</a>
                 <a th:href="@{|/board/modify/${board.id}|}"
                    class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
@@ -87,7 +92,11 @@
                     <span class="badge text-bg-light ms-1"
                           th:text="${#lists.size(comment.voter)}"></span>
                 </a>
-
+				<a href="javascript:void(0);" class="favorite btn btn-sm btn-outline-secondary"
+                	th:data-uri="@{|/comment/favorite/${comment.id}|}">
+                	★
+                	<span class="badge text-bg-light ms-1" th:text="${#lists.size(comment.favorite)}"></span>
+            	</a>
                 <a th:href="@{|/comment/modify/${comment.id}|}"
                    class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
@@ -123,7 +132,9 @@
                   rows="10"></textarea>
 
         <input type="submit" value="답변등록" class="btn btn-dark my-2">
+        <a th:href="@{/board/list}" class="btn btn-dark my-2">목록으로</a>
     </form>
+		
 
 </div>
 
@@ -143,5 +154,12 @@ Array.from(recommend_elements).forEach(function (element) {
   });
 });
 
+const favorite_elements = document.getElementsByClassName("favorite");
+Array.from(favorite_elements).forEach(function (element) {
+  element.addEventListener("click", function (e) {
+    e.preventDefault();                 // a/href 클릭 기본 이동 막기(선택)
+    location.href = this.dataset.uri;   // 바로 토글 요청 보내기
+  });
+});
 </script>
 </html>
