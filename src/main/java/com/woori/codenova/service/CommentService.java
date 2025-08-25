@@ -1,8 +1,13 @@
 package com.woori.codenova.service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.woori.codenova.DataNotFoundException;
@@ -114,7 +119,25 @@ public class CommentService {
 	 *                 체크/예외 처리 가능
 	 */
 	public void vote(Comment comment, SiteUser siteUser) {
-		comment.getVoter().add(siteUser);
+		boolean removed = comment.getVoter().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			comment.getVoter().add(siteUser);
+		}
 		this.commentRepository.save(comment);
 	}
+
+	public void favorite(Comment comment, SiteUser siteUser) {
+		// 이미 내가 추천했으면 제거, 아니면 추가 (ID 기준 비교: equals/hashCode 미구현 대비)
+		boolean removed = comment.getFavorite().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			comment.getFavorite().add(siteUser);
+		}
+		this.commentRepository.save(comment);
+	}
+
+	public Page<Comment> getPageByBoard(Board board, int page) {
+		Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+		return commentRepository.findByBoard(board, pageable);
+	}
+
 }
