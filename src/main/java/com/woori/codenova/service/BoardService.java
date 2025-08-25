@@ -3,6 +3,7 @@ package com.woori.codenova.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.Board;
 import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
@@ -38,27 +40,35 @@ public class BoardService {
 	 * 내용/댓글 작성자(username) 중 하나라도 키워드(kw)를 포함하면 매칭되도록 OR 조건을 구성. - LEFT JOIN 으로
 	 * 작성자/댓글/댓글작성자 연관을 묶고, 중복 제거를 위해 distinct(true) 지정.
 	 */
-	private Specification<Board> search(String kw) {
-		return new Specification<>() {
-			private static final long serialVersionUID = 1L;
-
+	private Specification<Board> search(String kw, String field) {
+		return new Specification<Board>() {
 			@Override
 			public Predicate toPredicate(Root<Board> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				query.distinct(true); // 조인으로 인한 결과 중복 제거 (SELECT DISTINCT)
-				// board.author (질문 작성자)와의 LEFT JOIN
+				query.distinct(true);
+
 				Join<Board, SiteUser> u1 = q.join("author", JoinType.LEFT);
-				// board.commentList (댓글 리스트)와의 LEFT JOIN
 				Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
-				// comment.author (댓글 작성자)와의 LEFT JOIN
 				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
 
-				// OR 조건: 제목/내용/질문작성자/댓글내용/댓글작성자 중 하나라도 like 매칭
-				return cb.or(cb.like(q.get("subject"), "%" + kw + "%"), // 제목
-						cb.like(q.get("contents"), "%" + kw + "%"), // 내용
-						cb.like(u1.get("username"), "%" + kw + "%"), // 질문 작성자
-						cb.like(a.get("contents"), "%" + kw + "%"), // 답변(댓글) 내용
-						cb.like(u2.get("username"), "%" + kw + "%") // 답변(댓글) 작성자
-				);
+				Predicate byTitle = cb.like(q.get("subject"), "%" + kw + "%"); // 제목
+				Predicate byContent = cb.like(q.get("contents"), "%" + kw + "%"); // 내용
+				Predicate byAuthor = cb.like(u1.get("username"), "%" + kw + "%"); // 글쓴이(작성자)
+				Predicate byCmt = cb.like(a.get("contents"), "%" + kw + "%"); // 댓글 내용
+				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
+
+				// ✅ 선택한 검색대상에 맞춰 조건 분기
+				switch (field) {
+				case "title":
+					return byTitle;
+				case "content":
+					return byContent;
+				case "author":
+					return byAuthor;
+				case "all":
+				default:
+					// 제목+내용(+작성자/댓글/댓글작성자) — 기존처럼 확장 검색
+					return cb.or(byTitle, byContent);
+				}
 			}
 		};
 	}
@@ -89,18 +99,12 @@ public class BoardService {
 	}
 
 	// ✅ 페이징 처리된 게시글 목록 조회 (page: 0부터 시작)
-	public Page<Board> getList(int page, String kw) {
-		// 정렬: 생성일시 내림차순
+	public Page<Board> getList(int page, String kw, String field) {
 		List<Sort.Order> sorts = new ArrayList<>();
 		sorts.add(Sort.Order.desc("createDate"));
-
-		// 페이지 요청 객체: 페이지 번호, 페이지 크기, 정렬
 		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
 
-		// 검색 스펙 생성(키워드 기반 동적 조건)
-		Specification<Board> spec = search(kw);
-
-		// 스펙 + 페이징으로 조회
+		Specification<Board> spec = search(kw, field);
 		return this.boardRepository.findAll(spec, pageable);
 	}
 
@@ -129,7 +133,28 @@ public class BoardService {
 
 	// ✅ 게시글 추천(좋아요) 처리
 	public void vote(Board board, SiteUser siteUser) {
-		board.getVoter().add(siteUser); // Set<SiteUser> 이므로 동일 사용자 중복 추가 방지
-		this.boardRepository.save(board); // 변경 감지로 조인 테이블에 INSERT 반영
+		// 이미 내가 추천했으면 제거, 아니면 추가 (ID 기준 비교: equals/hashCode 미구현 대비)
+		boolean removed = board.getVoter().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			board.getVoter().add(siteUser);
+		}
+		this.boardRepository.save(board);
 	}
+
+	public void favorite(Board board, SiteUser siteUser) {
+		// 이미 내가 추천했으면 제거, 아니면 추가 (ID 기준 비교: equals/hashCode 미구현 대비)
+		boolean removed = board.getFavorite().removeIf(u -> Objects.equals(u.getId(), siteUser.getId()));
+		if (!removed) {
+			board.getFavorite().add(siteUser);
+		}
+		this.boardRepository.save(board);
+	}
+
+	@Transactional
+	public Board viewBoard(Integer id) {
+		Board b = boardRepository.findById(id).orElseThrow(() -> new DataNotFoundException("board not found"));
+		b.setViewCount(b.getViewCount() + 1); // +1
+		return b; // 트랜잭션 커밋 시 UPDATE 발생
+	}
+
 }
