@@ -10,6 +10,10 @@ input[type=submit] {
 	min-height: 300px;
 }
 
+.placeholder {
+	background-color: inherit;
+}
+
 .align-b {
 	align-items: flex-end;
 }

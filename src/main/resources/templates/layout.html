@@ -22,6 +22,8 @@
 <link rel="stylesheet"
 	href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <!-- 브라우저 탭 제목 -->
 <title>CodeNova</title>
 </head>
@@ -46,7 +48,8 @@
 	<!-- Toast UI Editor 스크립트 (CDN) -->
 	<script
 		src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
+	<script th:src="@{/script.js}"></script>
+	
 	<!-- 페이지별 개별 스크립트 삽입 위치
          - 각 페이지 템플릿에서 <script layout:fragment="script"> ... </script> 로 제공한 코드가
            아래 블록에 주입됩니다. -->
