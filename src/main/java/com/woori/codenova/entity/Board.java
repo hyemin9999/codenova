@@ -37,10 +37,8 @@ public class Board {
 	// TEXT 타입: 긴 본문(마크다운 등)을 저장하기 위함, NOT NULL
 	private String contents; // 게시글 내용
 
-//	@Column(nullable = false)
-//	@ColumnDefault("0")
-	// ↑ 주석 처리됨: DB 레벨 기본값(0)을 주고 싶을 때 사용 가능
-	private int viewCount; // 조회수(현재는 애플리케이션 로직으로 증가시키는 전제)
+	@Column(columnDefinition = "integer default 0", nullable = false)
+	private int viewCount;
 
 	@Column(nullable = false) // NOT NULL
 	private LocalDateTime createDate; // 생성(작성) 일시
@@ -70,5 +68,12 @@ public class Board {
 			inverseJoinColumns = @JoinColumn(name = "user_id") // 반대편 엔티티(SiteUser)를 참조하는 FK
 	)
 	Set<SiteUser> voter; // 이 게시글을 추천한 사용자 집합(Set: 중복 추천 방지에 유리)
+
+	@ManyToMany // 다대다: 게시글-사용자 간 '추천' 관계
+	@JoinTable(name = "Board_Favorite", // 조인(중간) 테이블 이름
+			joinColumns = @JoinColumn(name = "board_id"), // 현재 엔티티(Board)를 참조하는 FK
+			inverseJoinColumns = @JoinColumn(name = "user_id") // 반대편 엔티티(SiteUser)를 참조하는 FK
+	)
+	Set<SiteUser> favorite; // 이 게시글을 추천한 사용자 집합(Set: 중복 추천 방지에 유리)
 
 }

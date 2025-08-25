@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.BoardForm;
 import com.woori.codenova.form.CommentForm;
 import com.woori.codenova.service.BoardService;
+import com.woori.codenova.service.CommentService;
 import com.woori.codenova.service.UserService;
 
 import jakarta.validation.Valid;
@@ -34,36 +36,37 @@ public class BoardController {
 
 	private final BoardService boardService; // 게시글 도메인 서비스
 	private final UserService userService; // 사용자 조회/인증 관련 서비스
+	private final CommentService commentService;
 
 	// ===============================================================
 	// 목록 페이지
 	// ===============================================================
 	@GetMapping("/list")
-	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page, // 0부터 시작하는 페이지 인덱스
-			@RequestParam(value = "kw", defaultValue = "") String kw) { // 검색 키워드(빈 문자열이면 전체)
-		// 지정한 페이지/키워드로 페이징 조회
-		Page<Board> paging = this.boardService.getList(page, kw);
+	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "kw", defaultValue = "") String kw,
+			@RequestParam(value = "field", defaultValue = "all") String field) {
 
-		// 뷰 템플릿에서 사용할 모델 속성 등록
+		Page<Board> paging = this.boardService.getList(page, kw, field);
+
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
-
-		// templates/board_list.html 렌더링
+		model.addAttribute("field", field); // ✅ 화면에서 선택값 유지
 		return "board_list";
 	}
 
 	// ===============================================================
 	// 상세 페이지
 	// ===============================================================
+	// BoardController.detail(...)
 	@GetMapping("/detail/{id}")
-	public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm) {
-		// PathVariable 로 넘어온 id로 게시글 단건 조회
-		Board board = this.boardService.getBoard(id);
+	public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm,
+			@RequestParam(value = "cpage", defaultValue = "0") int cpage) { // ⬅️ 여기!
 
-		// 뷰에 전달
+		Board board = this.boardService.viewBoard(id); // 조회수 +1
+		Page<Comment> cpaging = this.commentService.getPageByBoard(board, cpage);
+
 		model.addAttribute("board", board);
-
-		// templates/board_detail.html 렌더링
+		model.addAttribute("cpaging", cpaging);
 		return "board_detail";
 	}
 
@@ -200,4 +203,20 @@ public class BoardController {
 		return String.format("redirect:/board/detail/%s", id);
 	}
 
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/favorite/{id}")
+	public String boardFavorite(Principal principal, @PathVariable("id") Integer id) {
+		// 대상 조회
+		Board board = this.boardService.getBoard(id);
+
+		// 추천 사용자 조회
+		SiteUser siteUser = this.userService.getUser(principal.getName());
+
+		// 추천 처리
+		this.boardService.favorite(board, siteUser);
+
+		// 다시 상세로(앵커 등은 템플릿에서 처리)
+		return String.format("redirect:/board/detail/%s", id);
+
+	}
 }
