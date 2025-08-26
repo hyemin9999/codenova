@@ -49,6 +49,9 @@
 				<td><span th:text="${board.viewCount}">0</span></td>
 				<td><span th:text="${#lists.size(board.voter)}">0</span></td>
 			</tr>
+			<tr class="text-center" th:if="${paging.isEmpty()}">
+				<td colspan="5">게시글이 존재하지 않습니다.</td>
+			</tr>
 		</tbody>
 	</table>
 
