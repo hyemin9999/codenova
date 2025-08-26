@@ -3,4 +3,5 @@
     role="alert" th:if="${#fields.hasAnyErrors()}">
     <!-- 모든 필드의 에러 메시지를 반복 출력 -->
     <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
+    
 </div>

@@ -62,4 +62,9 @@ public class SiteUser {
 	public void updatePassword(String newEncodedPassword) {
 		this.password = newEncodedPassword;
 	}
+
+	// 접속자는 어디인가 기본값 null. 나중에 local로 넣어줄예정
+	private String provider;
+	// 고유식별코드
+	private String providerId;
 }

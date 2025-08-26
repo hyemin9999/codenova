@@ -6,8 +6,8 @@ spring:
   # 구글 SMTP에 접속하기 위해 내 계정을 사용함
     host : smtp.gmail.com
     port : 587
-    username :
-    password :
+    username : 
+    password : 
     properties :
       mail:
         smtp :
@@ -18,15 +18,20 @@ spring:
 #radis 테스트중     
   data:
     redis:
-      host:
-      port:
-      password:
+      host: 
+      port: 123
+      password: 
   
 #properties
 # 사용자가 받을 메일속 주소 (비밀번호 변경링크 예정)
 # 현재 applicationl.properties에 url이 선언되어 있어서 그쪽을 수정해야 작동함
   props:
-    reset-password-url: localhost:8080/user/reset-password
+    reset-password-url: 
+    find-id-url: 
     
-    
-    
+kakao :
+  client_id : 
+  redirect_uri : 
+  
+social :
+  secret-key : 
