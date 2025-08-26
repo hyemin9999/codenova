@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,9 +50,7 @@ public class SiteUser {
 
 	// 권한
 	@ManyToMany
+	@JoinTable(name = "userAuthority", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "roleId"))
 	Set<Role> authority;
 
-//	String = varchar
-// Integer = int
-// Long = bigint
 }
