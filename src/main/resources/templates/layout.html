@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="ko"  data-bs-theme="light">
+<html lang="ko" style="height: 100% !important;" data-bs-theme="light"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
 <!-- 필수 메타 태그 -->
-<!-- 문서 인코딩 -->
-<meta charset="utf-8">
+<!--  -->
 
-<!-- 반응형 레이아웃을 위한 뷰포트 설정 -->
-<meta name="viewport"
+<!-- 반응형 레이아웃을 위한 뷰포트 설정 / 문서 인코딩 -->
+<meta name="viewport" charset="utf-8"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 <!-- 정적 리소스: Bootstrap CSS
          - /src/main/resources/static/bootstrap.min.css 를 제공한다고 가정
          - th:href="@{/bootstrap.min.css}" : 컨텍스트 경로를 고려한 URL 생성 -->
 <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
-
 <!-- 사용자 정의 스타일 -->
 <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
 
@@ -28,7 +28,7 @@
 <title>CodeNova</title>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 	<!-- 메뉴 -->
 	<!-- 상단 네비게이션
          - navbar.html(또는 동명의 템플릿) 안의 'navbarFragment' 조각을 삽입합니다. -->
@@ -49,10 +49,12 @@
 	<script
 		src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 	<script th:src="@{/script.js}"></script>
-	
+
 	<!-- 페이지별 개별 스크립트 삽입 위치
          - 각 페이지 템플릿에서 <script layout:fragment="script"> ... </script> 로 제공한 코드가
            아래 블록에 주입됩니다. -->
 	<th:block layout:fragment="script"></th:block>
+
+	<footer th:replace="~{footer :: footer}"></footer>
 </body>
 </html>

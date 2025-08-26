@@ -24,6 +24,7 @@ import com.woori.codenova.form.BoardForm;
 import com.woori.codenova.form.CommentForm;
 import com.woori.codenova.service.BoardService;
 import com.woori.codenova.service.CommentService;
+import com.woori.codenova.service.SearchTextService;
 import com.woori.codenova.service.UserService;
 
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class BoardController {
 	private final BoardService boardService; // 게시글 도메인 서비스
 	private final UserService userService; // 사용자 조회/인증 관련 서비스
 	private final CommentService commentService;
+	private final SearchTextService searchTextService;
 
 	// ===============================================================
 	// 목록 페이지
@@ -51,6 +53,11 @@ public class BoardController {
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
 		model.addAttribute("field", field); // ✅ 화면에서 선택값 유지
+
+		if (!kw.isBlank()) {
+			searchTextService.create(kw, null);
+		}
+
 		return "board_list";
 	}
 
