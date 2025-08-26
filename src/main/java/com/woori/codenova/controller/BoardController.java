@@ -3,6 +3,8 @@ package com.woori.codenova.controller;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -67,13 +69,31 @@ public class BoardController {
 	// BoardController.detail(...)
 	@GetMapping("/detail/{id}")
 	public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm,
-			@RequestParam(value = "cpage", defaultValue = "0") int cpage) { // ⬅️ 여기!
+			@RequestParam(value = "cpage", defaultValue = "0") int cpage, Principal principal) { // ✅ Principal 추가
 
 		Board board = this.boardService.viewBoard(id); // 조회수 +1
 		Page<Comment> cpaging = this.commentService.getPageByBoard(board, cpage);
 
+		// ✅ 현재 로그인 유저 (비로그인일 수 있으니 null 체크)
+		SiteUser me = (principal != null) ? this.userService.getUser(principal.getName()) : null;
+
+		// ✅ 게시글 즐겨찾기 여부
+		boolean favoritedBoard = (me != null) && board.getFavorite() != null && board.getFavorite().contains(me);
+
+		// ✅ 댓글별 즐겨찾기 여부 Map<댓글ID, Boolean>
+		Map<Integer, Boolean> commentFavMap = new HashMap<>();
+		if (me != null) {
+			for (Comment c : cpaging.getContent()) {
+				boolean fav = (c.getFavorite() != null) && c.getFavorite().contains(me);
+				commentFavMap.put(c.getId(), fav);
+			}
+		}
+
 		model.addAttribute("board", board);
 		model.addAttribute("cpaging", cpaging);
+		model.addAttribute("favoritedBoard", favoritedBoard); // ✅ 추가
+		model.addAttribute("commentFavMap", commentFavMap); // ✅ 추가
+
 		return "board_detail";
 	}
 
