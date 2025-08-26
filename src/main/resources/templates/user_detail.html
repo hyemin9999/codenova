@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<div layout:fragment="content" class="container my-3">
+	<form th:action="@{/user/info}" th:object="${userModifyForm}"
+		method="post">
+		<div class="mb-3">
+			<label class="form-label">사용자ID</label> <label class="form-control"
+				th:text="*{username}"> </label>
+		</div>
+		<div class="mb-3 pwd" id="pwd">
+			<label for="pwd" class="form-label">비밀번호</label> <a
+				href="javascript:onDisplay(true);"
+				class="btn btn-sm btn-outline-info">비밀번호 변경</a>
+		</div>
+		<input type="hidden" th:name="${_csrf.parameterName}"
+			th:value="${_csrf.token}" />
+		<div class="pwdchange">
+			<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+		</div>
+		<div class="mb-3 pwdchange">
+			<label for="password" class="form-label">현재 비밀번호</label><input
+				type="password" th:field="*{password}" class="form-control " />
+		</div>
+		<div class="mb-3 pwdchange">
+			<label for="password1" class="form-label">변경 비밀번호</label><input
+				type="password" th:field="*{password1}" class="form-control" />
+		</div>
+		<div class="mb-3 pwdchange">
+			<label for="password2" class="form-label">변경 비밀번호 확인</label><input
+				type="password" th:field="*{password2}" class="form-control" />
+		</div>
+		<div class="mb-3 pwdchange">
+			<button type="submit" class="btn btn-sm btn-info">변경</button>
+			<a href="javascript:onDisplay(false);"
+				class="btn btn-sm btn-outline-info">취소</a>
+		</div>
+		<div class="mb-3">
+			<label for="email" class="form-label">이메일</label><label
+				class="form-control" th:text="*{email}"></label>
+		</div>
+	</form>
+</div>
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+	function onDisplay(d) {
+		const pwd_element = document.getElementById("pwd");
+		if (pwd_element) {
+			if (!d) {
+				pwd_element.style.display = 'block';
+			} else {
+				pwd_element.style.display = 'none';
+			}
+		}
+
+		const pwdchange_elements = document.getElementsByClassName("pwdchange");
+		Array.from(pwdchange_elements).forEach(
+				function(element) {
+					if (d) {
+						element.style.display = 'block';
+					} else {
+						element.style.display = 'none';
+						const alert_elements = document
+								.getElementsByClassName("alert alert-danger");
+						Array.from(alert_elements).forEach(function(element) {
+							element.remove();
+						});
+					}
+				});
+	}
+	const mode = /*[[${mode}]]*/'';
+
+	console.log(mode);
+
+	if (mode == 'modify') {
+		onDisplay(true);
+	}
+</script>
+</html>

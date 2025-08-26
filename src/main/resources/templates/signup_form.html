@@ -1,32 +1,40 @@
-<html layout:decorate="~{layout}">
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <div layout:fragment="content" class="container my-3">
-	<div class="my-3 border-bottom">
-		<div>
-			<h4>회원가입</h4>
+
+	<h5 class="border-bottom pb-2">회원가입</h5>
+
+	<div class="row">
+		<div class="col">
+
+			<form th:action="@{/user/signup}" th:object="${userForm}"
+				method="post">
+				<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+				<div class="mb-3">
+					<label for="username" class="form-label">사용자ID</label> <input
+						type="text" th:field="*{username}" class="form-control">
+				</div>
+				<div class="mb-3">
+					<label for="password1" class="form-label">비밀번호</label> <input
+						type="password" th:field="*{password1}" class="form-control">
+				</div>
+				<div class="mb-3">
+					<label for="password2" class="form-label">비밀번호 확인</label> <input
+						type="password" th:field="*{password2}" class="form-control">
+				</div>
+				<div class="mb-3">
+					<label for="email" class="form-label">이메일</label> <input
+						type="email" th:field="*{email}" class="form-control">
+				</div>
+				<div class="align-r">
+					<button type="submit" class="btn btn-info">회원가입</button>
+				</div>
+
+			</form>
 		</div>
 	</div>
-	<form th:action="@{/user/signup}" th:object="${userForm}" method="post">
-		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-		<div class="mb-3">
-			<label for="username" class="form-label">사용자ID</label> <input
-				type="text" th:field="*{username}" class="form-control">
-		</div>
-		<div class="mb-3">
-			<label for="password1" class="form-label">비밀번호</label> <input
-				type="password" th:field="*{password1}" class="form-control">
-		</div>
-		<div class="mb-3">
-			<label for="password2" class="form-label">비밀번호 확인</label> <input
-				type="password" th:field="*{password2}" class="form-control">
-		</div>
-		<div class="mb-3">
-			<label for="email" class="form-label">이메일</label> <input type="email"
-				th:field="*{email}" class="form-control">
-		</div>
-		<div class="align-r">
-			<button type="submit" class="btn btn-info">회원가입</button>
-		</div>
 
-	</form>
+
 </div>
 </html>

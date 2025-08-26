@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.woori.codenova.entity.Category;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
 	// 페이징 + 검색
 	Page<Category> findAll(Specification<Category> specification, Pageable pageable);
 
