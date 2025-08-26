@@ -16,31 +16,34 @@
 				<!-- 				액션 버튼 (중립 위주) -->
 				<!-- 				<div class="my-3 d-flex gap-2"> -->
 				<div class="mt-3">
-					<a href="javascript:void(0);"
-						class="recommend btn btn-sm btn-outline-info"
-						th:data-uri="@{|/board/vote/${board.id}|}">추천 <span
-						class="badge rounded-pill bg-info"
-						th:text="${#lists.size(board.voter)}"></span>
-					</a> <a href="javascript:void(0);"
-						class="favorite btn btn-sm btn-outline-info"
-						th:data-uri="@{|/board/favorite/${board.id}|}"> <span
-						className='star_icon'> <svg
-								xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-								viewBox="1 0 16 16" transform="translate(-1 -1)">
-								<path id="star"
-									d="M9,2l2.163,4.279L16,6.969,12.5,10.3l.826,4.7L9,12.779,4.674,15,5.5,10.3,2,6.969l4.837-.69Z"></path>
-                </svg>
-					</span> <!-- <span --> <!-- class="badge rounded-pill bg-info" --> <!-- th:text="${#lists.size(board.favorite)}"> </span> -->
-					</a> <a th:href="@{|/board/modify/${board.id}|}"
-						class="btn btn-sm btn-outline-info"
-						sec:authorize="isAuthenticated()"
-						th:if="${board.author != null and #authentication.getPrincipal().getUsername() == board.author.username}">
-						수정 </a> <a href="javascript:void(0);"
-						th:data-uri="@{|/board/delete/${board.id}|}"
-						class="delete btn btn-sm btn-outline-info"
-						sec:authorize="isAuthenticated()"
-						th:if="${board.author != null and #authentication.getPrincipal().getUsername() == board.author.username}">
-						삭제 </a>
+				<a href="javascript:void(0);"
+					class="recommend btn btn-sm btn-outline-info"
+					th:data-uri="@{|/board/vote/${board.id}|}">추천 <span
+					class="badge rounded-pill bg-info"
+					th:text="${#lists.size(board.voter)}"></span>
+				</a> <!-- 내가 즐겨찾기한 경우 -->
+					<a th:if="${favoritedBoard}" href="javascript:void(0);"
+					   class="favorite btn btn-sm btn-outline-info"
+					   th:data-uri="@{|/board/favorite/${board.id}|}">
+					  <span class="star_icon">⭐</span>
+					</a>
+					
+					<!-- 내가 즐겨찾기하지 않은 경우 -->
+					<a th:unless="${favoritedBoard}" href="javascript:void(0);"
+					   class="favorite btn btn-sm btn-outline-info"
+					   th:data-uri="@{|/board/favorite/${board.id}|}">
+					  <span class="star_icon">☆</span>
+					</a>
+					 <a th:href="@{|/board/modify/${board.id}|}"
+					class="btn btn-sm btn-outline-info"
+					sec:authorize="isAuthenticated()"
+					th:if="${board.author != null and #authentication.getPrincipal().getUsername() == board.author.username}">
+					수정 </a> <a href="javascript:void(0);"
+					th:data-uri="@{|/board/delete/${board.id}|}"
+					class="delete btn btn-sm btn-outline-info"
+					sec:authorize="isAuthenticated()"
+					th:if="${board.author != null and #authentication.getPrincipal().getUsername() == board.author.username}">
+					삭제 </a>
 				</div>
 
 				<!-- 작성 정보 -->
@@ -76,17 +79,20 @@
 						th:data-uri="@{|/comment/vote/${comment.id}|}"> 추천 <span
 						class="badge rounded-pill bg-info ms-1"
 						th:text="${#lists.size(comment.voter)}"></span>
-					</a> <a href="javascript:void(0);"
-						class="favorite btn btn-sm btn-outline-info"
-						th:data-uri="@{|/comment/favorite/${comment.id}|}"> <span
-						className='star_icon'> <svg
-								xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-								viewBox="1 0 16 16" transform="translate(-1 -1)">
-								<path id="star"
-									d="M9,2l2.163,4.279L16,6.969,12.5,10.3l.826,4.7L9,12.779,4.674,15,5.5,10.3,2,6.969l4.837-.69Z"></path></svg>
-					</span> <!-- 						<span --> <!-- 						class="badge text-bg-light ms-1" -->
-						<!-- 						th:text="${#lists.size(comment.favorite)}"></span> -->
-					</a> <a th:href="@{|/comment/modify/${comment.id}|}"
+					</a> <!-- 내가 즐겨찾기한 댓글 -->
+						<a th:if="${commentFavMap[comment.id]}" href="javascript:void(0);"
+						   class="favorite btn btn-sm btn-outline-info"
+						   th:data-uri="@{|/comment/favorite/${comment.id}|}">
+						  <span class="star_icon">⭐</span>
+						</a>
+						
+						<!-- 즐겨찾기하지 않은 댓글 -->
+						<a th:unless="${commentFavMap[comment.id]}" href="javascript:void(0);"
+						   class="favorite btn btn-sm btn-outline-info"
+						   th:data-uri="@{|/comment/favorite/${comment.id}|}">
+						  <span class="star_icon">☆</span>
+						</a>
+						 <a th:href="@{|/comment/modify/${comment.id}|}"
 						class="btn btn-sm btn-outline-info"
 						sec:authorize="isAuthenticated()"
 						th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}">
