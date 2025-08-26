@@ -39,7 +39,7 @@ public class SiteUser {
 	// 가입일
 	// 업데이트를 해도 수정이 안되며 db에서 수정해야함
 	@Column(updatable = false)
-	private LocalDateTime careteDate;
+	private LocalDateTime createDate;
 
 	// 수정일
 	// 마이페이지 구현되어야 사용가능
