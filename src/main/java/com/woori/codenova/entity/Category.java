@@ -24,7 +24,7 @@ public class Category {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	// 게시판 분류 이름
 	@Column(length = 50, nullable = false)

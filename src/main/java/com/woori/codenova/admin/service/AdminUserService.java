@@ -49,12 +49,12 @@ public class AdminUserService {
 
 	}
 
-// 역할이 연결되어 있는 사용자 목록 반환
-	public List<SiteUser> getList(Integer roleId) {
-
-		Specification<SiteUser> spec = search(roleId);
-		return userReporitory.findAll(spec);
-	}
+//// 역할이 연결되어 있는 사용자 목록 반환
+//	public List<SiteUser> getList(Integer roleId) {
+//
+//		Specification<SiteUser> spec = search(roleId);
+//		return userReporitory.findAll(spec);
+//	}
 
 	// 조회 - 상세
 	public SiteUser getItem(Long id) {
