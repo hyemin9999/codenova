@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta name="_csrf1" th:content="${_csrf.token}" />
+<meta name="_csrf_header1" th:content="${_csrf.headerName}" />
+<title>아이디 찾기</title>
+</head>
+<div layout:fragment="content" class="container my-3">
+
+	<p class="fw-bold">아이디 찾기 페이지</p>
+	<br>
+	<p class="fw-bold">이메일을 입력해주세요</p>
+
+
+	<!-- action으로 post 경로로 정보를 보내고 -->
+	<!-- object userFindIdForm의 양식을 따라서 정보를 이동시밈 -->
+	<!-- BindingResult는 해당 클래스내 모든 파일을 검사함으로 따로 만들어서 email 하나만 만들어야함 -->
+	<form id="findIdEmail">
+		<div class="mb-3">
+			<label for="email">이메일 입력</label> <input type="email" id="email"
+				name="email">
+		</div>
+		<button type="submit">아이디 찾기</button>
+	</form>
+
+	<p id="message"></p>
+
+
+</div>
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+    document.getElementById('findIdEmail').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+
+        // HTML에서 CSRF 토큰과 헤더 이름 가져오기
+        const csrfToken = document.querySelector('meta[name="_csrf1"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header1"]').getAttribute('content');
+
+
+        fetch('/api/findIdEmail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                   [csrfHeader]: csrfToken 
+                    //헤더와 토큰을 추가
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 오류 응답 처리
+                throw new Error('오류 발생.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('message').innerText = '아이디 찾기 이메일이 발송되었습니다.';
+            console.log('UUID:', data.uuid);
+        })
+        .catch(error => {
+            document.getElementById('message').innerText = error.message;
+        });
+    });
+  
+    </script>
+</html>

@@ -1,0 +1,119 @@
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<style>
+button {
+	width: 124px;
+	height: 42px;
+	color: #616161;
+	padding: 0;
+	box-sizing: border-box;
+	border: 1px solid #eee;
+	border-radius: 10px;
+	text-align: center;
+	cursor: pointer;
+}
+
+input, select {
+	vertical-align: middle;
+	border: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+input {
+	box-sizing: border-box;
+	width: 50%;
+	padding: 0 0 12px 0;
+	font-size: 1.5rem;
+	border-bottom: 2px solid #eeeeee;
+}
+
+/*placeholder 공통*/
+input::placeholder {
+	font-size: 1.5rem;
+	font-weight: 00;
+	color: #9e9e9e;
+}
+
+/*input focus 되면 border 색 변경*/
+input:focus {
+	outline: none;
+	border-bottom: 2px solid #5d5fef;
+}
+
+.certification {
+	margin-bottom: 10px;
+}
+
+.certificationTime {
+	font-size: 0.875rem;
+	font-weight: 700;
+	color: #616161;
+	line-height: 28px;
+}
+</style>
+
+</head>
+<div layout:fragment="content" class="container my-3">
+
+	<div class="my-3 border-bottom">
+		<div>
+			<h4>회원가입</h4>
+		</div>
+	</div>
+
+
+	<form th:action="@{/kakao/signup}" th:object="${userForm}"
+		method="post">
+		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+
+		<div class="mb-3">
+			<label for="username" class="form-label">사용자ID</label> <input
+				type="text" th:field="*{username}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password1" class="form-label">비밀번호</label> <input
+				type="password" th:field="*{password1}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password2" class="form-label">비밀번호 확인</label> <input
+				type="password" th:field="*{password2}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="email" class="form-label">이메일 (카카오 제공)</label> <input
+				type="email" id="email" class="form-control" name="email"
+				th:value="${#fields.hasErrors('email') ? userForm.getEmail() : email}"
+				readonly>
+			<!-- 				<input type="hidden" name="email" th:value="${email}"> -->
+		</div>
+		<button type="submit" class="btn btn-primary" id="clear1">회원가입</button>
+	</form>
+
+</div>
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+		  document.addEventListener('DOMContentLoaded', (event) => {
+	            const emailInput = document.getElementById('email');
+	            const initialEmailValue = emailInput.value;
+	            const storedEmail = sessionStorage.getItem('userEmail');
+
+	            // 1. 처음 페이지 로드 시, 서버에서 가져온 이메일 값이 있으면 sessionStorage에 저장
+	            if (initialEmailValue && !storedEmail) {
+	                sessionStorage.setItem('userEmail', initialEmailValue);
+	                console.log('서버에서 받은 이메일이 sessionStorage에 저장되었습니다.');
+	            }
+
+	            // 2. 새로고침 시, sessionStorage에 저장된 값이 있으면 입력 필드에 주입
+	            if (storedEmail) {
+	                emailInput.value = storedEmail;
+	                console.log('새로고침: sessionStorage에서 이메일이 로드되었습니다.');
+	            }
+	        });
+		
+		
+		</script>
+</html>

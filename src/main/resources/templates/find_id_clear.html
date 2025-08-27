@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<div layout:fragment="content" class="container my-3">
+
+	아이디 찾기 확인 페이지입니다.
+	<div>
+		<br> <span>귀하의 아이디는 : </span> <span th:text=${username}></span>
+	</div>
+</div>
+</html>
