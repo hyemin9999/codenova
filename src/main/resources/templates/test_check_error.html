@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div layout:fragment="content" class="container my-3">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+</head>
+
+<body>
+
+<div th:if="${errorMessage}" class="alert alert-danger">
+    <div th:text="${errorMessage}"></div>
+</div>
+
+
+
+에러 확인용 페이지
+
+
+</body>
+
+</div>
+</html>
