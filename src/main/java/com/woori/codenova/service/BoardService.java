@@ -57,26 +57,37 @@ public class BoardService {
 				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
 
 				// ✅ 선택한 검색대상에 맞춰 조건 분기
+				// BoardService.java - search(kw, field) 안의 switch 문만 교체
 				switch (field) {
-				case "title":
-					return byTitle;
-				case "content":
-					return byContent;
-				case "author":
-					return byAuthor;
-				case "all":
-				default:
-					// 제목+내용(+작성자/댓글/댓글작성자) — 기존처럼 확장 검색
-					return cb.or(byTitle, byContent);
+				  case "title":   return byTitle;
+				  case "content": return byContent;
+				  case "author":  return byAuthor;
+				  case "comment": return byCmt;
+				  case "title_content": // ✅ 새 분기: 제목+내용만
+				      return cb.or(byTitle, byContent);
+				  // case "comment_author": return byCmtUser; // (선택) 댓글쓴이 전용
+				  case "all":
+				  default:
+				      // ✅ 전체: 제목/내용/글쓴이/댓글내용/댓글쓴이
+				      return cb.or(byTitle, byContent, byAuthor, byCmt, byCmtUser);
 				}
+
+
 			}
 		};
 	}
 
 	// ✅ 게시글 전체 목록 조회 (페이징 없이 전부 반환)
-	public List<Board> getList() {
-		return this.boardRepository.findAll(); // 단순 전체 조회
+	// BoardService.java
+	public Page<Board> getList(int page, int size, String kw, String field) {
+	    List<Sort.Order> sorts = new ArrayList<>();
+	    sorts.add(Sort.Order.desc("createDate"));
+	    Pageable pageable = PageRequest.of(page, size, Sort.by(sorts)); // ★ size 적용
+
+	    Specification<Board> spec = search(kw, field);
+	    return this.boardRepository.findAll(spec, pageable);
 	}
+
 
 	// ✅ ID로 게시글 단건 조회
 	public Board getBoard(Integer id) {
