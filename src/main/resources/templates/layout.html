@@ -5,8 +5,6 @@
 
 <head>
 <!-- 필수 메타 태그 -->
-<!--  -->
-
 <!-- 반응형 레이아웃을 위한 뷰포트 설정 / 문서 인코딩 -->
 <meta name="viewport" charset="utf-8"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,7 +20,7 @@
 <link rel="stylesheet"
 	href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" th:src="@{/jquery-3.7.1.min.js}"></script>
 
 <!-- 브라우저 탭 제목 -->
 <title>CodeNova</title>
@@ -43,12 +41,13 @@
 	<th:block layout:fragment="content"></th:block>
 
 	<!-- Bootstrap JS (정적 리소스) -->
-	<script th:src="@{/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/bootstrap.bundle.min.js}"></script>
 
 	<!-- Toast UI Editor 스크립트 (CDN) -->
-	<script
+	<script type="text/javascript"
 		src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-	<script th:src="@{/script.js}"></script>
+	<script type="text/javascript" th:src="@{/script.js}"></script>
 
 	<!-- 페이지별 개별 스크립트 삽입 위치
          - 각 페이지 템플릿에서 <script layout:fragment="script"> ... </script> 로 제공한 코드가
