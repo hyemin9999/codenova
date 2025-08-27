@@ -1,4 +1,17 @@
-<html layout:decorate="~{layout}">
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<script th:inline="javascript">
+	// FlashAttribute에 담긴 'message' 변수를 자바스크립트로 가져옴
+	const message = /*[[${message}]]*/null;
+
+	// 메시지가 존재하면 팝업을 띄움
+	if (message) {
+		alert(message);
+	}
+</script>
+</head>
+
 <div layout:fragment="content" class="container my-3">
 	<form th:action="@{/user/login}" method="post">
 		<div th:if="${param.error}">
