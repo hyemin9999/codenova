@@ -36,6 +36,9 @@ dependencies {
 	
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	
+	//webflux 카카오api
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -53,7 +56,20 @@ dependencies {
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter' 
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//markdown
+	implementation 'org.commonmark:commonmark:0.21.0'
+
+	
+	//mail 8.13일자 추가 현재 이메일 인증 테스트중
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	//Swagger3 8.13일자 추가 swagger3 @operation 써볼려고 추가함
+	//implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+	//Redis 설정 및 @enableRedisRepositories 사용하기 위함
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    
 }
 
 tasks.named('test') {

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+<title>Insert title here</title>
+</head>
+<div layout:fragment="content" class="container my-3">
+
+
+
+	<div th:if="${errorMessage}" class="alert alert-danger">
+		<div th:text="${errorMessage}"></div>
+	</div>
+
+
+
+	에러 확인용 페이지
+
+
+
+</div>
+</html>
