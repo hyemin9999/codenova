@@ -45,21 +45,34 @@ public class BoardController {
 	// ===============================================================
 	// 목록 페이지
 	// ===============================================================
+	// BoardController.java
+	// BoardController.java
 	@GetMapping("/list")
 	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "kw", defaultValue = "") String kw,
-			@RequestParam(value = "field", defaultValue = "all") String field) {
+			@RequestParam(value = "field", defaultValue = "all") String field,
+			@RequestParam(value = "size", defaultValue = "10") int size) { // ★ 추가
 
-		Page<Board> paging = this.boardService.getList(page, kw, field);
+		// 허용값 화이트리스트
+		switch (size) {
+		case 10:
+		case 20:
+		case 30:
+		case 50:
+			break;
+		default:
+			size = 10;
+		}
+
+		Page<Board> paging = this.boardService.getList(page, size, kw, field); // ★ size 전달
 
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
-		model.addAttribute("field", field); // ✅ 화면에서 선택값 유지
+		model.addAttribute("field", field);
+		model.addAttribute("size", size); // ★ 셀렉트 유지
 
-		if (!kw.isBlank()) {
+		if (!kw.isBlank())
 			searchTextService.create(kw, null);
-		}
-
 		return "board_list";
 	}
 
