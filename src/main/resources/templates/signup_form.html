@@ -1,10 +1,50 @@
-<html layout:decorate="~{layout}">
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+<meta name="_csrf2" th:content="${_csrf.token}" />
+<meta name="_csrf_header2" th:content="${_csrf.headerName}" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="jquery-3.7.1.min.js"></script>
+<script src="typeit.js"></script>
+</head>
 <div layout:fragment="content" class="container my-3">
+	<!-- 	<div class="my-3 border-bottom"> -->
+	<!-- 		<div> -->
+	<!-- 			<h4>회원가입</h4> -->
+	<!-- 		</div> -->
+	<!-- 	</div> -->
+	<!-- 	<form th:action="@{/user/signup}" th:object="${userForm}" method="post"> -->
+	<!-- 		<div th:replace="~{form_errors :: formErrorsFragment}"></div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="username" class="form-label">사용자ID</label> <input -->
+	<!-- 				type="text" th:field="*{username}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="password1" class="form-label">비밀번호</label> <input -->
+	<!-- 				type="password" th:field="*{password1}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="password2" class="form-label">비밀번호 확인</label> <input -->
+	<!-- 				type="password" th:field="*{password2}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="email" class="form-label">이메일</label> <input type="email" -->
+	<!-- 				th:field="*{email}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="align-r"> -->
+	<!-- 			<button type="submit" class="btn btn-info">회원가입</button> -->
+	<!-- 		</div> -->
+
+	<!-- 	</form> -->
+
 	<div class="my-3 border-bottom">
 		<div>
 			<h4>회원가입</h4>
 		</div>
 	</div>
+
 	<form th:action="@{/user/signup}" th:object="${userForm}" method="post">
 		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
 		<div class="mb-3">
@@ -21,12 +61,247 @@
 		</div>
 		<div class="mb-3">
 			<label for="email" class="form-label">이메일</label> <input type="email"
-				th:field="*{email}" class="form-control">
+				id="email" th:field="*{email}" class="form-control">
+			<button id="sendSmsAuth"
+				class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
+			<button id="modifyEmail" class="btn btn-primary" type="button"
+				disabled>이메일 수정</button>
+			<p class="editPhoneTitle" id="emailMessage"></p>
+			<div class="certification">
+				<div class="">
+					<input type="text" name="authCode" id="textCheck"
+						placeholder="6자리 문자열" class="certificationNumber"
+						autocomplete="off"> <span class="certificationTime">03:00</span>
+				</div>
+			</div>
+			<button id="checkSmsAuth" class="btn btn-primary" type="button"
+				disabled>인증</button>
+			<p id="authMessage"></p>
 		</div>
-		<div class="align-r">
-			<button type="submit" class="btn btn-info">회원가입</button>
-		</div>
-
+		<button type="submit" class="btn btn-primary" id="clear1" disabled>회원가입</button>
 	</form>
 </div>
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+// ===================================== 타이머 세팅 ======================
+			let countTime = 0;
+let intervalCall;
+
+$.time = function(time) {
+    // 이전에 실행 중인 타이머가 있다면 중지
+    if (intervalCall) {
+        clearInterval(intervalCall);
+    }
+    countTime = time;
+    intervalCall = setInterval(alertFunc, 1000);
+};
+
+$.resetTime = function() {
+    clearInterval(intervalCall);
+    countTime = 0;
+    $('.certificationTime').text('03:00');
+};
+
+$.closeTime = function() {
+    clearInterval(intervalCall);
+};
+
+function alertFunc() {
+    // 먼저 감소시킨 후 0 미만인지 확인
+    countTime--;
+    if (countTime < 0) {
+        clearInterval(intervalCall);
+        $('.certificationTime').text('0:00'); // 0:00으로 고정
+        return; // 함수 종료
+    }
+
+    let min = Math.floor(countTime / 60);
+    let sec = countTime - (60 * min);
+    
+    if (sec > 9) {
+        $('.certificationTime').text(min + ':' + sec);
+    } else {
+        $('.certificationTime').text(min + ':0' + sec);
+    }
+};
+
+$('.certificationIssue').on("click", function() {
+    $.time(179);
+});
+// =======================================================================
+	            const CheckOkNum = document.getElementById('checkSmsAuth');
+	            const clear12 = document.getElementById('clear1');
+	            const sendCheck = document.getElementById('sendSmsAuth');
+	            const textCheck1 = document.getElementById('textCheck');
+	            const modifyEmail = document.getElementById('modifyEmail');
+				 const authMessage = document.getElementById('authMessage');
+				 const emailInput = document.getElementById('email');
+				 
+	window.addEventListener('DOMContentLoaded', (event) => {
+		 if (sessionStorage.getItem('isEmailVerified') === 'true') {
+			 emailInput.readOnly = true;
+			 emailInput.value = sessionStorage.getItem('verifiedEmail');
+			 
+			 //인증 확인
+			 CheckOkNum.disabled = true;
+			 //인증메일발송
+			 sendCheck.disabled = true;
+			 //회원가입
+			 clear12.disabled = false;
+			 //텍스트
+			 textCheck1.disabled = true;
+			 modifyEmail.disabled = false;
+			 
+			    document.getElementById('authMessage').textContent = '이미 인증에 성공했습니다.';
+			    document.getElementById('authMessage').style.color = 'blue';
+			 }
+		 });
+		 
+// ================================= 이메일 인증코드 발송 로직 ==========
+//             const clear12 = document.getElementById('clear1');
+//             const sendCheck = document.getElementById('sendSmsAuth');
+//             const textCheck1 = document.getElementById('textCheck');
+//             const modifyEmail = document.getElementById('modifyEmail');
+            const csrfToken = document.querySelector('meta[name="_csrf2"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header2"]').getAttribute('content');
+	
+        document.getElementById('sendSmsAuth').addEventListener('click', function(event) {
+            event.preventDefault();
+//             sendCheck.disabled = false;
+            const email = document.getElementById('email').value
+            const CheckOkNum = document.getElementById('checkSmsAuth');
+            
+
+            fetch('/api/checkEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                   		[csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // 오류 응답 처리
+                    throw new Error('사용자를 찾을 수 없습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('emailMessage').innerText = '이메일 확인 메일이 발송되었습니다.';
+                document.getElementById('emailMessage').style.color = 'green';
+//                 alert('비밀번호 재설정 이메일이 발송되었습니다.');
+				
+//                 console.log('UUID:', data.uuid);
+				CheckOkNum.disabled = false;
+            })
+            .catch(error => {
+                document.getElementById('emailMessage').innerText = error.message;
+                document.getElementById('emailMessage').style.color = 'red';
+            });
+        });
+        
+        document.getElementById('checkSmsAuth').addEventListener('click', function(event) {
+        	event.preventDefault();
+//             const CheckOkNum = document.getElementById('checkSmsAuth');
+//             const clear12 = document.getElementById('clear1');
+//             const sendCheck = document.getElementById('sendSmsAuth');
+//             const textCheck1 = document.getElementById('textCheck');
+//             const modifyEmail = document.getElementById('modifyEmail');
+// 			 const authMessage = document.getElementById('authMessage');
+			 // ====
+        	const email = document.getElementById('email').value;
+        	const uuidText = document.getElementById('textCheck').value;
+        	const checkList = {
+        			email : email,
+        			uuid : uuidText
+        			
+        	};
+        	 const csrfToken = document.querySelector('meta[name="_csrf2"]').getAttribute('content');
+             const csrfHeader = document.querySelector('meta[name="_csrf_header2"]').getAttribute('content');
+             
+             fetch('/api/checkListUuid', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     	[csrfHeader]: csrfToken
+                 },
+                 body: JSON.stringify(checkList),
+             })
+.then(response => {
+    // 서버 응답이 OK가 아니면 에러로 처리
+    if (!response.ok) {
+        throw new Error('Server returned an error.');
+    }
+    return response.json();
+})
+.then(data => {
+    // JSON 데이터에서 메시지를 꺼내서 화면에 표시
+    document.getElementById('authMessage').textContent = '인증에 성공했습니다.';
+    document.getElementById('authMessage').style.color = 'green';
+    //회원가입
+    clear12.disabled = false;
+    //발송
+	 sendCheck.disabled = true;
+    //이메일 인증 disabled로 하니 다시 제출시 값이 null로 표기되어서
+    //readOnly로 바꿈
+    emailInput.readOnly = true;
+	 //인증확인
+	 CheckOkNum.disabled = true;
+	 //인증문자 입력
+	 textCheck1.disabled = true;
+	 modifyEmail.disabled = false;
+	 $.closeTime()
+	 
+    sessionStorage.setItem('isEmailVerified', 'true');
+	sessionStorage.setItem('verifiedEmail', email);
+})
+.catch(error => {
+    // 에러 메시지 표시
+    document.getElementById('authMessage').textContent = '인증에 실패했습니다.';
+    document.getElementById('authMessage').style.color = 'red';
+});
+        });
+                
+        document.getElementById('modifyEmail').addEventListener('click', function() {
+//         	event.preventDefault();
+//             const CheckOkNum = document.getElementById('checkSmsAuth');
+//             const clear12 = document.getElementById('clear1');
+//             const sendCheck = document.getElementById('sendSmsAuth');
+//             const textCheck1 = document.getElementById('textCheck');
+//             const modifyEmail = document.getElementById('modifyEmail');
+			 const authMessage = document.getElementById('authMessage');
+			 // ====
+        	const email = document.getElementById('email').value;
+        	
+            // 1. Storage 초기화
+            sessionStorage.removeItem('isEmailVerified');
+            sessionStorage.removeItem('verifiedEmail');
+            
+            // 이메일 필드 활성화 및 값 초기화
+//             document.getElementById('email').readOnly = false;
+//             document.getElementById('email').value = '';
+            emailInput.readOnly = false;
+            emailInput.value = ''; // 값을 비워줍니다.
+
+            // 버튼 활성화
+            sendCheck.disabled = false;
+            CheckOkNum.disabled = true; // 인증번호 확인 버튼은 다시 비활성화
+
+            // 회원가입 버튼 및 인증번호 입력란 비활성화
+            clear12.disabled = true;
+            
+            textCheck1.disabled = false;
+            textCheck1.value = '';
+            modifyEmail.disabled = true;
+
+            // 메시지 초기화
+            authMessage.textContent = '인증번호를 다시 입력해주세요.';
+            authMessage.style.color = 'black';
+            //타이머 초기화?????
+            $.resetTime()
+        });
+        
+		</script>
 </html>

@@ -14,4 +14,13 @@ public interface UserRepository extends JpaRepository<SiteUser, Long> {
 	// 이메일 호출 및 유효성 검사를 위해 호출
 	Optional<SiteUser> findByEmail(String email);
 
+<<<<<<< HEAD
 }
+=======
+	// provider와 providerId로 사용자를 찾는 메서드
+	Optional<SiteUser> findByProviderAndProviderId(String provider, String providerId);
+
+	// 이메일로 사용자를 찾는 메서드 (계정 연동을 위해)
+//	Optional<SiteUser> findByEmail(String email);
+}
+>>>>>>> refs/remotes/origin/f/user
