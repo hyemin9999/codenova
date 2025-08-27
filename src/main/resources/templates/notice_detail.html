@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<div layout:fragment="content" class="container my-3">
+	<h5 class="my-3 border-bottom pb-2">공지사항</h5>
+
+	<div class="card my-3">
+		<div class="card-body">
+			<h3 class="border-bottom py-2 pt-0" th:text="${item.subject}"></h3>
+			<div id="viewer" class="card-text viewer"></div>
+			<input type="hidden" id="ecp1" th:value="${item.contents}">
+			<div class="d-flex justify-content-end mt-2">
+				<div
+					class="badge bg-secondary bg-opacity-10 text-dark p-2 text-start">
+					<div class="mb-2" th:if="${item.author !=null}">
+						<span th:text="${item.author.username}"></span>
+					</div>
+					<div
+						th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="align-r">
+		<a class="btn btn-info" th:href="@{/notice/list}">목록</a>
+	</div>
+</div>
+
+</html>
