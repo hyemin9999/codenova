@@ -1,124 +1,152 @@
-<!-- 기본 레이아웃 파일 상속 -->
-<html layout:decorate="~{layout}">
+<!-- board_list.html -->
+<html layout:decorate="~{layout}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <div layout:fragment="content" class="container my-3">
-	<h5 class="my-3 border-bottom pb-2">게시판</h5>
-	<!-- 상단: 등록 버튼 + 검색창 행 -->
-	<div class="row my-3">
-		<div class="col-5">
-			<a th:href="@{/board/create}" class="btn btn-info">작성</a>
-		</div>
-		<div class="col-7">
-			<div class="input-group">
-				<select id="search_field_select" class="form-select"
-					style="max-width: 140px;">
-					<option value="all" th:selected="${field} == 'all'">제목+내용</option>
-					<option value="title" th:selected="${field} == 'title'">제목</option>
-					<option value="content" th:selected="${field} == 'content'">내용</option>
-					<option value="author" th:selected="${field} == 'author'">글쓴이</option>
-				</select><input type="text" id="search_kw" class="form-control"
-					th:value="${kw}">
-				<button class="btn btn-outline-info" type="button" id="btn_search">검색</button>
-			</div>
-		</div>
-	</div>
-	<table class="table board">
-		<thead class="table-info">
-			<tr class="text-center">
-				<th>번호</th>
-				<th>제목</th>
-				<th>작성자</th>
-				<th>작성일</th>
-				<th>조회수</th>
-				<th>추천</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr class="text-center" th:each="board, loop : ${paging}">
-				<td
-					th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
-				<td class="text-start"><a
-					th:href="@{|/board/detail/${board.id}|}" th:text="${board.subject}"></a>
-					<!-- 댓글 수: 빨강 텍스트 대신 연한 배지로, 댓글이 1개 이상일 때만 숫자 출력 --> <span
-					class="badge bg-info" th:if="${#lists.size(board.commentList) > 0}"
-					th:text="${#lists.size(board.commentList)}"></span></td>
-				<td><span th:if="${board.author != null}"
-					th:text="${board.author.username}"></span></td>
-				<td
-					th:text="${#temporals.format(board.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-				<td><span th:text="${board.viewCount}">0</span></td>
-				<td><span th:text="${#lists.size(board.voter)}">0</span></td>
-			</tr>
-			<tr class="text-center" th:if="${paging.isEmpty()}">
-				<td colspan="5">게시글이 존재하지 않습니다.</td>
-			</tr>
-		</tbody>
-	</table>
+  <h5 class="my-3 border-bottom pb-2">게시판</h5>
 
-	<!-- 페이징-->
-	<div th:if="${!paging.isEmpty()}">
-		<ul class="pagination justify-content-center">
-			<li class="page-item"
-				th:classappend="${!paging.hasPrevious} ? 'disabled'"><a
-				class="page-link" href="javascript:void(0)"
-				th:data-page="${paging.number-1}"> <span>이전</span>
-			</a></li>
-			<li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
-				th:if="${page >= (paging.number - (paging.number % 10)) 
-				 	and page <= (paging.number - (paging.number % 10) + 9)}"
-				th:classappend="${page == paging.number} ? 'active'"
-				class="page-item"><a th:text="${page+1}" class="page-link"
-				href="javascript:void(0)" th:data-page="${page}"></a></li>
-			<li class="page-item"
-				th:classappend="${!paging.hasNext} ? 'disabled'"><a
-				class="page-link" href="javascript:void(0)"
-				th:data-page="${paging.number+1}"> <span>다음</span>
-			</a></li>
-		</ul>
-	</div>
+  <!-- 상단: 작성 버튼 + 검색/개수 -->
+  <div class="row my-3">
+    <div class="col-5">
+      <a th:href="@{/board/create}" class="btn btn-info">작성</a>
+    </div>
 
-	<form th:action="@{/board/list}" method="get" id="searchForm">
-		<input type="hidden" id="kw" name="kw" th:value="${kw}"> <input
-			type="hidden" id="field" name="field" th:value="${field}"> <input
-			type="hidden" id="page" name="page" th:value="${paging.number}">
-	</form>
+    <!-- ✅ 검색바를 form으로 감쌈: 엔터로도 현재 값 그대로 전송 -->
+    <div class="col-7">
+      <form th:action="@{/board/list}" method="get" id="searchForm">
+        <div class="input-group">
+          <select name="field" id="search_field_select" class="form-select" style="max-width:140px;">
+            <option value="all"            th:selected="${field} == 'all'">전체</option>
+            <option value="title_content"  th:selected="${field} == 'title_content'">제목+내용</option>
+            <option value="title"          th:selected="${field} == 'title'">제목</option>
+            <option value="content"        th:selected="${field} == 'content'">내용</option>
+            <option value="author"         th:selected="${field} == 'author'">글쓴이</option>
+            <option value="comment"        th:selected="${field} == 'comment'">댓글내용</option>
+          </select>
 
-	<!-- 하단에도 등록 버튼 한 번 더 제공 -->
-	<a th:href="@{/board/create}" class="btn btn-info">작성</a>
+          <input type="text" name="kw" id="search_kw" class="form-control" th:value="${kw}">
+          <button class="btn btn-outline-info" type="submit" id="btn_search">검색</button>
+        </div>
+
+        <!-- 페이지당 개수 선택(같은 폼 안) -->
+        <select name="size" id="page_size_select" class="form-select mt-2" style="max-width:100px;">
+          <option value="10"  th:selected="${size} == 10">10개</option>
+          <option value="20"  th:selected="${size} == 20">20개</option>
+          <option value="30"  th:selected="${size} == 30">30개</option>
+          <option value="50"  th:selected="${size} == 50">50개</option>
+        </select>
+
+        <!-- 현재 페이지(기본 0) — 숫자 링크 클릭 시 JS로 덮어씀 -->
+        <input type="hidden" name="page" id="page" value="0">
+      </form>
+    </div>
+  </div>
+
+  <!-- 목록 테이블 -->
+  <table class="table board">
+    <thead class="table-info">
+      <tr class="text-center">
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+        <th>추천</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="text-center" th:each="board, loop : ${paging}">
+        <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
+        <td class="text-start">
+          <a th:href="@{|/board/detail/${board.id}|}" th:text="${board.subject}"></a>
+          <span class="badge bg-info"
+                th:if="${#lists.size(board.commentList) > 0}"
+                th:text="${#lists.size(board.commentList)}"></span>
+        </td>
+        <td><span th:if="${board.author != null}" th:text="${board.author.username}"></span></td>
+        <td th:text="${#temporals.format(board.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+        <td><span th:text="${board.viewCount}">0</span></td>
+        <td><span th:text="${#lists.size(board.voter)}">0</span></td>
+      </tr>
+      <tr class="text-center" th:if="${paging.isEmpty()}">
+        <td colspan="6">게시글이 존재하지 않습니다.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 페이징(10개 블록, 처음/이전/다음/마지막 아이콘) -->
+  <div th:if="${!paging.isEmpty()}"
+       th:with="
+          blockStart=${paging.number - (paging.number % 10)},
+          blockEnd=${(paging.number - (paging.number % 10)) + 9},
+          lastIndex=${paging.totalPages - 1},
+          isFirstBlock=${(paging.number - (paging.number % 10)) == 0},
+          isLastBlock=${((paging.number - (paging.number % 10)) + 9) >= (paging.totalPages - 1)}
+       ">
+    <ul class="pagination justify-content-center">
+
+      <!-- « 처음 : 첫 블록에서는 숨김 -->
+      <li class="page-item" th:if="${!isFirstBlock}">
+        <a class="page-link" href="javascript:void(0)" th:data-page="0" aria-label="처음">
+          <span aria-hidden="true">&laquo;</span><span class="visually-hidden">처음</span>
+        </a>
+      </li>
+
+      <!-- ‹ 이전 : 첫 블록에서는 숨김 -->
+      <li class="page-item" th:if="${!isFirstBlock}">
+        <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number - 1}" aria-label="이전">
+          <span aria-hidden="true">&lsaquo;</span><span class="visually-hidden">이전</span>
+        </a>
+      </li>
+
+      <!-- 숫자 10개 묶음 -->
+      <li th:each="page : ${#numbers.sequence(blockStart, T(java.lang.Math).min(blockEnd, lastIndex))}"
+          class="page-item" th:classappend="${page == paging.number} ? 'active'">
+        <a class="page-link" href="javascript:void(0)" th:text="${page + 1}" th:data-page="${page}"></a>
+      </li>
+
+      <!-- › 다음 : 마지막 블록에서는 숨김 -->
+      <li class="page-item" th:if="${!isLastBlock}">
+        <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number + 1}" aria-label="다음">
+          <span aria-hidden="true">&rsaquo;</span><span class="visually-hidden">다음</span>
+        </a>
+      </li>
+
+      <!-- » 마지막 : 마지막 블록에서는 숨김 -->
+      <li class="page-item" th:if="${!isLastBlock}">
+        <a class="page-link" href="javascript:void(0)" th:data-page="${lastIndex}" aria-label="마지막">
+          <span aria-hidden="true">&raquo;</span><span class="visually-hidden">마지막</span>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+
+  <!-- 하단 등록 버튼 -->
+  <a th:href="@{/board/create}" class="btn btn-info">작성</a>
 </div>
 
-<!-- 페이지 전용 스크립트: 페이지 이동 및 검색어 제출 처리 -->
-<script layout:fragment="script" type='text/javascript'>
-	const page_elements = document.getElementsByClassName("page-link");
-	Array.from(page_elements).forEach(function(element) {
-		element.addEventListener('click', function() {
-			document.getElementById('page').value = this.dataset.page;
-			document.getElementById('searchForm').submit();
-		});
-	});
+<!-- 페이지/검색 스크립트 -->
+<script layout:fragment="script" type="text/javascript">
+  // 페이지 번호/화살표 클릭 → page 값만 바꾸고 같은 폼 제출
+  Array.from(document.getElementsByClassName("page-link")).forEach(function (el) {
+    el.addEventListener('click', function () {
+      document.getElementById('page').value = this.dataset.page;
+      document.getElementById('searchForm').submit();
+    });
+  });
 
-	const fieldSelect = document.getElementById("search_field_select");
-	const btn_search = document.getElementById("btn_search");
-	btn_search.addEventListener('click', function() {
-		// ✅ 최소 변경: 값 가져와서 trim, 비었으면 alert 후 return
-		const inputEl = document.getElementById('search_kw');
-		const trimmed = (inputEl.value || '').trim();
-		if (!trimmed) {
-			alert('검색어를 입력해주세요.');
-			inputEl.focus();
-			return;
-		}
+  // 페이지당 개수 바꾸면 1페이지부터 재조회
+  document.getElementById('page_size_select').addEventListener('change', function () {
+    document.getElementById('page').value = 0;
+    document.getElementById('searchForm').submit();
+  });
 
-		document.getElementById('kw').value = trimmed; // trim된 값 전달
-		document.getElementById('field').value = fieldSelect.value;
-		document.getElementById('page').value = 0; // 검색 시 항상 첫 페이지부터
-		document.getElementById('searchForm').submit();
-	});
-
-	window.addEventListener('pageshow', function(e) {
-		if (e.persisted) {
-			window.location.reload();
-		}
-	});
+  // 엔터로 제출 시도해도 현재 값 그대로 전송(추가 로직 불필요)
+  // 뒤로가기 캐시 대응
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) window.location.reload();
+  });
 </script>
 </html>
