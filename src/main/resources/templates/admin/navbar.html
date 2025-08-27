@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html layout:decorate="~{admin/layout}"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<nav th:fragment="navbarFragment"
+	class="navbar navbar-expand-md navbar-light bg-info-subtle border-bottom">
+
+	<div class="container-fluid">
+		<div>
+			<a class="navbar-brand" href="/" style="margin-right: 0px;">CodeNova</a>
+			<a class="navbar-brand" href="/admin">관리자페이지</a>
+		</div>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+			data-bs-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-lg-0">
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a> <a
+					class="nav-link" sec:authorize="isAuthenticated()"
+					th:href="@{/user/logout}">로그아웃</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/admin/user/list}">회원 관리</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/admin/role/list}">역할 관리</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/admin/category/list}">게시판 관리</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/admin/board/list}">게시글 관리</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/admin/notice/list}">공지사항 관리</a></li>
+
+			</ul>
+		</div>
+	</div>
+</nav>
+</html>
