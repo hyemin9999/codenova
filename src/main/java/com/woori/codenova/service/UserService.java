@@ -3,22 +3,15 @@ package com.woori.codenova.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-<<<<<<< HEAD
-=======
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
->>>>>>> refs/remotes/origin/f/user
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
 import com.woori.codenova.DataNotFoundException;
-=======
 import com.woori.codenova.NonExistentMemberException;
 import com.woori.codenova.ApiTest.ApiProps;
 import com.woori.codenova.ApiTest.KakaoUserInfoResponseDto;
 import com.woori.codenova.ApiTest.RedisService;
->>>>>>> refs/remotes/origin/f/user
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.UserForm;
 import com.woori.codenova.repository.UserRepository;
@@ -38,8 +31,6 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-<<<<<<< HEAD
-=======
 	// 이메일 인증 및 비밀번호 재설정에 사용
 	private final ApiProps props;
 	private final RedisService redisService;
@@ -47,7 +38,6 @@ public class UserService {
 	@Value("${social.secret-key}")
 	private String socialSecretKey;
 
->>>>>>> refs/remotes/origin/f/user
 	// 만들기로 가져옴
 	public SiteUser create(String username, String password, String email, String provider,
 			KakaoUserInfoResponseDto userInfo) {
@@ -61,7 +51,8 @@ public class UserService {
 		SiteUser user = new SiteUser();
 		user.setUsername(username);
 		user.setEmail(email);
-		user.setCareteDate(LocalDateTime.now());
+		user.setCreateDate(LocalDateTime.now());
+
 		// user.setPassword(password);
 		// 아랫줄에서 불러온것으로 대체됨
 		// 주석 처리한건 위에 final로 선언되어 가져온것
@@ -83,7 +74,6 @@ public class UserService {
 		return siteUserOptional.get();
 	}
 
-<<<<<<< HEAD
 	public SiteUser getUser(String username) {
 		Optional<SiteUser> User = this.userRepository.findByUsername(username);
 		if (User.isPresent()) {
@@ -92,8 +82,7 @@ public class UserService {
 			throw new DataNotFoundException("siteuser not found");
 		}
 	}
-}
-=======
+
 	// 비밀번호 변경 코드 작성중
 	public void resetPassword(String uuid, String newPassword) {
 		String email = redisService.getValues(uuid);
@@ -206,4 +195,3 @@ public class UserService {
 		return userRepository.save(user);
 	}
 }
->>>>>>> refs/remotes/origin/f/user
