@@ -2,8 +2,10 @@ HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
+/src/main/resources/application.yml
 *.properties
 *.yml
+src/main/resources/uploads/
 
 ### STS ###
 .apt_generated
