@@ -62,11 +62,7 @@ public class UserController {
 		}
 
 		try {
-<<<<<<< HEAD
-			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail());
-=======
 			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail(), "local", null);
->>>>>>> refs/remotes/origin/f/user
 		} catch (Exception e) {
 			e.printStackTrace();
 			bindingResult.reject("singupFailed", e.getMessage());
@@ -83,12 +79,10 @@ public class UserController {
 		return "login_form";
 	}
 
-<<<<<<< HEAD
 	@GetMapping("/findid")
 	public String findId(UserFindIdForm userFindIdForm) { // Model 객체를 매개변수로 추가
 		return "find_id";
 	}
-=======
 //	// 아이디 찾기 매핑 연결후 테스트중
 //	@GetMapping("/findid")
 ////	public String findId(Model model) { // Model 객체를 매개변수로 추가
@@ -101,7 +95,6 @@ public class UserController {
 // ========== 오류 페이지 출력 ====
 
 // ==================
->>>>>>> refs/remotes/origin/f/user
 
 	@PostMapping("/findid")
 	public String findId1(@Valid UserFindIdForm userFindIdForm, BindingResult bindingResult, Model model) {
@@ -136,10 +129,10 @@ public class UserController {
 
 	// 아이디 찾기 이메일 검증 테스트중 ======================
 	// =======================================================
-	@GetMapping("/findid")
-	public String Findid() {
-		return "find_id";
-	}
+//	@GetMapping("/findid")
+//	public String Findid() {
+//		return "find_id";
+//	}
 
 	@GetMapping("/find-id/{uuid}")
 	public String FindidClear(@PathVariable("uuid") String uuid, Model model) {

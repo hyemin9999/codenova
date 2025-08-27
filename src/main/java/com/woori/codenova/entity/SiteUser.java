@@ -37,7 +37,7 @@ public class SiteUser {
 	// 가입일
 	// 업데이트를 해도 수정이 안되며 db에서 수정해야함
 	@Column(updatable = false)
-	private LocalDateTime careteDate;
+	private LocalDateTime createDate;
 
 	// 수정일
 	// 마이페이지 구현되어야 사용가능
@@ -53,9 +53,6 @@ public class SiteUser {
 //	String = varchar
 // Integer = int
 // Long = bigint
-<<<<<<< HEAD
-}
-=======
 
 //	/**
 //	 * 암호화된 새 비밀번호로 비밀번호를 업데이트하는 메서드
@@ -71,4 +68,3 @@ public class SiteUser {
 	// 고유식별코드
 	private String providerId;
 }
->>>>>>> refs/remotes/origin/f/user
