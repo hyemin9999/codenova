@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" style="height: 100% !important;" data-bs-theme="light"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta name="viewport" charset="utf-8"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+
+<title>CodeNova</title>
+</head>
+<body class="d-flex flex-column h-100">
+	<nav th:replace="~{admin/navbar :: navbarFragment}"></nav>
+
+	<th:block layout:fragment="content"></th:block>
+
+	<div id="modal" class="modal fade" tabindex="-1" style="display: none;"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body text-center alert-danger">
+					<span id="message"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript"
+		src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+	<script type="text/javascript" th:src="@{/bootstrap.bundle.min.js}"></script>
+	<script type="text/javascript" th:src="@{/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/detail.js}"></script>
+
+
+	<th:block layout:fragment="script"></th:block>
+
+	<footer th:replace="~{footer :: footer}"></footer>
+</body>
+</html>
