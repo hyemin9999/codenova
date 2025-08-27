@@ -184,4 +184,5 @@ class CodenovaApplicationTests {
 			this.boardService.create(subject, contents, null);
 		}
 	}
+	
 }
