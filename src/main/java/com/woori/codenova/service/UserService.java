@@ -51,7 +51,8 @@ public class UserService {
 		SiteUser user = new SiteUser();
 		user.setUsername(username);
 		user.setEmail(email);
-		user.setCareteDate(LocalDateTime.now());
+		user.setCreateDate(LocalDateTime.now());
+
 		// user.setPassword(password);
 		// 아랫줄에서 불러온것으로 대체됨
 		// 주석 처리한건 위에 final로 선언되어 가져온것
