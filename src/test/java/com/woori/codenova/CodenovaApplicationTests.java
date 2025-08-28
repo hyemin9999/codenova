@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,8 +55,12 @@ class CodenovaApplicationTests {
 		userRepository.save(user);
 	}
 
-//	 @Test
+	@Test
 	void testJpa_01() {
+
+		Category c2 = categoryRepository.getById(2);
+		SiteUser u1 = userRepository.findByUsername("admin").orElse(null);
+
 		// 질문 저장하기
 		Board q1 = new Board();
 		q1.setSubject("수정과 삭제 테스트");
@@ -65,9 +70,12 @@ class CodenovaApplicationTests {
 		q1.setModifyDate(LocalDateTime.of(2025, 8, 3, 15, 30));
 		q1.setDelete(true);
 		q1.setDeleteDate(LocalDateTime.of(2025, 8, 4, 9, 0));
+		q1.setAuthor(u1);
 
+		q1.setCategory(c2);
 		boardRepository.save(q1);
 
+		Category c3 = categoryRepository.getById(3);
 		Board q2 = new Board();
 		q2.setSubject("두 번째 게시글 테스트");
 		q2.setContents("이 게시글은 두 번째 테스트입니다. 수정/삭제도 포함됩니다.");
@@ -76,6 +84,8 @@ class CodenovaApplicationTests {
 		q2.setModifyDate(LocalDateTime.of(2025, 8, 5, 17, 15));
 		q2.setDelete(false);
 		q2.setDeleteDate(null);
+		q2.setCategory(c3);
+		q2.setAuthor(u1);
 
 		boardRepository.save(q2);
 	}
@@ -248,6 +258,18 @@ class CodenovaApplicationTests {
 		c2.setName("자유게시판");
 		c2.setCreateDate(LocalDateTime.now());
 		categoryRepository.save(c2);
+
+		// Java게시판
+		Category c3 = new Category();
+		c3.setName("Java게시판");
+		c3.setCreateDate(LocalDateTime.now());
+		categoryRepository.save(c3);
+
+		// 자유게시판
+		Category c4 = new Category();
+		c4.setName("SQL게시판");
+		c4.setCreateDate(LocalDateTime.now());
+		categoryRepository.save(c4);
 	}
 
 }
