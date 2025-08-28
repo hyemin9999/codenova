@@ -98,6 +98,18 @@
 	</div>
 </div>
 
-<script layout:fragment="script" type='text/javascript'
-	th:src="@{/list_search.js}"></script>
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+	$(document).ready(function() {
+		const message = /*[[${message}]]*/'';
+		if (message.length != 0) {
+			$('#message').text(message);
+			$('#modal').modal('show');
+		}
+
+		$('#modal').on('hide.bs.modal', function(event) {
+
+		});
+	});
+</script>
 </html>
