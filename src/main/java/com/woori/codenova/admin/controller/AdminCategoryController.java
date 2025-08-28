@@ -36,10 +36,7 @@ public class AdminCategoryController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminCategoryForm adminCategoryForm,
 			BindingResult bindingResult) {
 
-		Page<Category> paging = adminCategoryService.getlist(page, kw);
-		model.addAttribute("paging", paging);
-		model.addAttribute("kw", kw);
-		model.addAttribute("mode", "info");
+		list(model, page, kw, adminCategoryForm, "list");
 
 		return "admin/category_list";
 	}
@@ -50,13 +47,13 @@ public class AdminCategoryController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminCategoryForm adminCategoryForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Integer id) {
 
-		Page<Category> paging = adminCategoryService.getlist(page, kw);
-		model.addAttribute("paging", paging);
-		model.addAttribute("kw", kw);
+		listById(model, page, kw, principal, adminCategoryForm, id, "list");
 
 		Category item = this.adminCategoryService.getitem(id);
 		if (item != null) {
 			adminCategoryForm.setName(item.getName());
+		} else {
+			model.addAttribute("message", "존재하지 않는 게시판 입니다.");
 		}
 
 		SiteUser user = this.adminUserService.getItem(principal.getName());
@@ -74,10 +71,7 @@ public class AdminCategoryController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminCategoryForm adminCategoryForm,
 			BindingResult bindingResult) {
 
-		Page<Category> paging = adminCategoryService.getlist(page, kw);
-		model.addAttribute("paging", paging);
-		model.addAttribute("kw", kw);
-		model.addAttribute("mode", "info");
+		list(model, page, kw, adminCategoryForm, "create");
 
 		if (bindingResult.hasErrors()) {
 			return "admin/category_list";
@@ -93,14 +87,13 @@ public class AdminCategoryController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminCategoryForm adminCategoryForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Integer id) {
 
-		Page<Category> paging = adminCategoryService.getlist(page, kw);
-		model.addAttribute("paging", paging);
-		model.addAttribute("kw", kw);
+		listById(model, page, kw, principal, adminCategoryForm, id, "modify");
 
 		Category item = this.adminCategoryService.getitem(id);
-
 		if (item != null) {
 			adminCategoryForm.setName(item.getName());
+		} else {
+			model.addAttribute("message", "존재하지 않는 게시판 입니다.");
 		}
 
 		SiteUser user = this.adminUserService.getItem(principal.getName());
@@ -137,4 +130,36 @@ public class AdminCategoryController {
 		return "redirect:/admin/category/list";
 	}
 
+	public void list(Model model, Integer page, String kw, AdminCategoryForm adminCategoryForm, String mode) {
+		Page<Category> paging = adminCategoryService.getlist(page, kw);
+		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
+		model.addAttribute("mode", "create");
+
+	}
+
+	public void listById(Model model, Integer page, String kw, Principal principal, AdminCategoryForm adminCategoryForm,
+			Integer id, String mode) {
+
+		Category item = this.adminCategoryService.getitem(id);
+		if (item == null) {
+			model.addAttribute("message", "존재하지 않는 게시판 입니다.");
+		}
+
+		Page<Category> paging = adminCategoryService.getlist(page, kw);
+		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
+		model.addAttribute("mode", "modify");
+
+		if (mode == "list" && item != null) {
+			adminCategoryForm.setName(item.getName());
+		}
+
+//		SiteUser user = this.adminUserService.getItem(principal.getName());
+//		if (user != null && !user.getAuthority().isEmpty()
+//				&& user.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) {
+//			model.addAttribute("mode", "modify");
+//		}
+
+	}
 }

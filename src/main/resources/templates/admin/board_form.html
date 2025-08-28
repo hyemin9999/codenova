@@ -7,7 +7,7 @@
 <div layout:fragment="content" class="container my-3">
 	<h5 class="border-bottom pb-2">게시글 관리</h5>
 	<div class="row">
-		<div class="col-6">
+		<div class="col">
 			<form method="post" th:object="${boardForm}">
 				<input type="hidden" th:name="${_csrf.parameterName}"
 					th:value="${_csrf.token}" id="_csrf" />
@@ -18,10 +18,10 @@
 						type="text" th:field="*{subject}" class="form-control">
 				</div>
 				<div class="mb-3">
-					<label for="content" class="form-label">내용</label>
-					<div id="content" class="form-control"></div>
-					<input type="hidden" name="content" id="ecp"><input
-						type="hidden" id="ecp1" th:field="*{content}">
+					<label for="contents" class="form-label">내용</label>
+					<div id="contents" class="form-control"></div>
+					<input type="hidden" name="contents" id="ecp"><input
+						type="hidden" id="ecp1" th:field="*{contents}">
 				</div>
 				<input type="submit" value="저장" class="btn btn-info my-2"> <a
 					class="btn btn-outline-info" th:href="@{/admin/board/list}">취소</a>
@@ -34,7 +34,7 @@
 
 	var files;
 		const editor = new toastui.Editor({
-			el : document.querySelector('#content'),
+			el : document.querySelector('#contents'),
 			height : '500px', 
 			initialEditType : 'markdown', 
 			initialValue : '',

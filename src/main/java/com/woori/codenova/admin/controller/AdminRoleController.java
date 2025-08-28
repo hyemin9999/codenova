@@ -39,8 +39,6 @@ public class AdminRoleController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminRoleForm adminRoleForm,
 			BindingResult bindingResult) {
 
-		System.out.println("list role :: GET ::");
-
 		list(model, page, kw, adminRoleForm, "list");
 
 		return "admin/role_list";
@@ -51,8 +49,6 @@ public class AdminRoleController {
 	public String create(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminRoleForm adminRoleForm,
 			BindingResult bindingResult) {
-
-		System.out.println("list role :: POST ::");
 
 		list(model, page, kw, adminRoleForm, "create");
 
@@ -70,9 +66,12 @@ public class AdminRoleController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminRoleForm adminRoleForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Integer id) {
 
-		System.out.println("list/id role :: GET ::");
-
 		listById(model, page, kw, principal, adminRoleForm, id, "list");
+
+		Role item = this.adminRoleService.getItem(id);
+		if (item == null) {
+			model.addAttribute("message", "존재하지 않는 역할 입니다.");
+		}
 
 		return "admin/role_list";
 	}
@@ -83,15 +82,13 @@ public class AdminRoleController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminRoleForm adminRoleForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Integer id) {
 
-		System.out.println("list/id role :: POST ::");
+		listById(model, page, kw, principal, adminRoleForm, id, "modify");
 
 		Role item = this.adminRoleService.getItem(id);
 		if (item == null) {
 			model.addAttribute("message", "존재하지 않는 역할 입니다.");
 			bindingResult.reject("존재하지 않는 역할 입니다.");
 		}
-
-		listById(model, page, kw, principal, adminRoleForm, id, "modify");
 
 		if (bindingResult.hasErrors()) {
 			return "admin/role_list";
@@ -148,14 +145,14 @@ public class AdminRoleController {
 		model.addAttribute("kw", kw);
 		model.addAttribute("mode", "modify");
 
-		if (mode == "list") {
+		if (mode == "list" && item != null) {
 			adminRoleForm.setName(item.getName());
 		}
 
 		List<Category> optionList = adminCategoryService.getlist();
 		adminRoleForm.setOptionList(optionList);
 
-		if (mode == "list") {
+		if (mode == "list" && item != null) {
 
 			List<Category> selectedlist = new ArrayList<>(item.getAuthority());
 //			if ((selectedlist.size() + 1) == optionList.size()) {

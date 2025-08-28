@@ -55,6 +55,8 @@ public class AdminNoticeController {
 		if (item != null) {
 			this.noticeService.setViewCount(item);
 			model.addAttribute("item", item);
+		} else {
+			model.addAttribute("message", "존재하지 않는 공지사항 입니다.");
 		}
 		return "admin/notice_detail";
 

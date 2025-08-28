@@ -44,8 +44,6 @@ public class AdminUserController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminUserForm adminUserForm,
 			BindingResult bindingResult) {
 
-		System.out.println("list user :: GET ::");
-
 		list(model, page, kw, adminUserForm, "list");
 
 		return "admin/user_list";
@@ -56,8 +54,6 @@ public class AdminUserController {
 	public String create(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminUserForm adminUserForm,
 			BindingResult bindingResult) {
-
-		System.out.println("list user :: POST ::");
 
 		list(model, page, kw, adminUserForm, "create");
 
@@ -73,7 +69,7 @@ public class AdminUserController {
 		} catch (DataIntegrityViolationException e) {
 
 			e.printStackTrace();
-			bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
+			bindingResult.reject("signupFailed", "이미 등록된 회원입니다.");
 
 			return "admin/user_list";
 		} catch (Exception e) {
@@ -91,9 +87,11 @@ public class AdminUserController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminUserModifyForm adminUserModifyForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Long id) {
 
-		System.out.println("list/id user :: GET ::");
-
 		listById(model, page, kw, principal, adminUserModifyForm, id, "list");
+		SiteUser item = this.adminUserService.getItem(id);
+		if (item == null) {
+			model.addAttribute("message", "존재하지 않는 회원 입니다.");
+		}
 
 		return "admin/user_list";
 	}
@@ -104,12 +102,9 @@ public class AdminUserController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminUserModifyForm adminUserModifyForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Long id) {
 
-		System.out.println("list/id user :: POST ::");
-
 		SiteUser item = this.adminUserService.getItem(id);
 		if (item == null) {
 			model.addAttribute("message", "존재하지 않는 회원 입니다.");
-			bindingResult.reject("존재하지 않는 회원 입니다.");
 		}
 
 		listById(model, page, kw, principal, adminUserModifyForm, id, "modify");
@@ -132,36 +127,37 @@ public class AdminUserController {
 //		}
 		if (item == null) {
 			model.addAttribute("message", "존재하지 않는 회원 입니다.");
+		} else {
+			// 사용자 삭제시
+
+			// 게시글 - 추천/즐겨찾기
+			List<Board> blist = adminBoardService.getListByAuthor(item);
+
+			if (blist != null && !blist.isEmpty()) {
+				adminBoardService.deleteList(blist);
+
+			}
+//			List<Board> bvlist = adminBoardService.getListByVorter(id);
+//			List<Board> bflist = adminBoardService.getListByFavorites(id);
+
+			// 댓글 삭제
+//			List<Comment> clist = adminCommentService.getListByAuthorId(id);
+
+			// 좋아요 - 게시글, 댓글, 게시판
+
+			// 추천 삭제 - 게시글, 댓글
+
+			// 역할 삭제
+			item.getAuthority().clear();
+			//
+//			List<Role> rlist = this.adminRoleService.getList(id);
+//			for (SiteUser siteUser : ulist) {
+//				siteUser.getAuthority().remove(item);
+//			}
+
+//			this.adminUserService.delete(item);
 		}
 
-		// 사용자 삭제시
-
-		// 게시글 - 추천/즐겨찾기
-		List<Board> blist = adminBoardService.getListByAuthor(item);
-
-		if (blist != null && !blist.isEmpty()) {
-			adminBoardService.deleteList(blist);
-
-		}
-//		List<Board> bvlist = adminBoardService.getListByVorter(id);
-//		List<Board> bflist = adminBoardService.getListByFavorites(id);
-
-		// 댓글 삭제
-//		List<Comment> clist = adminCommentService.getListByAuthorId(id);
-
-		// 좋아요 - 게시글, 댓글, 게시판
-
-		// 추천 삭제 - 게시글, 댓글
-
-		// 역할 삭제
-		item.getAuthority().clear();
-//
-//		List<Role> rlist = this.adminRoleService.getList(id);
-//		for (SiteUser siteUser : ulist) {
-//			siteUser.getAuthority().remove(item);
-//		}
-
-//		this.adminUserService.delete(item);
 		return "redirect:/admin/user/list";
 	}
 
@@ -181,17 +177,17 @@ public class AdminUserController {
 			AdminUserModifyForm adminUserModifyForm, Long id, String mode) {
 
 		SiteUser item = this.adminUserService.getItem(id);
-		if (item == null) {
-			model.addAttribute("message", "존재하지 않는 회원 입니다.");
-//			model.addAttribute("item", item);
-		}
+//		if (item == null) {
+//			model.addAttribute("message", "존재하지 않는 회원 입니다.");
+////			model.addAttribute("item", item);
+//		}
 
 		Page<SiteUser> paging = adminUserService.getList(page, kw);
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
 		model.addAttribute("mode", "modify");
 
-		if (mode == "list") {
+		if (mode == "list" && item != null) {
 			adminUserModifyForm.setUsername(item.getUsername());
 			adminUserModifyForm.setEmail(item.getEmail());
 		}
@@ -203,7 +199,7 @@ public class AdminUserController {
 		List<Role> optionList = adminRoleService.getlist();
 		adminUserModifyForm.setOptionList(optionList);
 
-		if (mode == "list") {
+		if (mode == "list" && item != null) {
 
 			List<Role> selectedlist = new ArrayList<>(item.getAuthority()); // 사용자에게 할당된 역할목록?
 			adminUserModifyForm.setSelectedList(selectedlist);
