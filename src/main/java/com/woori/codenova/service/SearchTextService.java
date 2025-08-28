@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class SearchTextService {
 
 	private final SearchTextRepository searchTextRepository;
+	private final CategoryService categoryService;
 
 	public List<SearchText> getList() {
 
@@ -34,6 +35,9 @@ public class SearchTextService {
 		SearchText item = new SearchText();
 		item.setText(text);
 		item.setSearchDate(LocalDateTime.now());
+		if (category == null) {
+			category = categoryService.getItem(1);
+		}
 		item.setCategory(category);
 
 		return searchTextRepository.save(item);
