@@ -19,11 +19,6 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
 
 	Optional<Role> findByGrade(Integer grade);
 
-//	// 회원 관리에서 사용할 역할 목록 반환 처리 - 이름순으로 정렬
-//	@Query("SELECT new com.woori.codenova.dto.AdminRoleDto(r.id, r.name, false) FROM Role r "
-//			+ "WHERE r.grade != 1 ORDER BY name ASC ")
-//	List<AdminRoleDto> findAllByAuthority();
-
 	@Query(value = "SELECT * FROM Role " + "WHERE grade != 1 ORDER BY name ASC ", nativeQuery = true)
 	List<Role> findAllByGrade();
 }
