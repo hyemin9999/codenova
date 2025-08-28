@@ -69,8 +69,8 @@ dependencies {
 	//implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 	//Redis 설정 및 @enableRedisRepositories 사용하기 위함
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()

@@ -107,9 +107,8 @@ public class UserService {
 		}
 	}
 
-//uuid 확인 로직 왜 이메일을 반환?
-//아이디찾기에 사용중
-	//
+	// uuid 확인 로직 왜 이메일을 반환?
+	// 아이디찾기에 사용중
 	public String SendFindIdEmail(String uuid) {
 		String email = redisService.getValues(uuid);
 		if (email == null) {

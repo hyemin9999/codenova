@@ -62,6 +62,7 @@ public class UserController {
 		}
 
 		try {
+
 			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail(), "local", null);
 		} catch (Exception e) {
 			e.printStackTrace();
