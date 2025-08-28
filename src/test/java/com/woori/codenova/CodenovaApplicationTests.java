@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -185,12 +186,15 @@ class CodenovaApplicationTests {
 
 	// 테스트 데이터 300개 생성
 
-	// @Test
+	//@Test
 	void testJpa_12() {
+		SiteUser u1 = userRepository.findByUsername("admin").orElse(null);
+		Category c2 = categoryRepository.findByname("자유게시판").orElse(null);
 		for (int i = 1; i <= 300; i++) {
 			String subject = String.format("테스트 데이터입니다:[%03d]", i);
 			String contents = "내용무";
-			this.boardService.create(subject, contents, null);
+
+			this.boardService.create1(subject, contents, u1, c2);
 		}
 	}
 
