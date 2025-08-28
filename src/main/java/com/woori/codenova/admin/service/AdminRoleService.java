@@ -29,7 +29,7 @@ public class AdminRoleService {
 	// 초기에 시스템 관리자와 일반 사용자의 역할이 저장되어야 하는게 아닐까??
 
 	private final RoleRepository roleReporitory;
-	private final AdminCategoryService adminCategoryService;
+//	private final AdminCategoryService adminCategoryService;
 
 	// 목록 - 페이징 - 검색
 	public Page<Role> getList(int page, String kw) {
