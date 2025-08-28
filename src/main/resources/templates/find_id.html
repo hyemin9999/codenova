@@ -1,32 +1,36 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout}" lang="ko">
-<div layout:fragment="content" class="container my-3">
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-<meta charset="UTF-8">
 <meta name="_csrf1" th:content="${_csrf.token}" />
 <meta name="_csrf_header1" th:content="${_csrf.headerName}" />
 <title>아이디 찾기</title>
 </head>
-<body>
-    <p class="fw-bold">아이디 찾기 페이지</p>
-    <br>
-    <p class="fw-bold">이메일을 입력해주세요</p>
+<div layout:fragment="content" class="container my-3">
+
+	<p class="fw-bold">아이디 찾기 페이지</p>
+	<br>
+	<p class="fw-bold">이메일을 입력해주세요</p>
 
 
-<!-- action으로 post 경로로 정보를 보내고 -->
-<!-- object userFindIdForm의 양식을 따라서 정보를 이동시밈 -->
-<!-- BindingResult는 해당 클래스내 모든 파일을 검사함으로 따로 만들어서 email 하나만 만들어야함 -->
-    <form id="findIdEmail">
-        <div class="mb-3">
-            <label for="email">이메일 입력</label> 
-            <input type="email" id="email" name="email">
-        </div>
-        <button type="submit">아이디 찾기</button>
-    </form>
-    
-    <p id = "message"></p>
-    
-    <script>
+	<!-- action으로 post 경로로 정보를 보내고 -->
+	<!-- object userFindIdForm의 양식을 따라서 정보를 이동시밈 -->
+	<!-- BindingResult는 해당 클래스내 모든 파일을 검사함으로 따로 만들어서 email 하나만 만들어야함 -->
+	<form id="findIdEmail">
+		<div class="mb-3">
+			<label for="email">이메일 입력</label> <input type="email" id="email"
+				name="email">
+		</div>
+		<button type="submit">아이디 찾기</button>
+	</form>
+
+	<p id="message"></p>
+
+
+</div>
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
     document.getElementById('findIdEmail').addEventListener('submit', function(event) {
         event.preventDefault();
         const email = document.getElementById('email').value;
@@ -62,6 +66,4 @@
     });
   
     </script>
-    </body>
-</div>
 </html>

@@ -1,64 +1,88 @@
-<html layout:decorate="~{layout}">
+
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
+
 <meta name="_csrf2" th:content="${_csrf.token}" />
 <meta name="_csrf_header2" th:content="${_csrf.headerName}" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="jquery-3.7.1.min.js"></script>
+<script src="typeit.js"></script>
 </head>
 <div layout:fragment="content" class="container my-3">
-	<h5 class="border-bottom pb-2">회원가입</h5>
+	<!-- 	<div class="my-3 border-bottom"> -->
+	<!-- 		<div> -->
+	<!-- 			<h4>회원가입</h4> -->
+	<!-- 		</div> -->
+	<!-- 	</div> -->
+	<!-- 	<form th:action="@{/user/signup}" th:object="${userForm}" method="post"> -->
+	<!-- 		<div th:replace="~{form_errors :: formErrorsFragment}"></div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="username" class="form-label">사용자ID</label> <input -->
+	<!-- 				type="text" th:field="*{username}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="password1" class="form-label">비밀번호</label> <input -->
+	<!-- 				type="password" th:field="*{password1}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="password2" class="form-label">비밀번호 확인</label> <input -->
+	<!-- 				type="password" th:field="*{password2}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="email" class="form-label">이메일</label> <input type="email" -->
+	<!-- 				th:field="*{email}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="align-r"> -->
+	<!-- 			<button type="submit" class="btn btn-info">회원가입</button> -->
+	<!-- 		</div> -->
 
-	<div class="row">
-		<div class="col">
+	<!-- 	</form> -->
 
-			<form th:action="@{/user/signup}" th:object="${userForm}"
-				method="post">
-				<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-				<div class="mb-3">
-					<label for="username" class="form-label">사용자ID</label> <input
-						type="text" th:field="*{username}" class="form-control">
-				</div>
-				<div class="mb-3">
-					<label for="password1" class="form-label">비밀번호</label> <input
-						type="password" th:field="*{password1}" class="form-control">
-				</div>
-				<div class="mb-3">
-					<label for="password2" class="form-label">비밀번호 확인</label> <input
-						type="password" th:field="*{password2}" class="form-control">
-				</div>
-				<div class="mb-3">
-
-					<label for="email" class="form-label">이메일</label> <input
-						type="email" th:field="*{email}" class="form-control">
-
-					<button id="sendSmsAuth"
-						class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
-					<button id="modifyEmail" class="btn btn-primary" type="button"
-						disabled>이메일 수정</button>
-					<p class="editPhoneTitle" id="emailMessage"></p>
-					<div class="certification">
-						<div class="">
-							<input type="text" name="authCode" id="textCheck"
-								placeholder="6자리 문자열" class="certificationNumber"
-								autocomplete="off"> <span class="certificationTime">03:00</span>
-						</div>
-					</div>
-
-					<button id="checkSmsAuth" class="btn btn-primary" type="button"
-						disabled>인증</button>
-					<p id="authMessage"></p>
-
-				</div>
-				<div class="align-r">
-					<button type="submit" class="btn btn-info" id="clear1" disabled>회원가입</button>
-				</div>
-
-			</form>
-
-			<!-- 			<script src="typeit.js"></script> -->
-
+	<div class="my-3 border-bottom">
+		<div>
+			<h4>회원가입</h4>
 		</div>
 	</div>
 
+	<form th:action="@{/user/signup}" th:object="${userForm}" method="post">
+		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+		<div class="mb-3">
+			<label for="username" class="form-label">사용자ID</label> <input
+				type="text" th:field="*{username}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password1" class="form-label">비밀번호</label> <input
+				type="password" th:field="*{password1}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password2" class="form-label">비밀번호 확인</label> <input
+				type="password" th:field="*{password2}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="email" class="form-label">이메일</label> <input type="email"
+				id="email" th:field="*{email}" class="form-control">
+			<button id="sendSmsAuth"
+				class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
+			<button id="modifyEmail" class="btn btn-primary" type="button"
+				disabled>이메일 수정</button>
+			<p class="editPhoneTitle" id="emailMessage"></p>
+			<div class="certification">
+				<div class="">
+					<input type="text" name="authCode" id="textCheck"
+						placeholder="6자리 문자열" class="certificationNumber"
+						autocomplete="off"> <span class="certificationTime">03:00</span>
+				</div>
+			</div>
+			<button id="checkSmsAuth" class="btn btn-primary" type="button"
+				disabled>인증</button>
+			<p id="authMessage"></p>
+		</div>
+		<button type="submit" class="btn btn-primary" id="clear1" disabled>회원가입</button>
+	</form>
 </div>
+
 <script layout:fragment="script" type="text/javascript"
 	th:inline="javascript">
 // ===================================== 타이머 세팅 ======================
