@@ -1,4 +1,4 @@
-package com.woori.codenova;
+package com.woori.codenova.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +35,19 @@ public class UserSecurityService implements UserDetailsService {
 		SiteUser siteUser = _siteUser.get();
 
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		if ("admin".equals(username)) {
-			authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
+
+		if (!siteUser.getAuthority().isEmpty()) {
+			if (siteUser.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) // 슈퍼관리자
+			{
+				authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+			} else {
+				authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
+			}
+			System.out.println("siteUser.getAuthority() :: ADMIN");
+
 		} else {
-			authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
+			System.out.println("siteUser.getAuthority() :: USER");
+			authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 		}
 		// 새로운 User권한을 주며 기록함
 		return new User(siteUser.getUsername(), siteUser.getPassword(), authorities);
