@@ -1,3 +1,4 @@
+
 <html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
@@ -85,19 +86,18 @@
 <script layout:fragment="script" type="text/javascript"
 	th:inline="javascript">
 // ===================================== 타이머 세팅 ======================
-			let countTime = 0;
-let intervalCall;
+	let countTime = 0;
+	let intervalCall;
+	
+	$.time = function(time) { 
+		if (intervalCall) { // 이전에 실행 중인 타이머가 있다면 중지
+			clearInterval(intervalCall);
+		}
+		countTime = time;
+		intervalCall = setInterval(alertFunc, 1000);
+		};
 
-$.time = function(time) {
-    // 이전에 실행 중인 타이머가 있다면 중지
-    if (intervalCall) {
-        clearInterval(intervalCall);
-    }
-    countTime = time;
-    intervalCall = setInterval(alertFunc, 1000);
-};
-
-$.resetTime = function() {
+		$.resetTime = function() {
     clearInterval(intervalCall);
     countTime = 0;
     $('.certificationTime').text('03:00');
