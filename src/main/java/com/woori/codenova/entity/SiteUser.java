@@ -53,9 +53,6 @@ public class SiteUser {
 //	String = varchar
 // Integer = int
 // Long = bigint
-<<<<<<< HEAD
-}
-=======
 
 //	/**
 //	 * 암호화된 새 비밀번호로 비밀번호를 업데이트하는 메서드
@@ -71,4 +68,3 @@ public class SiteUser {
 	// 고유식별코드
 	private String providerId;
 }
->>>>>>> origin/f/user

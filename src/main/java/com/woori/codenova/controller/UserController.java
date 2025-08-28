@@ -62,11 +62,9 @@ public class UserController {
 		}
 
 		try {
-<<<<<<< HEAD
-			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail());
-=======
+
 			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail(), "local", null);
->>>>>>> origin/f/user
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			bindingResult.reject("singupFailed", e.getMessage());
@@ -82,26 +80,6 @@ public class UserController {
 	public String login() {
 		return "login_form";
 	}
-
-<<<<<<< HEAD
-	@GetMapping("/findid")
-	public String findId(UserFindIdForm userFindIdForm) { // Model 객체를 매개변수로 추가
-		return "find_id";
-	}
-=======
-//	// 아이디 찾기 매핑 연결후 테스트중
-//	@GetMapping("/findid")
-////	public String findId(Model model) { // Model 객체를 매개변수로 추가
-//	public String findId(UserFindIdForm userFindIdForm) { // Model 객체를 매개변수로 추가
-////		model.addAttribute("userCreateForm", new UserCreateForm()); // 빈 객체를 모델에 담음
-//		return "find_id";
-//	}
-
-// ================================
-// ========== 오류 페이지 출력 ====
-
-// ==================
->>>>>>> origin/f/user
 
 	@PostMapping("/findid")
 	public String findId1(@Valid UserFindIdForm userFindIdForm, BindingResult bindingResult, Model model) {
