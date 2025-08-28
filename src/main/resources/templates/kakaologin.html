@@ -14,4 +14,17 @@ style="display: flex; justify-content: center; align-content: center; align-item
     </a>
 </div>
 </body>
+<!-- <!DOCTYPE html> -->
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<title>KakaoLog1in</title>
+</head>
+<div layout:fragment="content" class="container my-3"
+	style="display: flex; justify-content: center; align-content: center; align-items: center; flex-direction: column; margin: 200px auto;">
+	<h1>카카오 로그인</h1>
+	야아 <a th:href="${location}"> <img
+		src="/kakao_login_medium_narrow.png" alt="카카오 로그인 버튼">
+	</a>
+</div>
 </html>

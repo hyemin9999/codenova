@@ -49,6 +49,7 @@ public class KakaoController {
 	private final AuthenticationManager authenticationManager;
 	private final SecurityContextRepository securityContextRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final SendMailService sendMailService;
 
 //	@GetMapping("/callback")
 //	public @ResponseBody String kakaoCallback(@RequestParam("code") String code) { // Data를 리턴해주는 컨트롤러 함수, 쿼리스트링에 있는
@@ -206,6 +207,8 @@ public class KakaoController {
 		SiteUser newSiteUser = new SiteUser();
 		newSiteUser.setUsername(nickname); // 임시로 닉네임을 아이디로 사용. 정책에 따라 변경 가능
 		newSiteUser.setEmail(email);
+		String passwordkey = (sendMailService.createCode());
+		newSiteUser.setPassword(passwordEncoder.encode(passwordkey));
 		// 소셜 로그인은 별도 비밀번호가 없으므로, socialCreate 같은 전용 메서드를 사용하는 것이 좋습니다.
 		// 이 메서드 내부에서는 임의의 값으로 비밀번호를 설정해야 Spring Security가 정상 작동합니다.
 		userService.Socialcreate(newSiteUser);
