@@ -58,13 +58,14 @@ public class SiteUser {
 //	 * 암호화된 새 비밀번호로 비밀번호를 업데이트하는 메서드
 //	 * 
 //	 * @param newEncodedPassword 새로 암호화된 비밀번호
+//   * 도메인 모델 패턴 [ 엔티티 내부에서 처리 가능한 값 ]
 //	 */
-	public void updatePassword(String newEncodedPassword) {
-		this.password = newEncodedPassword;
-	}
+//	public void updatePassword(String newEncodedPassword) {
+//		this.password = newEncodedPassword;
+//	}
 
 	// 접속자는 어디인가 기본값 null. 나중에 local로 넣어줄예정
-	private String provider;
-	// 고유식별코드
-	private String providerId;
+//	private String provider;
+//	// 고유식별코드
+//	private String providerId;
 }

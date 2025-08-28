@@ -80,7 +80,14 @@ public class UserController {
 
 	// 로그인폼으로 보내버림 -> 로그인 처리는 UserSecurityService 에서 처리함
 	@GetMapping("/login")
-	public String login() {
+	public String login(Model model) {
+		String Kakaolocation = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id
+				+ "&redirect_uri=" + redirect_uri;
+		model.addAttribute("Kakaolocation", Kakaolocation);
+
+//		public String KakaoLoignPage(Model model) {
+//		}
+
 		return "login_form";
 	}
 

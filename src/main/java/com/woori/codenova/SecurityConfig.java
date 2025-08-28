@@ -26,7 +26,10 @@ public class SecurityConfig {
 	// 모든 페이지에 접근 가능
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+				// 로그인 사용자는 아이디찾기,비밀번호찾기에 접근 불가
+				.requestMatchers(new AntPathRequestMatcher("/user/login"),
+						new AntPathRequestMatcher("/user/resetpassword"))
+				.anonymous().requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 
 				.csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
 				// h2-console을 보안에서 허용한다.
@@ -36,7 +39,14 @@ public class SecurityConfig {
 				// 로그인 페이지 -> /user/login , 로그인 성공시 -> / 로 돌아간다
 				.formLogin((formLogin) -> formLogin.loginPage("/user/login").defaultSuccessUrl("/"))
 				.logout(logout -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-						.logoutSuccessUrl("/").invalidateHttpSession(true));
+						.logoutSuccessUrl("/").invalidateHttpSession(true))
+
+				.exceptionHandling((exceptionHandling) -> exceptionHandling
+						.accessDeniedHandler((request, response, accessDeniedException) -> {
+							// 접근이 거부되면 메인 페이지("/")로 리다이렉트
+							response.sendRedirect("/");
+						}));
+
 		return http.build();
 	}
 
