@@ -57,10 +57,10 @@ public class UserService {
 		// 주석 처리한건 위에 final로 선언되어 가져온것
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		user.setPassword(passwordEncoder.encode(password));
-		user.setProvider(provider);
-		if (!"local".equals(provider)) {
-			user.setProviderId(userInfo.getId().toString());
-		}
+//		user.setProvider(provider);
+//		if (!"local".equals(provider)) {
+//			user.setProviderId(userInfo.getId().toString());
+//		}
 		this.userRepository.save(user);
 		return user;
 	}
@@ -83,7 +83,9 @@ public class UserService {
 		}
 		SiteUser user = userRepository.findByEmail(email).orElseThrow(NonExistentMemberException::new);
 
-		user.updatePassword(passwordEncoder.encode(newPassword));
+//		user.updatePassword(passwordEncoder.encode(newPassword));
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
 		// UUId 사용이후 redis에서 삭제하여 재사용을 방지한다.
 //		redisService.deleteValues(email);
 		// 이메일 삭제하면 uuid가 그대로 남아있으니 주의바람
@@ -150,19 +152,14 @@ public class UserService {
 		// 모든 검증 통과 후 로직 진행
 	}
 
-	// provider을 사용해서 어떤 회원가입인지 구분 기존:local 카카오:kakao
-	public Optional<SiteUser> findByProviderAndProviderId(String provider, String providerId) {
-		return userRepository.findByProviderAndProviderId(provider, providerId);
-	}
-
 	public Optional<SiteUser> findByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 
 	@Transactional
 	public void linkSocialAccount(SiteUser user, String provider, String providerId) {
-		user.setProvider(provider);
-		user.setProviderId(providerId);
+//		user.setProvider(provider);
+//		user.setProviderId(providerId);
 		userRepository.save(user);
 	}
 
@@ -176,8 +173,8 @@ public class UserService {
 
 		// 2. KakaoUserInfoResponseDto에서 정보 설정
 //		user.setEmail(userInfo.getKakaoAccount().getEmail());
-		user.setProvider("kakao");
-		user.setProviderId(userInfo.getId().toString());
+//		user.setProvider("kakao");
+//		user.setProviderId(userInfo.getId().toString());
 
 		// 3. 기타 정보 설정
 //		user.setCareteDate(LocalDateTime.now());
@@ -185,4 +182,18 @@ public class UserService {
 
 		return userRepository.save(user);
 	}
+
+	@Transactional
+	public SiteUser Socialcreate(SiteUser siteUser) {
+		return userRepository.save(siteUser);
+	}
+
+	public SiteUser createAndSaveSocialUser(String nickname, String email) {
+		SiteUser newSiteUser = new SiteUser();
+		newSiteUser.setUsername(nickname);
+		newSiteUser.setEmail(email);
+		// socialCreate와 유사하게 비밀번호 등 설정
+		return userRepository.save(newSiteUser);
+	}
+
 }
