@@ -55,17 +55,21 @@ public class Board {
 	@JoinColumn(name = "user_id") // FK 컬럼명 지정 (board.user_id → site_user.id)
 	private SiteUser author; // 작성자
 
+	// 게시판(게시글 분류)
 	@ManyToOne // (fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryId", nullable = false)
 	private Category category;
 
-	
 	@OneToMany(mappedBy = "board", // 연관관계의 주인은 Comment.board (FK는 comment 테이블에 존재)
 			cascade = CascadeType.REMOVE, // 부모(Board) 삭제 시 자식(Comment)도 함께 삭제 전이
 			// 또는 CascadeType.ALL: 저장/병합/삭제 등 모든 연산 전이(범위가 넓으므로 의도 없으면 REMOVE 권장)
 			orphanRemoval = true // 컬렉션에서 제거된 자식(Comment)을 고아로 보고 DB에서도 삭제
 	)
 	private List<Comment> commentList; // 이 게시글에 달린 모든 댓글(양방향: Comment.board)
+
+	// 업로드 파일
+	@OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+	private List<UploadFile> uploadFile;
 
 	@ManyToMany // 다대다: 게시글-사용자 간 '추천' 관계
 	@JoinTable(name = "Board_Voter", // 조인(중간) 테이블 이름
