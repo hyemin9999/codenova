@@ -126,7 +126,7 @@ public class AdminCategoryController {
 	@GetMapping("/delete/{id}")
 	public String delete(Principal principal, @PathVariable("id") Integer id) {
 
-		Category item = this.adminCategoryService.getitem(id);
+//		Category item = this.adminCategoryService.getitem(id);
 //		if (!item.getAuthor().getUsername().equals(principal.getName())) {
 //			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
 //		}
