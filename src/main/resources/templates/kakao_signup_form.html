@@ -1,13 +1,6 @@
-<html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
-	<head>
-
-<meta charset="UTF-8">
-<div class="my-3 border-bottom">
-	<div>
-		<h4>회원가입</h4>
-	</div>
-</div>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
 <style>
 button {
 	width: 124px;
@@ -62,37 +55,47 @@ input:focus {
 }
 </style>
 
-	</head>
-	<body>
-		<form th:action="@{/kakao/signup}" th:object="${userForm}"
-			method="post">
-			<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-			
-			
-			<div class="mb-3">
-				<label for="username" class="form-label">사용자ID</label> <input
-					type="text" th:field="*{username}" class="form-control">
-			</div>
-			<div class="mb-3">
-				<label for="password1" class="form-label">비밀번호</label> <input
-					type="password" th:field="*{password1}" class="form-control">
-			</div>
-			<div class="mb-3">
-				<label for="password2" class="form-label">비밀번호 확인</label> <input
-					type="password" th:field="*{password2}" class="form-control">
-			</div>
-			<div class="mb-3">
-				<label for="email" class="form-label">이메일 (카카오 제공)</label>
-				<input type="email" id="email" class="form-control" name ="email"
-				th:value="${#fields.hasErrors('email') ? userForm.getEmail() : email}" readonly>
-<!-- 				<input type="hidden" name="email" th:value="${email}"> -->
-			</div>
-			<button type="submit" class="btn btn-primary" id="clear1">회원가입</button>
-		</form>
-		
-		
-		
-		<script>
+</head>
+<div layout:fragment="content" class="container my-3">
+
+	<div class="my-3 border-bottom">
+		<div>
+			<h4>회원가입</h4>
+		</div>
+	</div>
+
+
+	<form th:action="@{/kakao/signup}" th:object="${userForm}"
+		method="post">
+		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+
+		<div class="mb-3">
+			<label for="username" class="form-label">사용자ID</label> <input
+				type="text" th:field="*{username}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password1" class="form-label">비밀번호</label> <input
+				type="password" th:field="*{password1}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password2" class="form-label">비밀번호 확인</label> <input
+				type="password" th:field="*{password2}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="email" class="form-label">이메일 (카카오 제공)</label> <input
+				type="email" id="email" class="form-control" name="email"
+				th:value="${#fields.hasErrors('email') ? userForm.getEmail() : email}"
+				readonly>
+			<!-- 				<input type="hidden" name="email" th:value="${email}"> -->
+		</div>
+		<button type="submit" class="btn btn-primary" id="clear1">회원가입</button>
+	</form>
+
+</div>
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
 		  document.addEventListener('DOMContentLoaded', (event) => {
 	            const emailInput = document.getElementById('email');
 	            const initialEmailValue = emailInput.value;
@@ -113,7 +116,4 @@ input:focus {
 		
 		
 		</script>
-	</body>
-
-</div>
 </html>

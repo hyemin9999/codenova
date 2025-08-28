@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 // HTTP 상태 코드 404(Not Found)를 반환하도록 설정
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class NonExistentMemberException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
 	// 기본 생성자
 	public NonExistentMemberException() {

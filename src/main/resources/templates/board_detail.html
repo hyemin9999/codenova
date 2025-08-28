@@ -1,67 +1,234 @@
-<!-- 기본 레이아웃 파일(layout.html)을 상속 -->
-<html layout:decorate="~{layout}">
+<!-- board_detail.html -->
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<!-- 콘텐츠 본문 영역 정의 -->
 <div layout:fragment="content" class="container my-3">
+	<h5 class="my-3 border-bottom pb-2">게시판</h5>
 
-    <!-- 게시글 제목 표시 -->
-    <h2 class="border-bottom py-2" th:text="${board.subject}"></h2>
+	<!-- 본문 카드 -->
+	<div class="card border-0 shadow-sm">
+		<div class="card-body bg-white">
+			<h3 class="border-bottom pb-2" th:text="${board.subject}"></h3>
 
-    <!-- 게시글 내용 카드 -->
-    <div class="card my-3">
-        <div class="card-body">
+			<!-- 본문 (Toast UI Viewer 등을 외부 script로 렌더링한다면 #ecp1 값을 사용) -->
+			<div id="viewer" class="card-text viewer"></div>
+			<input type="hidden" id="ecp1" th:value="${board.contents}">
 
-            <!-- 게시글 본문 (줄바꿈 유지) -->
-            <div class="card-text" style="white-space: pre-line;"
-                 th:text="${board.contents}"></div>
+			<div class="d-flex justify-content-between mt-2">
+				<!-- 액션 -->
+				<div class="mt-3">
+					<a href="javascript:void(0);"
+						class="recommend btn btn-sm btn-outline-info"
+						th:data-uri="@{|/board/vote/${board.id}|}"> 추천 <span
+						class="badge rounded-pill bg-info"
+						th:text="${#lists.size(board.voter)}"></span>
+					</a>
 
-            <!-- 게시글 작성일 표시 -->
-            <div class="d-flex justify-contents-end">
-                <div class="badge bg-light text-dark p-2 text-start">
-                    <div th:text="${#temporals.format(board.createDate, 'yyyy-MM-dd HH:mm')}"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+					<!-- 즐겨찾기 토글 -->
+					<a th:if="${favoritedBoard}" href="javascript:void(0);"
+						class="favorite btn btn-sm btn-outline-info"
+						th:data-uri="@{|/board/favorite/${board.id}|}"> <span
+						class="star_icon">⭐</span>
+					</a> <a th:unless="${favoritedBoard}" href="javascript:void(0);"
+						class="favorite btn btn-sm btn-outline-info"
+						th:data-uri="@{|/board/favorite/${board.id}|}"> <span
+						class="star_icon">☆</span>
+					</a>
 
-    <!-- 댓글 개수 표시 -->
-    <h5 class="border-bottom my-3 py-2"
-        th:text="|${#lists.size(board.commentList)}개의 답변이 있습니다.|"></h5>
+					<!-- 수정/삭제 (작성자만) -->
+					<a th:href="@{|/board/modify/${board.id}|}"
+						class="btn btn-sm btn-outline-info"
+						sec:authorize="isAuthenticated()"
+						th:if="${board.author != null and #authentication.getPrincipal().getUsername() == board.author.username}">
+						수정 </a> <a href="javascript:void(0);"
+						th:data-uri="@{|/board/delete/${board.id}|}"
+						class="delete btn btn-sm btn-outline-info"
+						sec:authorize="isAuthenticated()"
+						th:if="${board.author != null and #authentication.getPrincipal().getUsername() == board.author.username}">
+						삭제 </a>
+				</div>
 
-    <!-- 댓글 목록 반복 출력 -->
-    <div class="card my-3" th:each="comment : ${board.commentList}">
-        <div class="card-body">
+				<!-- 작성 정보 -->
+				<div
+					class="badge bg-info-custom bg-opacity-10 text-dark p-2 text-start">
+					<div class="mb-2">
+						<span th:if="${board.author != null}"
+							th:text="${board.author.username}"></span>
+					</div>
+					<div
+						th:text="${#temporals.format(board.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-            <!-- 댓글 내용 -->
-            <div class="card-text" style="white-space: pre-line;"
-                 th:text="${comment.contents}"></div>
+	<!-- 댓글 수 -->
+	<div class="d-flex justify-content-between mt-2 align-b">
+		<span th:text="|${cpaging.totalElements}개의 댓글이 있습니다.|"></span>
+	</div>
 
-            <!-- 댓글 작성일 표시 -->
-            <div class="d-flex justify-contents-end">
-                <div class="badge bg-light text-dark p-2 text-start">
-                    <div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- 댓글 반복 끝 -->
+	<!-- 댓글 리스트 -->
+	<div class="card border-0 shadow-sm my-3"
+		th:each="comment : ${cpaging.content}">
+		<a th:id="|comment_${comment.id}|"></a>
+		<div class="card-body bg-white">
+			<div class="card-text text-body"
+				th:utext="${@commonUtil.markdown(comment.contents)}"></div>
 
-    <!-- 댓글 작성 폼 -->
-    <!-- 사용자가 입력한 댓글을 서버로 전송함 -->
-    <form th:action="@{|/comment/create/${board.id}|}"
-          th:object="${commentForm}"
-          method="post"
-          class="my-3">
+			<div class="d-flex justify-content-between mt-2">
+				<div class="mt-3">
+					<!-- 추천 -->
+					<a href="javascript:void(0);"
+						class="recommend btn btn-sm btn-outline-info"
+						th:data-uri="@{|/comment/vote/${comment.id}|}"> 추천 <span
+						class="badge rounded-pill bg-info ms-1"
+						th:text="${#lists.size(comment.voter)}"></span>
+					</a>
 
-        <!-- 유효성 검사 에러 출력 -->
-        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+					<!-- 즐겨찾기 -->
+					<a th:if="${commentFavMap[comment.id]}" href="javascript:void(0);"
+						class="favorite btn btn-sm btn-outline-info"
+						th:data-uri="@{|/comment/favorite/${comment.id}|}"> <span
+						class="star_icon">⭐</span>
+					</a> <a th:unless="${commentFavMap[comment.id]}"
+						href="javascript:void(0);"
+						class="favorite btn btn-sm btn-outline-info"
+						th:data-uri="@{|/comment/favorite/${comment.id}|}"> <span
+						class="star_icon">☆</span>
+					</a>
 
-        <!-- 댓글 내용 입력 -->
-        <textarea th:field="*{contents}" rows="10" class="form-control"></textarea>
+					<!-- 수정/삭제 (작성자만) -->
+					<a th:href="@{|/comment/modify/${comment.id}|}"
+						class="btn btn-sm btn-outline-info"
+						sec:authorize="isAuthenticated()"
+						th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}">
+						수정 </a> <a href="javascript:void(0);"
+						th:data-uri="@{|/comment/delete/${comment.id}|}"
+						class="delete btn btn-sm btn-outline-info"
+						sec:authorize="isAuthenticated()"
+						th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}">
+						삭제 </a>
+				</div>
 
-        <!-- 댓글 등록 버튼 -->
-        <input type="submit" value="답변등록" class="btn btn-primary my-2">
-    </form>
+				<div
+					class="badge bg-info-custom bg-opacity-10 text-dark p-2 text-start">
+					<div class="mb-2">
+						<span th:if="${comment.author != null}"
+							th:text="${comment.author.username}"></span>
+					</div>
+					<div
+						th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 댓글 페이징 (10개 블록 + 처음/이전/다음/마지막) -->
+	<div th:if="${!cpaging.isEmpty()}"
+		th:with="
+          blockStart=${cpaging.number - (cpaging.number % 10)},
+          blockEnd=${(cpaging.number - (cpaging.number % 10)) + 9},
+          lastIndex=${cpaging.totalPages - 1},
+          isFirstBlock=${(cpaging.number - (cpaging.number % 10)) == 0},
+          isLastBlock=${((cpaging.number - (cpaging.number % 10)) + 9) >= (cpaging.totalPages - 1)}
+       ">
+		<ul class="pagination justify-content-center">
+
+			<!-- « 처음 : 첫 블록에서는 숨김 -->
+			<li class="page-item" th:if="${!isFirstBlock}"><a
+				class="page-link cpage-link" href="javascript:void(0)"
+				th:data-page="0" aria-label="처음"> <span aria-hidden="true">&laquo;</span><span
+					class="visually-hidden">처음</span>
+			</a></li>
+
+			<!-- ‹ 이전 : 첫 블록에서는 숨김 -->
+			<li class="page-item" th:if="${!isFirstBlock}"><a
+				class="page-link cpage-link" href="javascript:void(0)"
+				th:data-page="${cpaging.number - 1}" aria-label="이전"> <span
+					aria-hidden="true">&lsaquo;</span><span class="visually-hidden">이전</span>
+			</a></li>
+
+			<!-- 숫자 10개 묶음 -->
+			<li
+				th:each="page : ${#numbers.sequence(blockStart, T(java.lang.Math).min(blockEnd, lastIndex))}"
+				class="page-item"
+				th:classappend="${page == cpaging.number} ? 'active'"><a
+				class="page-link cpage-link" href="javascript:void(0)"
+				th:text="${page + 1}" th:data-page="${page}"></a></li>
+
+			<!-- › 다음 : 마지막 블록에서는 숨김 -->
+			<li class="page-item" th:if="${!isLastBlock}"><a
+				class="page-link cpage-link" href="javascript:void(0)"
+				th:data-page="${cpaging.number + 1}" aria-label="다음"> <span
+					aria-hidden="true">&rsaquo;</span><span class="visually-hidden">다음</span>
+			</a></li>
+
+			<!-- » 마지막 : 마지막 블록에서는 숨김 -->
+			<li class="page-item" th:if="${!isLastBlock}"><a
+				class="page-link cpage-link" href="javascript:void(0)"
+				th:data-page="${lastIndex}" aria-label="마지막"> <span
+					aria-hidden="true">&raquo;</span><span class="visually-hidden">마지막</span>
+			</a></li>
+
+		</ul>
+	</div>
+
+	<!-- 댓글 작성 -->
+	<form th:action="@{|/comment/create/${board.id}|}"
+		th:object="${commentForm}" method="post" class="my-3">
+		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+		<textarea sec:authorize="isAnonymous()" disabled
+			th:field="*{contents}" class="form-control" rows="6"></textarea>
+		<textarea sec:authorize="isAuthenticated()" th:field="*{contents}"
+			class="form-control" rows="6"></textarea>
+
+		<input type="submit" value="저장" class="btn btn-info my-2"> <a
+			th:href="@{/board/list}" class="btn btn-info my-2">목록</a>
+	</form>
+
+	<!-- 댓글 페이지 이동용 폼 -->
+	<form th:action="@{|/board/detail/${board.id}|}" method="get"
+		id="cmtPageForm">
+		<input type="hidden" id="cpage" name="cpage"
+			th:value="${cpaging.number}">
+	</form>
 
 </div>
+
+<script layout:fragment="script" type="text/javascript">
+	// 삭제 확인
+	Array.from(document.getElementsByClassName("delete")).forEach(function(el) {
+		el.addEventListener('click', function() {
+			if (confirm("정말로 삭제하시겠습니까?"))
+				location.href = this.dataset.uri;
+		});
+	});
+
+	// 추천/즐겨찾기 토글
+	Array.from(document.getElementsByClassName("recommend")).forEach(
+			function(el) {
+				el.addEventListener('click', function(e) {
+					e.preventDefault();
+					location.href = this.dataset.uri;
+				});
+			});
+	Array.from(document.getElementsByClassName("favorite")).forEach(
+			function(el) {
+				el.addEventListener('click', function(e) {
+					e.preventDefault();
+					location.href = this.dataset.uri;
+				});
+			});
+
+	// 댓글 페이지 이동
+	Array.from(document.getElementsByClassName("cpage-link")).forEach(
+			function(el) {
+				el.addEventListener('click', function() {
+					document.getElementById('cpage').value = this.dataset.page;
+					document.getElementById('cmtPageForm').submit();
+				});
+			});
+</script>
 </html>
