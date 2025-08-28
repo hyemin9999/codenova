@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.UserRepository;
@@ -23,9 +24,10 @@ public class UserSecurityService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 
-	@Override
 	// username으로 선언해야 로그인 가능 (String userId)하면 실행불가함
 	// 또한 여기 정보는 login_form에서 가져오는 거니 참고할것
+	@Override
+	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<SiteUser> _siteUser = this.userRepository.findByUsername(username);
 		if (_siteUser.isEmpty()) {

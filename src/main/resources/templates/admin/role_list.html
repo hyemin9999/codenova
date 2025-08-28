@@ -37,10 +37,10 @@
 							th:href="@{|/admin/role/list/${item.id}|}" th:text="${item.name}"></a></td>
 						<td
 							th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-<!-- 						<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a -->
-<!-- 							href="javascript:void(0);" -->
-<!-- 							class="delete btn btn-sm btn-outline-info" -->
-<!-- 							th:data-uri="@{|/admin/role/delete/${item.id}|}" th:text="삭제"></a></td> -->
+						<!-- 						<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a -->
+						<!-- 							href="javascript:void(0);" -->
+						<!-- 							class="delete btn btn-sm btn-outline-info" -->
+						<!-- 							th:data-uri="@{|/admin/role/delete/${item.id}|}" th:text="삭제"></a></td> -->
 					</tr>
 					<tr class="text-center" th:if="${paging.isEmpty()}">
 						<td colspan="4">역할이 존재하지 않습니다.</td>
@@ -112,6 +112,19 @@
 		</div>
 	</div>
 </div>
-<script layout:fragment="script" type='text/javascript'
-	th:src="@{/list_search.js}"></script>
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+	$(document).ready(function() {
+		const message = /*[[${message}]]*/'';
+		if (message.length != 0) {
+			$('#message').text(message);
+			$('#modal').modal('show');
+		}
+
+		$('#modal').on('hide.bs.modal', function(event) {
+
+		});
+
+	});
+</script>
 </html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html layout:decorate="~{admin/layout}"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div layout:fragment="content" class="container my-3">
+
+	<h5 class="border-bottom pb-2">공지사항 관리</h5>
+	<div class="row">
+		<div class="col">
+			<div class="card my-3">
+				<div class="card-body">
+					<h3 class="border-bottom py-2 pt-0" th:text="${item.subject}"></h3>
+					<div id="viewer" class="card-text viewer"></div>
+					<input type="hidden" id="ecp1" th:value="${item.contents}">
+					<div class="d-flex justify-content-between mt-2">
+						<div class="mt-3">
+							<a th:href="@{|/admin/notice/modify/${item.id}|}"
+								class="btn btn-sm btn-outline-info"
+								sec:authorize="isAuthenticated()"
+								th:if="${item.author != null and #authentication.getPrincipal().getUsername() == item.author.username}"
+								th:text="수정"></a> <a href="javascript:void(0);"
+								th:data-uri="@{|/admin/notice/delete/${item.id}|}"
+								class="delete btn btn-sm btn-outline-info"
+								sec:authorize="isAuthenticated()"
+								th:if="${item.author != null and #authentication.getPrincipal().getUsername() == item.author.username}"
+								th:text="삭제"></a>
+						</div>
+						<div class="badge bg-info bg-opacity-10 text-dark p-2 text-start">
+							<div class="mb-2" th:if="${item.author !=null}">
+								<span th:text="${item.author.username}"></span>
+							</div>
+							<div
+								th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="align-r">
+				<a class="btn btn-info" th:href="@{/admin/notice/list}">목록</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+</html>

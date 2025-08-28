@@ -27,7 +27,7 @@
 						<th>사용자 ID</th>
 						<th>Email</th>
 						<th>가입일</th>
-<!-- 						<th></th> -->
+						<!-- 						<th></th> -->
 					</tr>
 				</thead>
 				<tbody>
@@ -42,10 +42,10 @@
 						<td><span th:text="${item.email}"></span></td>
 						<td
 							th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-<!-- 						<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a -->
-<!-- 							href="javascript:void(0);" th:if="${item.username != 'admin'}" -->
-<!-- 							class="delete btn btn-sm btn-outline-info" -->
-<!-- 							th:data-uri="@{|/admin/user/delete/${item.id}|}" th:text="삭제"></a></td> -->
+						<!-- 						<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a -->
+						<!-- 							href="javascript:void(0);" th:if="${item.username != 'admin'}" -->
+						<!-- 							class="delete btn btn-sm btn-outline-info" -->
+						<!-- 							th:data-uri="@{|/admin/user/delete/${item.id}|}" th:text="삭제"></a></td> -->
 					</tr>
 					<tr class="text-center" th:if="${paging.isEmpty()}">
 						<td colspan="5">회원이 존재하지 않습니다.</td>
@@ -73,7 +73,8 @@
 				</ul>
 			</div>
 			<form th:action="@{/admin/user/list}" method="get" id="searchForm">
-				<input type="hidden" id="kw" name="kw" th:value="${kw}"> <input
+				<input type="hidden" id="kw" name="kw" th:value="${kw}"><input
+					type="hidden" id="field" name="field" th:value="${field}"><input
 					type="hidden" id="page" name="page" th:value="${paging.number}">
 			</form>
 		</div>
@@ -166,8 +167,20 @@
 		</div>
 	</div>
 </div>
-<script layout:fragment="script" type='text/javascript'
-	th:src="@{/list_search.js}">
-	
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+	$(document).ready(function() {
+		const message = /*[[${message}]]*/'';
+		if (message.length != 0) {
+			$('#message').text(message);
+			$('#modal').modal('show');
+		}
+
+		$('#modal').on('hide.bs.modal', function(event) {
+
+		});
+
+	});
 </script>
 </html>
