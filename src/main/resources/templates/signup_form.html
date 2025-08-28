@@ -1,112 +1,89 @@
-<html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
-	<head>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
 
-<meta charset="UTF-8">
 <meta name="_csrf2" th:content="${_csrf.token}" />
 <meta name="_csrf_header2" th:content="${_csrf.headerName}" />
-<div class="my-3 border-bottom">
-	<div>
-		<h4>회원가입</h4>
-	</div>
-</div>
-<style>
-button {
-	width: 124px;
-	height: 42px;
-	color: #616161;
-	padding: 0;
-	box-sizing: border-box;
-	border: 1px solid #eee;
-	border-radius: 10px;
-	text-align: center;
-	cursor: pointer;
-}
-
-input, select {
-	vertical-align: middle;
-	border: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-}
-
-input {
-	box-sizing: border-box;
-	width: 50%;
-	padding: 0 0 12px 0;
-	font-size: 1.5rem;
-	border-bottom: 2px solid #eeeeee;
-}
-
-/*placeholder 공통*/
-input::placeholder {
-	font-size: 1.5rem;
-	font-weight: 00;
-	color: #9e9e9e;
-}
-
-/*input focus 되면 border 색 변경*/
-input:focus {
-	outline: none;
-	border-bottom: 2px solid #5d5fef;
-}
-
-.certification {
-	margin-bottom: 10px;
-}
-
-.certificationTime {
-	font-size: 0.875rem;
-	font-weight: 700;
-	color: #616161;
-	line-height: 28px;
-}
-</style>
-
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="jquery-3.7.1.min.js"></script>
 <script src="typeit.js"></script>
-	</head>
-	<body>
-		<form th:action="@{/user/signup}" th:object="${userForm}"
-			method="post">
-			<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-			<div class="mb-3">
-				<label for="username" class="form-label">사용자ID</label> <input
-					type="text" th:field="*{username}" class="form-control">
-			</div>
-			<div class="mb-3">
-				<label for="password1" class="form-label">비밀번호</label> <input
-					type="password" th:field="*{password1}" class="form-control">
-			</div>
-			<div class="mb-3">
-				<label for="password2" class="form-label">비밀번호 확인</label> <input
-					type="password" th:field="*{password2}" class="form-control">
-			</div>
-			<div class="mb-3">
-				<label for="email" class="form-label">이메일</label> <input
-					type="email" id="email" th:field="*{email}" class="form-control">
-				<button id="sendSmsAuth"
-					class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
-				<button id="modifyEmail"
-					class="btn btn-primary" type="button"
-					disabled>이메일 수정</button>
-				<p class="editPhoneTitle" id="emailMessage"></p>
-				<div class="certification">
-					<div class="">
-						<input type="text" name="authCode" id="textCheck"
-							placeholder="6자리 문자열" class="certificationNumber"
-							autocomplete="off"> <span class="certificationTime">03:00</span>
-					</div>
+</head>
+<div layout:fragment="content" class="container my-3">
+	<!-- 	<div class="my-3 border-bottom"> -->
+	<!-- 		<div> -->
+	<!-- 			<h4>회원가입</h4> -->
+	<!-- 		</div> -->
+	<!-- 	</div> -->
+	<!-- 	<form th:action="@{/user/signup}" th:object="${userForm}" method="post"> -->
+	<!-- 		<div th:replace="~{form_errors :: formErrorsFragment}"></div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="username" class="form-label">사용자ID</label> <input -->
+	<!-- 				type="text" th:field="*{username}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="password1" class="form-label">비밀번호</label> <input -->
+	<!-- 				type="password" th:field="*{password1}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="password2" class="form-label">비밀번호 확인</label> <input -->
+	<!-- 				type="password" th:field="*{password2}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="mb-3"> -->
+	<!-- 			<label for="email" class="form-label">이메일</label> <input type="email" -->
+	<!-- 				th:field="*{email}" class="form-control"> -->
+	<!-- 		</div> -->
+	<!-- 		<div class="align-r"> -->
+	<!-- 			<button type="submit" class="btn btn-info">회원가입</button> -->
+	<!-- 		</div> -->
+
+	<!-- 	</form> -->
+
+	<div class="my-3 border-bottom">
+		<div>
+			<h4>회원가입</h4>
+		</div>
+	</div>
+
+	<form th:action="@{/user/signup}" th:object="${userForm}" method="post">
+		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+		<div class="mb-3">
+			<label for="username" class="form-label">사용자ID</label> <input
+				type="text" th:field="*{username}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password1" class="form-label">비밀번호</label> <input
+				type="password" th:field="*{password1}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="password2" class="form-label">비밀번호 확인</label> <input
+				type="password" th:field="*{password2}" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="email" class="form-label">이메일</label> <input type="email"
+				id="email" th:field="*{email}" class="form-control">
+			<button id="sendSmsAuth"
+				class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
+			<button id="modifyEmail" class="btn btn-primary" type="button"
+				disabled>이메일 수정</button>
+			<p class="editPhoneTitle" id="emailMessage"></p>
+			<div class="certification">
+				<div class="">
+					<input type="text" name="authCode" id="textCheck"
+						placeholder="6자리 문자열" class="certificationNumber"
+						autocomplete="off"> <span class="certificationTime">03:00</span>
 				</div>
-				<button id="checkSmsAuth" class="btn btn-primary" type="button" disabled>인증</button>
-				<p id="authMessage"></p>
 			</div>
-			<button type="submit" class="btn btn-primary" id="clear1" disabled>회원가입</button>
-		</form>
-		<script>
+			<button id="checkSmsAuth" class="btn btn-primary" type="button"
+				disabled>인증</button>
+			<p id="authMessage"></p>
+		</div>
+		<button type="submit" class="btn btn-primary" id="clear1" disabled>회원가입</button>
+	</form>
+</div>
+
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
 // ===================================== 타이머 세팅 ======================
 			let countTime = 0;
 let intervalCall;
@@ -327,7 +304,4 @@ $('.certificationIssue').on("click", function() {
         });
         
 		</script>
-	</body>
-
-</div>
 </html>

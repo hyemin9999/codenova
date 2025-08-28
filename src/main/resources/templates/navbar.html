@@ -1,6 +1,9 @@
-
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <nav th:fragment="navbarFragment"
-	class="navbar navbar-expand-lg navbar-light bg-secondary border-bottom">
+	class="navbar navbar-expand-lg bg-info-subtle">
 	<div class="container-fluid">
 		<a class="navbar-brand" href="/">CodeNova</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -11,13 +14,26 @@
 		</button>
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-				<a class="nav-link" sec:authorize="isAnonymous()"	th:href="@{/user/login}">로그인</a>
-				<a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
-				<a class="nav-link" th:href="@{/user/signup}">회원가입</a>
-				<a class="nav-link" sec:authorize="isAnonymous()"	th:href="@{/user/findid}">아이디 찾기</a>
-				<a class="nav-link" sec:authorize="isAnonymous()"	th:href="@{/user/resetpassword}">비밀번호 찾기</a>
-<!-- 				<a class= "nav-link" sec:authorize = "isAnonymous()" th:href="@{/useridpwquiry}">구현예정</a> -->
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a><a
+					class="nav-link" sec:authorize="isAuthenticated()"
+					th:href="@{/user/logout}">로그아웃</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/user/signup}" sec:authorize="isAnonymous()">회원가입</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/notice/list}">공지사항</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/board/list}">게시판</a></li>
+				<li class="nav-item" sec:authorize="hasRole('ADMIN')"><a
+					class="nav-link" href="#">관리자 페이지</a></li>
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/findid}">아이디 찾기</a></li>
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/resetpassword}">비밀번호
+						찾기</a></li>
+				<!-- 			<li class="nav-item">	<a class= "nav-link" sec:authorize = "isAnonymous()" th:href="@{/useridpwquiry}">구현예정</a></li> -->
 			</ul>
 		</div>
 	</div>
 </nav>
+</html>

@@ -61,9 +61,6 @@ public class UserController {
 			return "signup_form";
 		}
 
-		// 서비스 계층 호출하려다남은 잔재
-//		userService.createUserTest(userCreateForm.getUserid(), userCreateForm.getEmail());
-
 		try {
 			userService.create(userForm.getUsername(), userForm.getPassword1(), userForm.getEmail(), "local", null);
 		} catch (Exception e) {
@@ -74,8 +71,6 @@ public class UserController {
 		}
 		// 회원가입 끝나면 메인화면에 연결된 곳으로 보내버림
 		return "redirect:/";
-		// 회원가입 축하페이지 테스트용 코드
-//		return "signupsuccess_form";
 	}
 
 	// 로그인폼으로 보내버림 -> 로그인 처리는 UserSecurityService 에서 처리함
@@ -91,6 +86,10 @@ public class UserController {
 		return "login_form";
 	}
 
+	@GetMapping("/findid")
+	public String findId(UserFindIdForm userFindIdForm) { // Model 객체를 매개변수로 추가
+		return "find_id";
+	}
 //	// 아이디 찾기 매핑 연결후 테스트중
 //	@GetMapping("/findid")
 ////	public String findId(Model model) { // Model 객체를 매개변수로 추가
@@ -113,7 +112,7 @@ public class UserController {
 
 			return "login_form";
 		}
-//		userService.find_id(userCreateForm.getEmail()); 
+
 		try {
 			// 1. 서비스에서 반환된 SiteUser 객체를 받습니다.
 			SiteUser siteUser = userService.find_id(userFindIdForm.getEmail());
@@ -132,15 +131,15 @@ public class UserController {
 			bindingResult.reject("emailNotFound", e.getMessage());
 			return "main"; // 다시 폼 페이지로 돌아감
 		}
-//		return "find_id";
+
 	}
 
 	// 아이디 찾기 이메일 검증 테스트중 ======================
 	// =======================================================
-	@GetMapping("/findid")
-	public String Findid() {
-		return "find_id";
-	}
+//	@GetMapping("/findid")
+//	public String Findid() {
+//		return "find_id";
+//	}
 
 	@GetMapping("/find-id/{uuid}")
 	public String FindidClear(@PathVariable("uuid") String uuid, Model model) {

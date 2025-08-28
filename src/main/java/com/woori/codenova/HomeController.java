@@ -25,4 +25,10 @@ public class HomeController {
 	public String signupsuccess() {
 		return "signupsuccess_form";
 	}
+
+	@GetMapping(value = { "/i", "/index/" })
+	public String index() {
+		return "index";
+	}
+
 }

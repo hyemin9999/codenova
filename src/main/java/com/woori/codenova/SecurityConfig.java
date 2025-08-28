@@ -51,12 +51,12 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public SecurityContextRepository securityContextRepository() {
+	SecurityContextRepository securityContextRepository() {
 		return new HttpSessionSecurityContextRepository();
 	}
 
