@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.BoardRepository;
 
@@ -39,7 +40,7 @@ public class BoardService {
 	 * 내용/댓글 작성자(username) 중 하나라도 키워드(kw)를 포함하면 매칭되도록 OR 조건을 구성. - LEFT JOIN 으로
 	 * 작성자/댓글/댓글작성자 연관을 묶고, 중복 제거를 위해 distinct(true) 지정.
 	 */
-	private Specification<Board> search(String kw, String field) {
+	private Specification<Board> search(String kw, String field, Integer cid) {
 		return new Specification<Board>() {
 			private static final long serialVersionUID = 1L;
 
@@ -51,11 +52,15 @@ public class BoardService {
 //				Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
 //				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
 
+				Join<Board, Category> ca = q.join("category", JoinType.LEFT);
+
 				Predicate byTitle = cb.like(q.get("subject"), "%" + kw + "%"); // 제목
 				Predicate byContent = cb.like(q.get("contents"), "%" + kw + "%"); // 내용
 				Predicate byAuthor = cb.like(u1.get("username"), "%" + kw + "%"); // 글쓴이(작성자)
 //				Predicate byCmt = cb.like(a.get("contents"), "%" + kw + "%"); // 댓글 내용
 //				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
+
+				Predicate category = cb.equal(ca.get("id"), cid);
 
 				// ✅ 선택한 검색대상에 맞춰 조건 분기
 				switch (field) {
@@ -68,7 +73,13 @@ public class BoardService {
 				case "all":
 				default:
 					// 제목+내용(+작성자/댓글/댓글작성자) — 기존처럼 확장 검색
-					return cb.or(byTitle, byContent);
+					// return cb.or(byTitle, byContent);
+					if (cid != 0) {
+						return cb.and(cb.or(byTitle, byContent), category);
+
+					} else {
+						return cb.or(byTitle, byContent);
+					}
 				}
 			}
 		};
@@ -100,12 +111,12 @@ public class BoardService {
 	}
 
 	// ✅ 페이징 처리된 게시글 목록 조회 (page: 0부터 시작)
-	public Page<Board> getList(int page, String kw, String field) {
+	public Page<Board> getList(int page, String kw, String field, Integer cid) {
 		List<Sort.Order> sorts = new ArrayList<>();
 		sorts.add(Sort.Order.desc("createDate"));
 		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
 
-		Specification<Board> spec = search(kw, field);
+		Specification<Board> spec = search(kw, field, cid);
 		return this.boardRepository.findAll(spec, pageable);
 	}
 
