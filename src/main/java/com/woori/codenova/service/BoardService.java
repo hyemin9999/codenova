@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.BoardRepository;
+import com.woori.codenova.repository.CategoryRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -35,6 +37,7 @@ public class BoardService {
 	// 의존성 주입: 게시글 저장소 (Spring Data JPA 프록시 구현체가 주입됨)
 	private final BoardRepository boardRepository;
 
+	private final CategoryRepository c;
 	/**
 	 * 검색용 Specification 빌더 - 동적 쿼리를 위해 JPA Criteria 를 사용. - 제목/내용/작성자(username)/댓글
 	 * 내용/댓글 작성자(username) 중 하나라도 키워드(kw)를 포함하면 매칭되도록 OR 조건을 구성. - LEFT JOIN 으로
@@ -110,6 +113,23 @@ public class BoardService {
 		q.setContents(contents); // 내용 설정(마크다운 등)
 		q.setCreateDate(LocalDateTime.now()); // 생성 일시 설정
 		q.setAuthor(user); // 작성자 설정
+	
+		Category c2 = c.findByname("자유게시판").orElse(null);
+		q.setCategory(c2);
+		q.setViewCount(0);
+		q.setDelete(false);
+		this.boardRepository.save(q); // 영속화(INSERT)
+	}
+	
+	public void create1(String subject, String contents, SiteUser user, Category c) {
+		Board q = new Board(); // 새 엔티티 인스턴스 생성
+		q.setSubject(subject); // 제목 설정
+		q.setContents(contents); // 내용 설정(마크다운 등)
+		q.setCreateDate(LocalDateTime.now()); // 생성 일시 설정
+		q.setViewCount(0);
+		q.setDelete(false);
+		q.setAuthor(user); // 작성자 설정
+		q.setCategory(c);
 		this.boardRepository.save(q); // 영속화(INSERT)
 	}
 

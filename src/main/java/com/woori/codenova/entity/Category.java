@@ -33,9 +33,9 @@ public class Category {
 	// 수정날짜
 	private LocalDateTime modifyDate;
 
-//	// 게시글 == board
-//	@OneToMany(mappedBy = "category")
-//	private List<Board> boardList;
+	// 게시글 == board
+	@OneToMany(mappedBy = "category")
+	private List<Board> boardList;
 
 	// 공지사항 - 게시글
 	@OneToMany(mappedBy = "category")
