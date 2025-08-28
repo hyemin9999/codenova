@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.Board;
-import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.BoardRepository;
 
@@ -42,19 +41,21 @@ public class BoardService {
 	 */
 	private Specification<Board> search(String kw, String field) {
 		return new Specification<Board>() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Predicate toPredicate(Root<Board> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
 				query.distinct(true);
 
 				Join<Board, SiteUser> u1 = q.join("author", JoinType.LEFT);
-				Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
-				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
+//				Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
+//				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
 
 				Predicate byTitle = cb.like(q.get("subject"), "%" + kw + "%"); // 제목
 				Predicate byContent = cb.like(q.get("contents"), "%" + kw + "%"); // 내용
 				Predicate byAuthor = cb.like(u1.get("username"), "%" + kw + "%"); // 글쓴이(작성자)
-				Predicate byCmt = cb.like(a.get("contents"), "%" + kw + "%"); // 댓글 내용
-				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
+//				Predicate byCmt = cb.like(a.get("contents"), "%" + kw + "%"); // 댓글 내용
+//				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
 
 				// ✅ 선택한 검색대상에 맞춰 조건 분기
 				switch (field) {

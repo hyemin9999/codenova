@@ -15,13 +15,10 @@ import org.springframework.stereotype.Service;
 
 import com.woori.codenova.entity.Role;
 import com.woori.codenova.entity.SiteUser;
-import com.woori.codenova.repository.RoleRepository;
 import com.woori.codenova.repository.UserRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminUserService {
 
 	private final UserRepository userReporitory;
-	private final RoleRepository roleReporitory;
+//	private final RoleRepository roleReporitory;
 	private final PasswordEncoder passwordEncoder;
 
 	// 목록 - 페이징 - 검색
@@ -133,18 +130,18 @@ public class AdminUserService {
 		};
 	}
 
-	// 검색
-	private Specification<SiteUser> search(Integer roleId) {
-		return new Specification<>() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Predicate toPredicate(Root<SiteUser> r, CriteriaQuery<?> q, CriteriaBuilder cb) {
-
-				q.distinct(true); // 중복을 제거
-				Join<SiteUser, Role> role = r.join("authority", JoinType.LEFT);
-				return cb.equal(role.get("Id"), roleId); // role id
-			}
-		};
-	}
+//	// 검색
+//	private Specification<SiteUser> search(Integer roleId) {
+//		return new Specification<>() {
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public Predicate toPredicate(Root<SiteUser> r, CriteriaQuery<?> q, CriteriaBuilder cb) {
+//
+//				q.distinct(true); // 중복을 제거
+//				Join<SiteUser, Role> role = r.join("authority", JoinType.LEFT);
+//				return cb.equal(role.get("Id"), roleId); // role id
+//			}
+//		};
+//	}
 }
