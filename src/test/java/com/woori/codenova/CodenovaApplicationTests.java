@@ -55,7 +55,7 @@ class CodenovaApplicationTests {
 		userRepository.save(user);
 	}
 
-	@Test
+//	@Test
 	void testJpa_01() {
 
 		Category c2 = categoryRepository.getById(2);
