@@ -7,16 +7,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Comment;
+import com.woori.codenova.entity.Role;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.BoardRepository;
+import com.woori.codenova.repository.CategoryRepository;
 import com.woori.codenova.repository.CommentRepository;
+import com.woori.codenova.repository.RoleRepository;
 import com.woori.codenova.repository.UserRepository;
 import com.woori.codenova.service.BoardService;
 
@@ -25,19 +30,23 @@ class CodenovaApplicationTests {
 
 	@Autowired
 	private BoardRepository boardRepository;
+	@Autowired
+	private BoardService boardService;
 
 	@Autowired
 	private CommentRepository commentRepository;
-
-	@Autowired
-	private BoardService boardService;
 
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@Test
+	@Autowired
+	private RoleRepository roleReporitory;
+	@Autowired
+	private CategoryRepository categoryRepository;
+
+//	@Test
 	void passwordChangeTest() {
 		SiteUser user = userRepository.findByEmail("user1@test.com").orElse(null);
 		user.setPassword(passwordEncoder.encode("!A1234"));
@@ -183,6 +192,61 @@ class CodenovaApplicationTests {
 			String contents = "내용무";
 			this.boardService.create(subject, contents, null);
 		}
+	}
+
+//	@Test
+	void insertRoles() {
+		// 역할 초기값 ==> 슈퍼 관리자(1) insert
+
+		Role r2 = new Role();
+		r2.setName("관리자");
+		r2.setGrade(1);
+		r2.setCreateDate(LocalDateTime.now());
+		roleReporitory.save(r2);
+	}
+
+//	@Test
+	void insertUsers() {
+		// 사용자 초기값 ==> 사용자(user), 관리자(admin) insert
+		SiteUser u1 = new SiteUser();
+		u1.setUsername("admin");
+		u1.setPassword(passwordEncoder.encode("1234"));
+		u1.setEmail("admin@email.com");
+		u1.setCreateDate(LocalDateTime.now());
+		userRepository.save(u1);
+
+		SiteUser u2 = new SiteUser();
+		u2.setUsername("user");
+		u2.setPassword(passwordEncoder.encode("1234"));
+		u2.setEmail("user@email.com");
+		u2.setCreateDate(LocalDateTime.now());
+		userRepository.save(u2);
+	}
+
+//	@Test
+	@Transactional // 트랜잭션 추가
+	@Rollback(value = false)
+	void insertUser_Authority() {
+
+		SiteUser u1 = userRepository.findByUsername("admin").orElse(null);
+		assertTrue(u1 != null);
+
+		Role r1 = roleReporitory.findByGrade(1).orElse(null);
+		assertTrue(r1 != null);
+
+		u1.getAuthority().add(r1);
+		userRepository.save(u1);
+
+	}
+
+//	@Test
+	void insertCategory() {
+
+		// 자유게시판
+		Category c2 = new Category();
+		c2.setName("자유게시판");
+		c2.setCreateDate(LocalDateTime.now());
+		categoryRepository.save(c2);
 	}
 
 }
