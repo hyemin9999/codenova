@@ -1,5 +1,6 @@
 package com.woori.codenova.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -22,11 +23,11 @@ public class SocialUser {
 	private String nickname;
 	private String email;
 	private String provider; // kakao, local, naver, ....
+	@Column(unique = true, nullable = false)
 	private String providerId; // 식별 코드
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "site_user_id") // SiteUser의 ID를 참조하는 FK
 	private SiteUser siteUser;
 
-	// Getters and Setters
 }
