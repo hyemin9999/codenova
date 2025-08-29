@@ -26,9 +26,9 @@ public class SecurityConfig {
 	// 모든 페이지에 접근 가능
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-				.requestMatchers(new AntPathRequestMatcher("/admin/user/**")).hasAnyRole("ADMIN")
-				.requestMatchers(new AntPathRequestMatcher("/admin/role/**")).hasAnyRole("ADMIN")
-				.requestMatchers(new AntPathRequestMatcher("/admin/category/**")).hasAnyRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/admin/user/**")).hasRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/admin/role/**")).hasRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/admin/category/**")).hasRole("ADMIN")
 				.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "MANAGER")
 				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 				// DB나 특정링크 접속권한을 주지만 내부 데이터 접근불가
