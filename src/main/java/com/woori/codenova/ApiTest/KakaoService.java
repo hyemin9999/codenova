@@ -28,6 +28,13 @@ public class KakaoService {
 		KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 	}
 
+	public KakaoUserInfoResponseDto getaccessToken(String authCode) {
+
+//	KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
+		String accessToken = getAccessTokenFromKakao(authCode);
+		return getUserInfo(accessToken);
+	}
+
 	public String getAccessTokenFromKakao(String code) {
 
 		String redirectUri = "http://localhost:8080/callback";

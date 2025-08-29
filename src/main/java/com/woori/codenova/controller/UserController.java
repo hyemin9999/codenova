@@ -36,6 +36,9 @@ public class UserController {
 	@Value("${kakao.client_id}")
 	private String client_id;
 
+	@Value("${google.client_id}")
+	private String googleclient_id;
+
 	@Value("${kakao.redirect_uri}")
 	private String redirect_uri;
 
@@ -78,10 +81,11 @@ public class UserController {
 	public String login(Model model) {
 		String Kakaolocation = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id
 				+ "&redirect_uri=" + redirect_uri;
-		model.addAttribute("Kakaolocation", Kakaolocation);
 
-//		public String KakaoLoignPage(Model model) {
-//		}
+		String reqUrl = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + googleclient_id
+				+ "&redirect_uri=http://localhost:8080/api/v1/oauth2/google&response_type=code&scope=email%20profile%20openid&access_type=offline";
+		model.addAttribute("Kakaolocation", Kakaolocation);
+		model.addAttribute("Googlelocation", reqUrl);
 
 		return "login_form";
 	}
