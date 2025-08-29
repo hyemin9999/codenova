@@ -49,6 +49,19 @@
 				class="btn btn-outline-info" th:href="@{/board/list}">취소</a>
 		</div>
 	</form>
+
+ <div class="btn d-block text-center aibtn" id="aiBtn">AI</div>
+	<div id="aiPopup" class="ai-popup" style="display:none;">
+        <div class="ai-popup-content">
+            <span class="ai-popup-close" id="aiPopupClose">&times;</span>
+            <div id="aiResponse" class="ai-response"></div>
+            <div class="ai-prompt-group mt-3">
+                <textarea id="aiPrompt" placeholder="입력" class="ai-prompt"></textarea>
+                <button id="aiSendBtn" class="ai-send-btn">전송</button>
+            </div>
+      </div>
+</div>
+
 </div>
 
 <!-- 페이지 전용 스크립트 블록
@@ -113,5 +126,142 @@
 		// URL 인코딩하지 않고 그대로 전송(컨트롤러에서 URLDecoder 사용 시 이중 인코딩 주의)
 		document.querySelector('#ecp').value = encodedC;
 	});
+	// AI 시작
+    const AI_HISTORY_KEY = 'aiHistory';
+    let aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+        { role: 'user', parts: [{ text: '' }] }
+    ];
+
+    let lastUserPrompt = '';
+    // --- AI 전송/중지 상태 관리 변수 추가 ---
+    let isAiRequesting = false;
+    let aiAbortController = null;
+
+    // 스킨별 시스템 프롬프트 생성 함수
+    function getPromptBySkin(skin) {
+        let tempPrompt = '';
+        tempPrompt += '코드도우미';
+        tempPrompt += '나는 할아버지다';
+        tempPrompt += '말투를 무조건 셈으로 끝낸다.';
+        tempPrompt += '텍스트 받은내용을 해석하거나 풀이하는걸 중점으로 한다..';
+       
+        
+        return tempPrompt;
+    }
+
+    function showAiResponse(text) {
+        document.getElementById('aiResponse').innerHTML =
+            `<div class="ai-user-prompt-small">[명령] ${lastUserPrompt}</div>\n   <div>${text}</div>`;
+    }
+
+    function saveAiHistory() {
+        localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory));
+    }
+
+    function loadAiHistory() {
+        aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+            { role: 'user', parts: [{ text: getPromptBySkin(currentSkin) }] }
+        ];
+    }
+
+    // --- 버튼 상태 토글 함수 ---
+    function setAiButtonState(state) {
+        const btn = document.getElementById('aiSendBtn');
+        if (state === 'send') {
+            btn.textContent = '전송';
+            btn.classList.remove('stop');
+            btn.classList.add('send');
+        } else {
+            btn.textContent = '중지';
+            btn.classList.remove('send');
+            btn.classList.add('stop');
+        }
+    }
+
+    document.getElementById('aiBtn').addEventListener('click', function() {
+        document.getElementById('aiPopup').style.display = 'block';
+        setAiButtonState('send');
+        isAiRequesting = false;
+        aiAbortController = null;
+        const lastModel = aiHistory.slice().reverse().find(m => m.role === 'model');
+        if (lastModel) showAiResponse(lastModel.parts[0].text);
+    });
+
+    document.getElementById('aiPopupClose').addEventListener('click', function() {
+        document.getElementById('aiPopup').style.display = 'none';
+    });
+    // AI 전송/중지 버튼 이벤트
+    document.getElementById('aiSendBtn').addEventListener('click', async function() {
+        lastUserPrompt = document.getElementById('aiPrompt').value;
+
+        if (isAiRequesting) {
+            // 중지 버튼 동작: 요청 중단
+            if (aiAbortController) aiAbortController.abort();
+            isAiRequesting = false;
+            setAiButtonState('send');
+            showAiResponse('요청이 중지되었습니다.');
+            return;
+        }
+        // 이미 요청 중이면 무시(중복 방지)
+        if (isAiRequesting) return;
+        isAiRequesting = true;
+        setAiButtonState('stop');
+        aiAbortController = new AbortController();
+                const pageContent = document.getElementById('contents')?.innerText || '';
+        aiHistory[1] = { role: 'user', parts: [{ text: pageContent }] };
+        // 사용자 입력 프롬프트 push
+        aiHistory.push({ role: 'user', parts: [{ text: lastUserPrompt || '' }] });
+
+        // turn 제한: 시스템 프롬프트/페이지컨텍스트 제외하고 최근 3개만 유지
+        let userModelTurns = aiHistory.slice(2).filter(m => m.role === 'user' || m.role === 'model');
+        if (userModelTurns.length > 3) {
+            userModelTurns = userModelTurns.slice(userModelTurns.length - 3);
+            aiHistory = [aiHistory[0], aiHistory[1], ...userModelTurns];
+        }
+        saveAiHistory();
+        document.getElementById('aiPrompt').value = '';
+        document.getElementById('aiPrompt').focus();
+
+        showAiResponse('응답을 불러오는 중...');
+        try {
+            const response = await fetch('/api/ai/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json','X-CSRF-Token':  $('#_csrf').attr('value')},
+                body: JSON.stringify({ contents: aiHistory }),
+               
+                signal: aiAbortController.signal
+            });
+
+            const data = await response.json();
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '응답이 없습니다.';
+            showAiResponse(aiText);
+            aiHistory.push({ role: 'model', parts: [{ text: aiText }] });
+            // turn 제한 다시 적용
+            let userModelTurns2 = aiHistory.slice(1).filter(m => m.role === 'user' || m.role === 'model');
+            if (userModelTurns2.length > 10) {
+                userModelTurns2 = userModelTurns2.slice(userModelTurns2.length - 10);
+                aiHistory = [aiHistory[0], ...userModelTurns2];
+            }
+            saveAiHistory();
+        } catch (e) {
+            if (e.name === 'AbortError') {
+                showAiResponse('요청이 중지되었습니다.');
+            } else {
+                showAiResponse('에러 발생: ' + e);
+            }
+        } finally {
+            isAiRequesting = false;
+            setAiButtonState('send');
+        }
+    });
+    // 페이지 로드시 히스토리 복원 및 시스템 프롬프트 보장
+    loadAiHistory();
+    
+    // 스킨 변경 시 시스템 프롬프트 갱신
+    function changeSkin(skinName) {
+        document.cookie = 'selectedSkin=' + skinName + '; path=/; max-age=31536000; SameSite=Lax';
+        setSystemPromptBySkin(skinName);
+        location.reload();
+    }
 </script>
 </html>
