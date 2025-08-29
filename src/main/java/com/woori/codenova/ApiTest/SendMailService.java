@@ -126,4 +126,21 @@ public class SendMailService {
 		redisService.setValuesWitchTimeout(email, uuid, uuidValidTime);
 		// 찾는키 , 해당값 , 만료시간 /
 	}
+
+//	public void EmailSendCountChecker(String Uuid, String email) {
+//		long CheckEmailCount = sendEmailCheckRepository.countByEmailAddress(email);
+//		if(CheckEmailCount >= 3) { //일치하는 이메일이 몇개인지 카운트
+//			Optional<SendEmail> lastTopEmailSet = sendEmailCheckRepository.findTopByEmailAddressOrderByRequestedAtDesc(email);
+//			
+//			lastTopEmailSet.set
+//			throw new RuntimeException("요청 횟수가 초과되었습니다");
+//		}
+//				
+//		SendEmail sendEmail = new SendEmail();
+//		sendEmail.setEmail(email);
+//		sendEmail.setSendUuid(Uuid);
+//		sendEmail.setSendTime(LocalDateTime.now());
+////		sendEmail.setRequestCount(CheckEmailCount+1);
+//	
+
 }
