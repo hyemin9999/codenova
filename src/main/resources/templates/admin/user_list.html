@@ -36,7 +36,8 @@
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}">
 						</td>
-						<td><a th:text="${!item.authority.isEmpty() ? '관리자':''}"></a></td>
+						<td><a
+							th:text="${!item.authority.isEmpty() ? (item.username =='admin' ? '관리자' : '매니저' ) : ''}"></a></td>
 						<td><a th:href="@{|/admin/user/list/${item.id}|}"
 							th:text="${item.username}"></a></td>
 						<td><span th:text="${item.email}"></span></td>
