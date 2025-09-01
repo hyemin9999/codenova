@@ -46,15 +46,6 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "http://localhost:8080") // 뭔지 모름
 public class SocialLoginController {
 
-//	@Value("${google.client_id}")
-//	private String googleClientId;
-//	@Value("${google.client_pw}")
-//	private String googleClientPw;
-//	@Value("${social.secret-key}")
-//	private String socialSecretKey;
-//	@Value("${google.redirect.url}")
-//	private String googleRedirect;
-
 	private final UserService userService;
 	private final KakaoService kakaoService;
 	private final SocialUserService socialUserService;
@@ -62,6 +53,51 @@ public class SocialLoginController {
 	private final PasswordEncoder passwordEncoder;
 	private final SendMailService sendMailService;
 	private final GoogleService googleService;
+	private final NaverApi naverApi;
+
+	/**
+	 * 네이버 로그인 성공 후 리다이렉트되는 콜백 URL을 처리합니다.
+	 * 
+	 * @param code  네이버가 발급한 인가 코드
+	 * @param state CSRF 방지를 위한 상태 값
+	 * @return 최종적으로 얻은 사용자 정보
+	 */
+	@GetMapping("/naver/callback") // 네이버 개발자 센터에 등록한 Redirect URI 경로
+	public RedirectView naverLoginCallback(@RequestParam("code") String authCode, @RequestParam("state") String state,
+			HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			RedirectAttributes redirectAttributes) {
+		String accessToken = naverApi.getAccessToken(authCode, state);
+		NaverProfile userInfo = naverApi.getUserInfo(accessToken);
+
+		String provider = "naver";
+		String providerId = userInfo.getId(); // 구글의 고유 식별 코드는 'sub' 입니다.
+		String email = userInfo.getEmail();
+		String nickname = userInfo.getNickname();
+//		return ResponseEntity.ok(userInfo);
+		return processSocialLogin(provider, providerId, email, nickname, session, request, response,
+				redirectAttributes);
+	}
+
+//	@ResponseBody
+//	@GetMapping("/login/naver/code")
+//	public Map<String, Object> naverLogin(@RequestParam(name = "code") String code,
+//			@RequestParam(name = "state") String state) {
+//		Map<String, Object> map = new HashMap<>();
+//		// 1. 인가 코드 받기 -> @RequestParam String code
+//
+//		// 2. 접근 토큰 발급 요청
+//		String accessToken = naverApi.getAccessToken(code, state);
+//		System.out.println("accessToken = " + accessToken);
+//
+//		// 3. 사용자 정보 받기
+//		NaverProfile userInfo = naverApi.getUserInfo(accessToken);
+//		map.put("id", userInfo.getId());
+//		map.put("nickName", userInfo.getNickname());
+//		map.put("email", userInfo.getEmail());
+//		map.put("mobile", userInfo.getMobile());
+//
+//		return map;
+//	}
 
 	@RequestMapping(value = "/api/v1/oauth2/google", method = RequestMethod.POST)
 	@ResponseBody
@@ -118,7 +154,6 @@ public class SocialLoginController {
 		String nickname = userInfo.getKakaoAccount().getProfile().getNickName();
 		return processSocialLogin(provider, providerId, email, nickname, session, request, response,
 				redirectAttributes);
-
 	}
 
 //	@GetMapping("/callback")
@@ -274,7 +309,7 @@ public class SocialLoginController {
 		// 자동으로 Model에 다시 담겨서 Thymeleaf로 전달됩니다.
 		// 따라서 model.addAttribute(...)를 또 호출할 필요가 없습니다.
 
-		return "checkIntegration"; // 실제 html 파일 경로
+		return "check_Integration"; // 실제 html 파일 경로
 	}
 
 	@PostMapping("/user/link/process")
