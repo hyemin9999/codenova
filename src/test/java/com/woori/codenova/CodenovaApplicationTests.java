@@ -203,7 +203,7 @@ class CodenovaApplicationTests {
 			String subject = String.format("테스트 데이터입니다:[%03d]", i);
 			String contents = "내용무";
 
-			this.boardService.create(subject, contents, u1, c2);
+			this.boardService.create(subject, contents, u1, c2.getId());
 		}
 	}
 
