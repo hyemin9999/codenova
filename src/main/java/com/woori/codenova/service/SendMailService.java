@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
@@ -10,6 +10,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.woori.codenova.ApiTest.RedisService;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;

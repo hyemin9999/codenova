@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.woori.codenova.CheckEmailcode;
+import com.woori.codenova.ApiTest.SendFindIdEmailReq;
+import com.woori.codenova.ApiTest.SendFindIdEmailRes;
+import com.woori.codenova.ApiTest.SendResetPasswordEmailReq;
+import com.woori.codenova.ApiTest.SendResetPasswordEmailRes;
+import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.UserService;
 
 import groovy.util.logging.Slf4j;
