@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +28,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.woori.codenova.ApiTest.NaverApi;
+import com.woori.codenova.ApiTest.NaverProfile;
 import com.woori.codenova.dto.GoogleInfResponse;
+import com.woori.codenova.dto.KakaoUserInfoResponseDto;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.entity.SocialUser;
+import com.woori.codenova.service.GoogleService;
+import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.SocialUserService;
 import com.woori.codenova.service.UserService;
 
@@ -293,6 +298,7 @@ public class SocialLoginController {
 		return new RedirectView("/"); // 회원가입 후 메인 페이지로 이동
 	}
 
+	// 계정 연동할껀지 물어보기 위해 선행 URL / check폼으로 넘김
 	@GetMapping("/user/Check/integration") // 또는 "/user/link-account"
 	public String showLinkAccountPage(@ModelAttribute("provider") String provider,
 			@ModelAttribute("providerId") String providerId, @ModelAttribute("email") String email, Model model) {
@@ -312,6 +318,8 @@ public class SocialLoginController {
 		return "check_Integration"; // 실제 html 파일 경로
 	}
 
+	// 바로 위 코드 진행 이후 이메일 연동 확인 시스템
+	// <-- 아직 null검증 않넣어서 임의로 타고오면 500에러
 	@PostMapping("/user/link/process")
 	public String linkAccountProcess(@RequestParam("provider") String provider,
 			@RequestParam("providerId") String providerId, @RequestParam("email") String email,

@@ -14,10 +14,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.woori.codenova.InvalidUuidException;
 import com.woori.codenova.NonExistentMemberException;
 import com.woori.codenova.UserFindIdForm;
-import com.woori.codenova.ApiTest.KakaoUserInfoResponseDto;
 import com.woori.codenova.ApiTest.ResetPasswordReq;
-import com.woori.codenova.ApiTest.SendMailService;
 import com.woori.codenova.form.UserForm;
+import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -249,27 +248,28 @@ public class UserController {
 //		return "kakaologin";
 //	}
 
-	@GetMapping("/api/signup")
-	public String KakaoSignup(HttpSession session, Model model) {
-		KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute("kakaoUserInfo");
-
-		// 사용자가 직접 url 치고오면 돌려보내기
-		if (userInfo == null) {
-			return "redirect:/user/login";
-		}
-//		model.addAttribute("userForm", new UserForm());
+// 더이상 안쓰는 코드임 실험의 잔재용
+//	@GetMapping("/api/signup")
+//	public String KakaoSignup(HttpSession session, Model model) {
+//		KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute("kakaoUserInfo");
+//
+//		// 사용자가 직접 url 치고오면 돌려보내기
+//		if (userInfo == null) {
+//			return "redirect:/user/login";
+//		}
+////		model.addAttribute("userForm", new UserForm());
+////		model.addAttribute("email", userInfo.getKakaoAccount().getEmail());
+//
+//		// 이메일 정보는 세션에서 가져와 모델에 추가
+//		// 이렇게 하면 GET 요청으로 올 때마다 이메일 값이 유지됩니다.
 //		model.addAttribute("email", userInfo.getKakaoAccount().getEmail());
-
-		// 이메일 정보는 세션에서 가져와 모델에 추가
-		// 이렇게 하면 GET 요청으로 올 때마다 이메일 값이 유지됩니다.
-		model.addAttribute("email", userInfo.getKakaoAccount().getEmail());
-
-		// userForm이 비어있으면 새로 생성 (최초 접근 시)
-		if (model.getAttribute("userForm") == null) {
-			model.addAttribute("userForm", new UserForm());
-		}
-
-		return "kakao_signup_form";
-	}
+//
+//		// userForm이 비어있으면 새로 생성 (최초 접근 시)
+//		if (model.getAttribute("userForm") == null) {
+//			model.addAttribute("userForm", new UserForm());
+//		}
+//
+//		return "kakao_signup_form";
+//	}
 
 }
