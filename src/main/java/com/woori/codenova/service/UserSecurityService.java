@@ -1,4 +1,4 @@
-package com.woori.codenova;
+package com.woori.codenova.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.UserRepository;
@@ -23,9 +24,10 @@ public class UserSecurityService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 
-	@Override
 	// username으로 선언해야 로그인 가능 (String userId)하면 실행불가함
 	// 또한 여기 정보는 login_form에서 가져오는 거니 참고할것
+	@Override
+	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<SiteUser> _siteUser = this.userRepository.findByUsername(username);
 		if (_siteUser.isEmpty()) {
@@ -35,10 +37,19 @@ public class UserSecurityService implements UserDetailsService {
 		SiteUser siteUser = _siteUser.get();
 
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		if ("admin".equals(username)) {
-			authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
+
+		if (!siteUser.getAuthority().isEmpty()) {
+			if (siteUser.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) // 슈퍼관리자
+			{
+				authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+			} else {
+				authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
+			}
+			System.out.println("siteUser.getAuthority() :: ADMIN");
+
 		} else {
-			authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
+			System.out.println("siteUser.getAuthority() :: USER");
+			authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 		}
 		// 새로운 User권한을 주며 기록함
 		return new User(siteUser.getUsername(), siteUser.getPassword(), authorities);

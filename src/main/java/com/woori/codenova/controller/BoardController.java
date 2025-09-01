@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.BoardForm;
 import com.woori.codenova.form.CommentForm;
 import com.woori.codenova.service.BoardService;
+import com.woori.codenova.service.CategoryService;
 import com.woori.codenova.service.CommentService;
 import com.woori.codenova.service.SearchTextService;
 import com.woori.codenova.service.UserService;
@@ -41,35 +43,64 @@ public class BoardController {
 	private final UserService userService; // 사용자 조회/인증 관련 서비스
 	private final CommentService commentService;
 	private final SearchTextService searchTextService;
+	private final CategoryService categoryService;
 
 	// ===============================================================
 	// 목록 페이지
 	// ===============================================================
 	// BoardController.java
-	// BoardController.java
 	@GetMapping("/list")
-	public String list(
-	        Model model,
-	        @RequestParam(value = "page",  defaultValue = "0")   int page,
-	        @RequestParam(value = "kw",    defaultValue = "")    String kw,
-	        @RequestParam(value = "field", defaultValue = "all") String field,
-	        @RequestParam(value = "size",  defaultValue = "10")  int size) {   // ★ 추가
+	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "kw", defaultValue = "") String kw,
+			@RequestParam(value = "field", defaultValue = "all") String field,
+			@RequestParam(value = "size", defaultValue = "10") int size) { // ★ 추가
 
-	    // 허용값 화이트리스트
-	    switch (size) { case 10: case 20: case 30: case 50: break; default: size = 10; }
+		// 허용값 화이트리스트
+		switch (size) {
+		case 10:
+		case 20:
+		case 30:
+		case 50:
+			break;
+		default:
+			size = 10;
+		}
 
-	    Page<Board> paging = this.boardService.getList(page, size, kw, field); // ★ size 전달
+		Page<Board> paging = this.boardService.getList(0, page, kw, field, size); // ★ size 전달
 
-	    model.addAttribute("paging", paging);
-	    model.addAttribute("kw", kw);
-	    model.addAttribute("field", field);
-	    model.addAttribute("size", size); // ★ 셀렉트 유지
+		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
+		model.addAttribute("field", field); // ✅ 화면에서 선택값 유지
+		model.addAttribute("size", size); // ★ 셀렉트 유지
 
-	    if (!kw.isBlank()) searchTextService.create(kw, null);
-	    return "board_list";
+		if (!kw.isBlank()) {
+			Category citem = categoryService.getItem(0);
+			searchTextService.create(kw, citem);
+		}
+
+		return "board_list";
 	}
 
+	@GetMapping("/list/{cid}")
+	public String list(Model model, @PathVariable("cid") Integer cid,
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "kw", defaultValue = "") String kw,
+			@RequestParam(value = "field", defaultValue = "all") String field,
+			@RequestParam(value = "size", defaultValue = "10") int size) {
 
+		Page<Board> paging = this.boardService.getList(cid, page, kw, field, size);
+
+		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
+		model.addAttribute("field", field);
+		model.addAttribute("size", size); // ★ 셀렉트 유지
+
+		if (!kw.isBlank()) {
+			Category citem = categoryService.getItem(cid);
+			searchTextService.create(kw, citem);
+		}
+		return "board_list";
+	}
 
 	// ===============================================================
 	// 상세 페이지
@@ -135,8 +166,10 @@ public class BoardController {
 		// (에디터/전송 과정에서 인코딩된 경우를 대비해) 내용 디코딩
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 
+		Category citem = categoryService.getItem(1);
+
 		// 게시글 생성
-		this.boardService.create(boardForm.getSubject(), con, siteUser);
+		this.boardService.create(boardForm.getSubject(), con, siteUser, citem);
 
 		// 생성 뒤 목록으로 리다이렉트(새로고침 중복 제출 방지: PRG 패턴)
 		return "redirect:/board/list";

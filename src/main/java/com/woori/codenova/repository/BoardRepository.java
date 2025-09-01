@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.SiteUser;
 
 /**
  * BoardRepository
@@ -50,4 +51,7 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
 	// - 동적 조건(Specification<Board>) + Pageable 동시 적용.
 	// - 예: 검색 키워드에 따라 조인/like/조건을 동적으로 구성해 전달.
 	Page<Board> findAll(Specification<Board> spec, Pageable pageable);
+
+	// 작성자
+	List<Board> findByAuthor(SiteUser author);
 }
