@@ -30,14 +30,9 @@
 					role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						게시판 </a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<li><a class="dropdown-item" th:href="@{/board/list}">전체
-								게시글</a></li>
-						<li><a class="dropdown-item" th:href="@{/board/list/1}">자유
-								게시판</a></li>
-						<li><a class="dropdown-item" th:href="@{/board/list/2}">Java
-								게시판</a></li>
-						<li><a class="dropdown-item" th:href="@{/board/list/3}">SQL
-								게시판</a></li>
+						<li th:unless="${#lists.isEmpty(menus)}" th:each="menu : ${menus}"><a
+							class="dropdown-item" th:href="@{|/board/list/${menu.id}|}"
+							th:text="${menu.name}"></a></li>
 					</ul></li>
 
 				<li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')"><a
