@@ -128,6 +128,7 @@ public class BoardController {
 			}
 		}
 
+		model.addAttribute("menuName", board.getCategory().getName());
 		model.addAttribute("board", board);
 		model.addAttribute("cpaging", cpaging);
 		model.addAttribute("favoritedBoard", favoritedBoard); // ✅ 추가
