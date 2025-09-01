@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.service;
 
 import java.util.HashMap;
 import java.util.Map;
