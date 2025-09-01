@@ -166,13 +166,35 @@ public class BoardController {
 		// (에디터/전송 과정에서 인코딩된 경우를 대비해) 내용 디코딩
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 
-		Category citem = categoryService.getItem(1);
-
 		// 게시글 생성
-		this.boardService.create(boardForm.getSubject(), con, siteUser, citem);
+		this.boardService.create(boardForm.getSubject(), con, siteUser, null);
 
 		// 생성 뒤 목록으로 리다이렉트(새로고침 중복 제출 방지: PRG 패턴)
 		return "redirect:/board/list";
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/create/{cid}")
+	public String create(Model model, BoardForm boardForm, @PathVariable("cid") Integer cid) {
+
+		model.addAttribute("mode", "create");
+		return "board_form";
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/create/{cid}")
+	public String create(Model model, @Valid BoardForm boardForm, BindingResult bindingResult, Principal principal,
+			@PathVariable("cid") Integer cid, @RequestParam(value = "filse", defaultValue = "0") String files) {
+
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("mode", "create");
+			return "board_form";
+		}
+		SiteUser author = this.userService.getUser(principal.getName());
+		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
+
+		this.boardService.create(boardForm.getSubject(), con, author, cid);
+		return "redirect:/board/list/" + cid;
 	}
 
 	// ===============================================================
