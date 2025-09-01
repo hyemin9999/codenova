@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -24,6 +26,10 @@ public class SecurityConfig {
 	// 모든 페이지에 접근 가능
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+				.requestMatchers(new AntPathRequestMatcher("/admin/user/**")).hasRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/admin/role/**")).hasRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/admin/category/**")).hasRole("ADMIN")
+				.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "MANAGER")
 				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 				// DB나 특정링크 접속권한을 주지만 내부 데이터 접근불가
 				// 즉 로그인창만 넘어가며 나머진 거부됨
@@ -40,8 +46,13 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	SecurityContextRepository securityContextRepository() {
+		return new HttpSessionSecurityContextRepository();
 	}
 
 	// 인증과 인가(권한) 부여를 처리함

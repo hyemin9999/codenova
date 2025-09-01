@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,9 +40,11 @@ public class UploadFile {
 	private LocalDateTime uploadDate;
 
 	@ManyToOne
+	@JoinColumn(name = "boardId")
 	private Board board;
 
 	@ManyToOne
+	@JoinColumn(name = "noticeId")
 	private Notice notice;
 
 }

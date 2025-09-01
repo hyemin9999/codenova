@@ -26,9 +26,43 @@ public class HomeController {
 		return "signupsuccess_form";
 	}
 
-	@GetMapping(value = { "/i", "/index/" })
+	@GetMapping(value = { "/i", "/index" })
 	public String index() {
 		return "index";
 	}
 
+	@GetMapping(value = { "/notice", "/notice/" })
+	public String notice() {
+		return "redirect:/notice/list";
+	}
+
+	@GetMapping(value = { "/board", "/board/" })
+	public String board() {
+		return "redirect:/board/list";
+	}
+
+	@GetMapping(value = { "/admin/u", "/admin/user", "/admin/user/", })
+	public String admin() {
+		return "redirect:/admin/user/list";
+	}
+
+	@GetMapping(value = { "/admin/r", "/admin/role", "/admin/role/" })
+	public String adminRole() {
+		return "redirect:/admin/role/list";
+	}
+
+	@GetMapping(value = { "/admin", "/admin/", "/admin/n", "/admin/notice", "/admin/notice/" })
+	public String adminNotice() {
+		return "redirect:/admin/notice/list";
+	}
+
+	@GetMapping(value = { "/admin/c", "/admin/category", "/admin/category/" })
+	public String adminCategory() {
+		return "redirect:/admin/category/list";
+	}
+
+	@GetMapping(value = { "/admin/b", "/admin/board", "/admin/board/" })
+	public String adminBoard() {
+		return "redirect:/admin/board/list";
+	}
 }

@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +39,7 @@ public class SiteUser {
 	// 가입일
 	// 업데이트를 해도 수정이 안되며 db에서 수정해야함
 	@Column(updatable = false)
-	private LocalDateTime careteDate;
+	private LocalDateTime createDate;
 
 	// 수정일
 	// 마이페이지 구현되어야 사용가능
@@ -48,9 +50,24 @@ public class SiteUser {
 
 	// 권한
 	@ManyToMany
+	@JoinTable(name = "userAuthority", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "roleId"))
 	Set<Role> authority;
 
 //	String = varchar
 // Integer = int
 // Long = bigint
+
+//	/**
+//	 * 암호화된 새 비밀번호로 비밀번호를 업데이트하는 메서드
+//	 * 
+//	 * @param newEncodedPassword 새로 암호화된 비밀번호
+//	 */
+	public void updatePassword(String newEncodedPassword) {
+		this.password = newEncodedPassword;
+	}
+
+	// 접속자는 어디인가 기본값 null. 나중에 local로 넣어줄예정
+	private String provider;
+	// 고유식별코드
+	private String providerId;
 }

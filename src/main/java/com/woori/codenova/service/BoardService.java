@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.BoardRepository;
+import com.woori.codenova.repository.CategoryRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -34,44 +36,65 @@ public class BoardService {
 
 	// 의존성 주입: 게시글 저장소 (Spring Data JPA 프록시 구현체가 주입됨)
 	private final BoardRepository boardRepository;
+	private final CategoryRepository categoryRepository;
 
 	/**
 	 * 검색용 Specification 빌더 - 동적 쿼리를 위해 JPA Criteria 를 사용. - 제목/내용/작성자(username)/댓글
 	 * 내용/댓글 작성자(username) 중 하나라도 키워드(kw)를 포함하면 매칭되도록 OR 조건을 구성. - LEFT JOIN 으로
 	 * 작성자/댓글/댓글작성자 연관을 묶고, 중복 제거를 위해 distinct(true) 지정.
 	 */
-	private Specification<Board> search(String kw, String field) {
+
+	private Specification<Board> search(String kw, String field, Integer categoryId) {
 		return new Specification<Board>() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Predicate toPredicate(Root<Board> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
 				query.distinct(true);
 
 				Join<Board, SiteUser> u1 = q.join("author", JoinType.LEFT);
 				Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
-				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
+//				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
+
+				Join<Board, Category> ca = q.join("category", JoinType.LEFT);
 
 				Predicate byTitle = cb.like(q.get("subject"), "%" + kw + "%"); // 제목
 				Predicate byContent = cb.like(q.get("contents"), "%" + kw + "%"); // 내용
 				Predicate byAuthor = cb.like(u1.get("username"), "%" + kw + "%"); // 글쓴이(작성자)
 				Predicate byCmt = cb.like(a.get("contents"), "%" + kw + "%"); // 댓글 내용
-				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
+//				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
+
+				Predicate category = cb.equal(ca.get("id"), categoryId); // 게시판
 
 				// ✅ 선택한 검색대상에 맞춰 조건 분기
 				// BoardService.java - search(kw, field) 안의 switch 문만 교체
 				switch (field) {
-				  case "title":   return byTitle;
-				  case "content": return byContent;
-				  case "author":  return byAuthor;
-				  case "comment": return byCmt;
-				  case "title_content": // ✅ 새 분기: 제목+내용만
-				      return cb.or(byTitle, byContent);
-				  // case "comment_author": return byCmtUser; // (선택) 댓글쓴이 전용
-				  case "all":
-				  default:
-				      // ✅ 전체: 제목/내용/글쓴이/댓글내용/댓글쓴이
-				      return cb.or(byTitle, byContent, byAuthor, byCmt, byCmtUser);
-				}
+				case "title":
+					return byTitle;
+				case "content":
+					return byContent;
+				case "author":
+					return byAuthor;
+				case "comment":
+					return byCmt;
+				case "title_content": // ✅ 새 분기: 제목+내용만
+					return cb.or(byTitle, byContent);
+				// case "comment_author": return byCmtUser; // (선택) 댓글쓴이 전용
+				case "all":
+				default:
 
+					Predicate all = cb.and(cb.or(byTitle, byContent), category);
+
+					// 제목+내용(+작성자/댓글/댓글작성자) — 기존처럼 확장 검색
+					// return cb.or(byTitle, byContent);
+					if (categoryId != 0) {
+						return cb.and(all, category);
+
+					} else {
+						// ✅ 전체: 제목/내용/글쓴이/댓글내용/댓글쓴이
+						return all;
+					}
+				}
 
 			}
 		};
@@ -79,15 +102,15 @@ public class BoardService {
 
 	// ✅ 게시글 전체 목록 조회 (페이징 없이 전부 반환)
 	// BoardService.java
-	public Page<Board> getList(int page, int size, String kw, String field) {
-	    List<Sort.Order> sorts = new ArrayList<>();
-	    sorts.add(Sort.Order.desc("createDate"));
-	    Pageable pageable = PageRequest.of(page, size, Sort.by(sorts)); // ★ size 적용
+	public Page<Board> getList(Integer categoryId, int page, String kw, String field, int size) {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("createDate"));
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sorts)); // ★ size 적용
 
-	    Specification<Board> spec = search(kw, field);
-	    return this.boardRepository.findAll(spec, pageable);
+		Specification<Board> spec = search(kw, field, categoryId);
+
+		return this.boardRepository.findAll(spec, pageable);
 	}
-
 
 	// ✅ ID로 게시글 단건 조회
 	public Board getBoard(Integer id) {
@@ -100,24 +123,26 @@ public class BoardService {
 	}
 
 	// ✅ 게시글 생성
-	public void create(String subject, String contents, SiteUser user) {
+	public void create(String subject, String contents, SiteUser user, Category citem) {
 		Board q = new Board(); // 새 엔티티 인스턴스 생성
 		q.setSubject(subject); // 제목 설정
 		q.setContents(contents); // 내용 설정(마크다운 등)
 		q.setCreateDate(LocalDateTime.now()); // 생성 일시 설정
 		q.setAuthor(user); // 작성자 설정
+		q.setViewCount(0);
+		q.setDelete(false);
+		q.setCategory(citem);
 		this.boardRepository.save(q); // 영속화(INSERT)
 	}
 
-	// ✅ 페이징 처리된 게시글 목록 조회 (page: 0부터 시작)
-	public Page<Board> getList(int page, String kw, String field) {
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("createDate"));
-		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-
-		Specification<Board> spec = search(kw, field);
-		return this.boardRepository.findAll(spec, pageable);
-	}
+//	public Page<Board> getList(Integer categoryId, int page, String kw, String field, int size) {
+//		List<Sort.Order> sorts = new ArrayList<>();
+//		sorts.add(Sort.Order.desc("createDate"));
+//		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+//
+//		Specification<Board> spec = search(kw, field, categoryId);
+//		return this.boardRepository.findAll(spec, pageable);
+//	}
 
 	// ✅ 게시글 수정
 	public void modify(Board board, String subject, String content) {
