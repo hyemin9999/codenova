@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<nav th:fragment="navbarFragment"
+	class="navbar navbar-expand-md navbar-light bg-info-subtle border-bottom">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="/">CodeNova</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+			data-bs-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-lg-0">
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAuthenticated()" th:href="@{/user/info}"
+					th:text="${#authentication.name}">마이페이지</a></li>
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a><a
+					class="nav-link" sec:authorize="isAuthenticated()"
+					th:href="@{/user/logout}">로그아웃</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/user/signup}" sec:authorize="isAnonymous()">회원가입</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:href="@{/notice/list}">공지사항</a></li>
+
+				<li class="nav-item dropdown"><a
+					class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+					role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						게시판</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li th:unless="${#lists.isEmpty(menus)}" th:each="menu : ${menus}"><a
+							class="dropdown-item" th:href="@{|/board/list/${menu.id}|}"
+							th:text="${menu.name}"></a></li>
+					</ul></li>
+				<li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')"><a
+					class="nav-link" th:href="@{/admin}">관리자 페이지</a></li>
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/findid}">아이디 찾기</a>
+				</li>
+				<li class="nav-item"><a class="nav-link"
+					sec:authorize="isAnonymous()" th:href="@{/user/resetpassword}">비밀번호
+						찾기</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+</html>
