@@ -4,10 +4,10 @@
 
 <meta name="_csrf2" th:content="${_csrf.token}" />
 <meta name="_csrf_header2" th:content="${_csrf.headerName}" />
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="jquery-3.7.1.min.js"></script>
-<script src="typeit.js"></script>
+<!-- <script -->
+<!-- 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
+<!-- <script src="jquery-3.7.1.min.js"></script> -->
+<!-- <script src="typeit.js"></script> -->
 </head>
 <div layout:fragment="content" class="container my-3">
 
@@ -35,7 +35,7 @@
 			<label for="email" class="form-label">이메일</label> <input type="email"
 				id="email" th:field="*{email}" class="form-control">
 			<button id="sendSmsAuth"
-				class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
+				class="certificationIssue btn btn-primary btnStroke" type="button">인증번호발송</button>
 			<button id="modifyEmail" class="btn btn-primary" type="button"
 				disabled>이메일 수정</button>
 			<p class="editPhoneTitle" id="emailMessage"></p>
@@ -51,14 +51,16 @@
 			<p id="authMessage"></p>
 		</div>
 		<button type="submit" class="btn btn-primary" id="clear1" disabled>회원가입</button>
-	</form>
+<!-- 	</form> -->
 	<br>
+<!-- 	<form> -->
 	            <a th:href="${Kakaolocation}">
         <img src="/kakao_login_medium_narrow.png" alt="카카오 로그인 버튼" >
     </a>
             <a th:href="${Googlelocation}">
         <img src="/web_light_sq_SU@1x.png" alt="구글 로그인 버튼" >
     </a>
+	</form>
 </div>
 
 <script layout:fragment="script" type="text/javascript"
@@ -146,6 +148,16 @@ $('.certificationIssue').on("click", function() {
 //             sendCheck.disabled = false;
             const email = document.getElementById('email').value
             const CheckOkNum = document.getElementById('checkSmsAuth');
+              // 인증메일발송 버튼을 10초간 비활성화
+              sendCheck.disabled = true;
+              sendCheck.textContent = '10초 대기 중...';
+
+              // 10초 후에 버튼 활성화
+              setTimeout(() => {
+            	 sendCheck.disabled = false;
+            	 sendCheck.textContent = '인증번호발송';
+              }, 10000); // 10000밀리초 = 10초
+//             });
             
 
             fetch('/api/checkEmail', {
@@ -170,6 +182,8 @@ $('.certificationIssue').on("click", function() {
 				//sendSmsAuth 인증버튼 발송
 //                 console.log('UUID:', data.uuid);
 				CheckOkNum.disabled = false;
+				//발송 버튼 잠궈버리기
+// 				sendCheck.disabled = false;
             })
             .catch(error => {
                 document.getElementById('emailMessage').innerText = error.message;
