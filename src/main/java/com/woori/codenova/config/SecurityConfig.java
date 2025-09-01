@@ -1,4 +1,4 @@
-package com.woori.codenova;
+package com.woori.codenova.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

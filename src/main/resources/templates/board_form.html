@@ -4,51 +4,53 @@
 
 <!-- 콘텐츠 본문 영역 정의: 이 div의 내용이 layout.html의 layout:fragment="content" 위치에 주입됨 -->
 <div layout:fragment="content" class="container">
-
 	<!-- 폼 제목 -->
-	<h5 class="my-3 border-bottom pb-2">게시글 작성</h5>
-
-	<!-- 게시글 작성/수정을 위한 폼
+	<h5 class="border-bottom pb-2">[[${menuName}]] 게시판</h5>
+	<div class="row">
+		<div class="col">
+			<!-- 게시글 작성/수정을 위한 폼
          - th:object 로 BoardForm를 바인딩하여 하위 th:field="*{...}"에서 접근 가능
          - method="post" : POST 전송 -->
-	<form th:object="${boardForm}" method="post">
-		<!-- CSRF 토큰: Spring Security 활성화 시 필수. 서버가 제공하는 파라미터/값을 그대로 숨김 필드에 주입 -->
-		<input type="hidden" th:name="${_csrf.parameterName}" id="_csrf"
-			th:value="${_csrf.token}" />
+			<form th:object="${boardForm}" method="post">
+				<!-- CSRF 토큰: Spring Security 활성화 시 필수. 서버가 제공하는 파라미터/값을 그대로 숨김 필드에 주입 -->
+				<input type="hidden" th:name="${_csrf.parameterName}" id="_csrf"
+					th:value="${_csrf.token}" />
 
-		<!-- 유효성 검사 오류 표시 영역
+				<!-- 유효성 검사 오류 표시 영역
              - form_errors.html 의 formErrorsFragment를 포함
              - BindingResult가 존재하는 경우에만 내부에서 에러를 렌더링 -->
-		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+				<div th:replace="~{form_errors :: formErrorsFragment}"></div>
 
-		<!-- 제목 입력 필드 -->
-		<div class="mb-3">
-			<label for="subject" class="form-label">제목</label>
-			<!-- th:field="*{subject}" : boardForm.subject 와 양방향 바인딩 -->
-			<input type="text" th:field="*{subject}" class="form-control">
-		</div>
+				<!-- 제목 입력 필드 -->
+				<div class="mb-3">
+					<label for="subject" class="form-label">제목</label>
+					<!-- th:field="*{subject}" : boardForm.subject 와 양방향 바인딩 -->
+					<input type="text" th:field="*{subject}" class="form-control">
+				</div>
 
-		<!-- 내용 입력 필드 -->
-		<div class="mb-3">
-			<label for="contents" class="form-label">내용</label>
+				<!-- 내용 입력 필드 -->
+				<div class="mb-3">
+					<label for="contents" class="form-label">내용</label>
 
-			<!-- (기존 textarea 대체) Toast UI Editor를 붙일 컨테이너
+					<!-- (기존 textarea 대체) Toast UI Editor를 붙일 컨테이너
                  - 실제로는 이 div에 자바스크립트로 에디터 인스턴스를 생성하여 표시 -->
-			<!-- <textarea th:field="*{contents}" class="form-control" rows="10"></textarea> -->
-			<div id="contents" class="form-control"></div>
+					<!-- <textarea th:field="*{contents}" class="form-control" rows="10"></textarea> -->
+					<div id="contents" class="form-control"></div>
 
-			<!-- 서버 전송용 숨김 필드
+					<!-- 서버 전송용 숨김 필드
                  - 최종적으로 에디터의 마크다운 문자열을 이 input(name="contents")에 넣어
                    서버에서 boardForm.contents 로 받을 수 있게 함 -->
-			<input type="hidden" name="contents" id="ecp"><input
-				type="hidden" id="ecp1" th:field="*{contents}">
+					<input type="hidden" name="contents" id="ecp"><input
+						type="hidden" id="ecp1" th:field="*{contents}">
+				</div>
+				<div class="align-r">
+					<!-- 제출 버튼: 클릭 시 폼 submit → script에서 에디터 내용을 hidden 필드에 세팅 후 전송 -->
+					<input type="submit" value="확인" class="btn btn-info my-2">
+					<a class="btn btn-outline-info" th:href="@{/board/list}">취소</a>
+				</div>
+			</form>
 		</div>
-		<div class="align-r">
-			<!-- 제출 버튼: 클릭 시 폼 submit → script에서 에디터 내용을 hidden 필드에 세팅 후 전송 -->
-			<input type="submit" value="확인" class="btn btn-info my-2"> <a
-				class="btn btn-outline-info" th:href="@{/board/list}">취소</a>
-		</div>
-	</form>
+	</div>
 </div>
 
 <!-- 페이지 전용 스크립트 블록

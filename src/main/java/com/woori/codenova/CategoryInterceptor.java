@@ -30,14 +30,21 @@ public class CategoryInterceptor implements HandlerInterceptor {
 		request.setAttribute("menus", menuList);
 
 		String url = request.getRequestURI();
-
+		Category item = menuList.get(0);
 		if (url.startsWith("/board/")) {
 
 			String[] str = url.split("/");
+
 			if (str.length > 0) {
-				request.setAttribute("cid", str[str.length - 1]);
+				String last = str[str.length - 1];
+				if (last.matches("\\d+")) {
+					Integer cid = Integer.parseInt(str[str.length - 1]);
+					item = menuList.stream().filter(o -> o.getId().equals(cid)).findAny().orElse(item);
+				}
 			}
 
+			request.setAttribute("cid", item.getId());
+			request.setAttribute("menuName", item.getName());
 		}
 
 		return HandlerInterceptor.super.preHandle(request, response, handler);
