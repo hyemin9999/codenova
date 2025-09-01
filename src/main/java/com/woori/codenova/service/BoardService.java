@@ -123,7 +123,7 @@ public class BoardService {
 	}
 
 	// ✅ 게시글 생성
-	public void create(String subject, String contents, SiteUser user, Category citem) {
+	public void create(String subject, String contents, SiteUser user, Integer cid) {
 		Board q = new Board(); // 새 엔티티 인스턴스 생성
 		q.setSubject(subject); // 제목 설정
 		q.setContents(contents); // 내용 설정(마크다운 등)
@@ -131,7 +131,10 @@ public class BoardService {
 		q.setAuthor(user); // 작성자 설정
 		q.setViewCount(0);
 		q.setDelete(false);
+
+		Category citem = categoryRepository.findById(cid).orElse(null);
 		q.setCategory(citem);
+
 		this.boardRepository.save(q); // 영속화(INSERT)
 	}
 
