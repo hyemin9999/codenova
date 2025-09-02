@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,15 +32,12 @@ class CodenovaApplicationTests {
 	private BoardRepository boardRepository;
 	@Autowired
 	private BoardService boardService;
-
 	@Autowired
 	private CommentRepository commentRepository;
-
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
 	@Autowired
 	private RoleRepository roleReporitory;
 	@Autowired
@@ -233,7 +229,7 @@ class CodenovaApplicationTests {
 		userRepository.save(u2);
 	}
 
-	@Test
+//	@Test
 	@Transactional
 	@Rollback(value = false)
 	void insertUser_Authority() {
@@ -253,19 +249,34 @@ class CodenovaApplicationTests {
 	void insertCategory() {
 
 		Category c2 = new Category();
-		c2.setName("자유게시판");
+		c2.setName("자유");
 		c2.setCreateDate(LocalDateTime.now());
 		categoryRepository.save(c2);
 
 		Category c3 = new Category();
-		c3.setName("Java게시판");
+		c3.setName("Java");
 		c3.setCreateDate(LocalDateTime.now());
 		categoryRepository.save(c3);
 
 		Category c4 = new Category();
-		c4.setName("SQL게시판");
+		c4.setName("SQL");
 		c4.setCreateDate(LocalDateTime.now());
 		categoryRepository.save(c4);
+
+		Category c5 = new Category();
+		c5.setName("Thymeleaf");
+		c5.setCreateDate(LocalDateTime.now());
+		categoryRepository.save(c5);
+
+		Category c6 = new Category();
+		c6.setName("Spring boot");
+		c6.setCreateDate(LocalDateTime.now());
+		categoryRepository.save(c6);
+
+		Category c7 = new Category();
+		c7.setName("Python");
+		c7.setCreateDate(LocalDateTime.now());
+		categoryRepository.save(c7);
 	}
 
 }
