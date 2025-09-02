@@ -44,21 +44,9 @@ public class AdminCategoryService {
 		return list;// addAllItem(list);
 	}
 
-	public List<Category> addAllItem(List<Category> list) {
-
-		Category item = new Category();
-		item.setName("전체");
-		item.setId(0);
-		list.add(0, item);
-
-		return list;
+	public List<Category> getAllByName() {
+		return categoryRepository.findAllByName();
 	}
-
-//	// 목록
-//	public List<Category> getlist(int roleId) {
-//		Specification<Category> spec = search(roleId);
-//		return categoryRepository.findAll(spec);
-//	}
 
 	// 조회 - 상세
 	public Category getitem(Integer id) {

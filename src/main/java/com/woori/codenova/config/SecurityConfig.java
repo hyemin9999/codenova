@@ -26,11 +26,9 @@ public class SecurityConfig {
 	// 모든 페이지에 접근 가능
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-
-				.requestMatchers(new AntPathRequestMatcher("/admin/user/**")).hasRole("ADMIN")
-				.requestMatchers(new AntPathRequestMatcher("/admin/role/**")).hasRole("ADMIN")
-				.requestMatchers(new AntPathRequestMatcher("/admin/category/**")).hasRole("ADMIN")
-				.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "MANAGER")
+				.requestMatchers(new AntPathRequestMatcher("/admin/user/**"),
+						new AntPathRequestMatcher("/admin/role/**"), new AntPathRequestMatcher("/admin/category/**"))
+				.hasRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "MANAGER")
 				.requestMatchers(new AntPathRequestMatcher("/user/login"),
 						new AntPathRequestMatcher("/user/find-password"), new AntPathRequestMatcher("/user/find-id"))
 				.anonymous().requestMatchers(new AntPathRequestMatcher("/**")).permitAll())

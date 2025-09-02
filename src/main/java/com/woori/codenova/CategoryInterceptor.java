@@ -6,6 +6,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.woori.codenova.entity.Category;
 import com.woori.codenova.repository.CategoryRepository;
+import com.woori.codenova.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,9 +14,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CategoryInterceptor implements HandlerInterceptor {
 
 	private final CategoryRepository categoryRepository;
+	private final UserRepository userRepository;
 
-	public CategoryInterceptor(CategoryRepository categoryRepository) {
+	public CategoryInterceptor(CategoryRepository categoryRepository, UserRepository userRepository) {
 		this.categoryRepository = categoryRepository;
+		this.userRepository = userRepository;
 	}
 
 	private List<Category> getCategoryList() {
@@ -26,12 +29,14 @@ public class CategoryInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
+		String url = request.getRequestURI();
+
 		List<Category> menuList = getCategoryList();
 		request.setAttribute("menus", menuList);
 
-		String url = request.getRequestURI();
-		Category item = menuList.get(0);
-		if (url.startsWith("/board/")) {
+		if (url.startsWith("/board/") || url.startsWith("/admin/board/")) {
+			request.setAttribute("type", "board");
+			Category item = menuList.get(0);
 
 			String[] str = url.split("/");
 

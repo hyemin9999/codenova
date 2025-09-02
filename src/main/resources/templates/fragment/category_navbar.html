@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<nav th:fragment="navbarFragment"
-	th:if="${menus != null && !menus.isEmpty() && type == 'board'}"
+<nav th:fragment="navbarFragment" th:if="${menus != null && !menus.isEmpty() && type == 'board'}"
 	class="navbar navbar-expand-md navbar-light bg-secondary-subtle border-bottom">
 	<div class="container-fluid">
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse"

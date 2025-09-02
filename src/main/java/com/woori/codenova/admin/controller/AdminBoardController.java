@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.woori.codenova.admin.service.AdminBoardService;
+import com.woori.codenova.admin.service.AdminCategoryService;
 import com.woori.codenova.admin.service.AdminUserService;
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Notice;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.BoardForm;
 import com.woori.codenova.form.CommentForm;
+import com.woori.codenova.service.UploadFileService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,18 +36,43 @@ import lombok.RequiredArgsConstructor;
 public class AdminBoardController {
 	private final AdminBoardService adminBoardService;
 	private final AdminUserService adminUserService;
+	private final UploadFileService uploadFileService;
+	private final AdminCategoryService adminCategoryService;
+
+	private final String redirect_list = "redirect:/admin/board/list/%s";
+	private final String redirect_detail = "redirect:/admin/board/detail/%s";
+
+	private final String board_list = "admin/board_list";
+	private final String board_detail = "admin/board_detail";
+	private final String board_form = "admin/board_form";
 
 	@GetMapping("/list")
 	@PreAuthorize("isAuthenticated()")
 	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "kw", defaultValue = "") String kw) {
+			@RequestParam(value = "kw", defaultValue = "") String kw,
+			@RequestParam(value = "field", defaultValue = "") String field) {
 
-		Page<Board> paging = adminBoardService.getList(page, kw);
+		Page<Board> paging = adminBoardService.getList(page, kw, field, 0);
 
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
+		model.addAttribute("field", field);
 
-		return "admin/board_list";
+		return board_list;
+	}
+
+	@GetMapping("/list/{cid}")
+	public String listCateogry(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "kw", defaultValue = "") String kw,
+			@RequestParam(value = "field", defaultValue = "all") String field, @PathVariable("cid") Integer cid) {
+
+		Page<Board> paging = adminBoardService.getList(page, kw, field, cid);
+
+		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
+		model.addAttribute("field", field);
+
+		return board_list;
 	}
 
 	@GetMapping(value = "/detail/{id}")
@@ -63,28 +91,35 @@ public class AdminBoardController {
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/create")
-	public String create(Model model, BoardForm boardForm) {
+	@GetMapping("/create/{cid}")
+	public String create(Model model, BoardForm boardForm, @PathVariable("cid") Integer cid) {
 
 		model.addAttribute("mode", "create");
-		return "admin/board_form";
+		return board_form;
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/create")
-	public String create(Model model, @Valid BoardForm boardForm, BindingResult bindingResult, Principal principal) {
+	@PostMapping("/create/{cid}")
+	public String create(Model model, @Valid BoardForm boardForm, BindingResult bindingResult, Principal principal,
+			@PathVariable("cid") Integer cid) {
 
+		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("mode", "create");
-			return "admin/board_form";
+			model.addAttribute("item", new Notice());
+			boardForm.setSubject(boardForm.getSubject());
+			boardForm.setContents(con);
+
+			return board_form;
 		}
 		SiteUser author = this.adminUserService.getItem(principal.getName());
-		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 
-		// TODO :: 넘겨받은 게시판 값 넘겨줘야 함
+		if (cid == 0) {
+			cid = adminCategoryService.getAllByName().get(0).getId();
+		}
 
-		this.adminBoardService.create(boardForm.getSubject(), con, author);
-		return "redirect:/admin/board/list";
+		this.adminBoardService.create(boardForm.getSubject(), con, author, cid, boardForm.getFileids());
+		return String.format(redirect_list, cid);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -123,7 +158,7 @@ public class AdminBoardController {
 		// TODO :: 게시판 수정가능 여부?? - 없으면 좋겠다
 
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
-		this.adminBoardService.modify(item, boardForm.getSubject(), con);
+		this.adminBoardService.modify(item, boardForm.getSubject(), con, boardForm.getFileids());
 		return String.format("redirect:/admin/board/detail/%s", id);
 	}
 
