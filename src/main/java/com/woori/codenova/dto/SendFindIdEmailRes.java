@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

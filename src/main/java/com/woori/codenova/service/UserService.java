@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.NonExistentMemberException;
-import com.woori.codenova.ApiTest.ApiProps;
-import com.woori.codenova.ApiTest.RedisService;
+import com.woori.codenova.dto.ApiProps;
 import com.woori.codenova.dto.KakaoUserInfoResponseDto;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.UserForm;

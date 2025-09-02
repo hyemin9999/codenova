@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.dto;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

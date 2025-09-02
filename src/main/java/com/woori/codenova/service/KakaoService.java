@@ -1,4 +1,4 @@
-package com.woori.codenova.controller;
+package com.woori.codenova.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

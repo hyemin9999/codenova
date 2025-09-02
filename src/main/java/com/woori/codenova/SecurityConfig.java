@@ -28,7 +28,7 @@ public class SecurityConfig {
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
 				// 로그인 사용자는 아이디찾기,비밀번호찾기에 접근 불가
 				.requestMatchers(new AntPathRequestMatcher("/user/login"),
-						new AntPathRequestMatcher("/user/resetpassword"))
+						new AntPathRequestMatcher("/user/find-password"), new AntPathRequestMatcher("/user/find-id"))
 				.anonymous().requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 
 				.csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
