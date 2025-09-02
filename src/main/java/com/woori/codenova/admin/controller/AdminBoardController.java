@@ -25,7 +25,6 @@ import com.woori.codenova.entity.Notice;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.BoardForm;
 import com.woori.codenova.form.CommentForm;
-import com.woori.codenova.service.UploadFileService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 public class AdminBoardController {
 	private final AdminBoardService adminBoardService;
 	private final AdminUserService adminUserService;
-	private final UploadFileService uploadFileService;
 	private final AdminCategoryService adminCategoryService;
 
 	private final String redirect_list = "redirect:/admin/board/list/%s";
@@ -129,13 +127,10 @@ public class AdminBoardController {
 		model.addAttribute("mode", "modify");
 		Board item = this.adminBoardService.getItem(id);
 		if (!item.getAuthor().getUsername().equals(principal.getName())) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
 			model.addAttribute("message", "수정권한이 없습니다.");
 		}
 		boardForm.setSubject(item.getSubject());
 		boardForm.setContents(item.getContents());
-
-		// TODO :: 게시판 수정가능 여부?? - 없으면 좋겠다
 
 		return "admin/board_form";
 	}
@@ -151,11 +146,8 @@ public class AdminBoardController {
 		}
 		Board item = this.adminBoardService.getItem(id);
 		if (!item.getAuthor().getUsername().equals(principal.getName())) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
 			model.addAttribute("message", "수정권한이 없습니다.");
 		}
-
-		// TODO :: 게시판 수정가능 여부?? - 없으면 좋겠다
 
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 		this.adminBoardService.modify(item, boardForm.getSubject(), con, boardForm.getFileids());
