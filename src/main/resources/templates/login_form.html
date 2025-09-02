@@ -1,51 +1,122 @@
-<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-<div layout:fragment="content" class="container my-3">
-    <form th:action="@{/user/login}" method="post">
-        <div th:if="${param.error}">
-            <div class="alert alert-danger">
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head layout:fragment="head">
+    <title>로그인</title>
+    <style>
+        /* 전체 폼을 감싸는 컨테이너 스타일 */
+        .login-form-container {
+            max-width: 500px;
+            margin: 40px auto; /* 위아래 여백 추가 및 자동 중앙 정렬 */
+        }
+
+        /* 소셜 로그인 버튼 공통 스타일 */
+        .social-login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            flex-grow: 1; /* 버튼들이 동일한 너비를 갖도록 설정 */
+        }
+
+        /* 각 소셜 버튼의 고유 스타일 */
+        .kakao-btn {
+            background-color: #FEE500;
+            border-color: #FEE500;
+        }
+
+        .google-btn {
+            background-color: #FFFFFF;
+        }
+
+        .naver-btn {
+            background-color: #03C75A;
+            color: white;
+            border-color: #03C75A;
+        }
+
+/*         /* 소셜 로그인 버튼 아이콘 스타일 (선택 사항) */ */
+/*         .social-login-button img { */
+/*             height: 20px; */
+/*             margin-right: 8px; */
+/*         } */
+        
+        /* 링크 컨테이너 Flexbox 설정 */
+        .links-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* 버튼 사이의 간격 */
+            margin-top: 15px;
+        }
+ .social-login-button .platform-logo {
+    height: 20px;       /* 이미지 높이 지정 */
+    width: auto;        /* 너비는 비율에 맞게 자동 조절 */
+    margin-right: 8px;  /* 이미지와 텍스트 사이 간격 */
+}
+    </style>
+</head>
+
+<div layout:fragment="content" class="container my-5">
+    <div class="login-form-container">
+        <form th:action="@{/user/login}" method="post">
+            <div th:if="${param.error}" class="alert alert-danger">
                 사용자ID 또는 비밀번호를 확인해 주세요.
             </div>
-        </div>
-        <div class="mb-3">
-<!--         username으로 선언해야 UserSecurityService에서 받아서 사용함 -->
-<!--         userId로 받아보니까 작동 안하는거 확인 -->
-            <label for="username" class="form-label">사용자ID</label>
-            <input type="text" name="username" id="username" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">비밀번호</label>
-            <input type="password" name="password" id="password" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-primary">로그인</button>
-        <br>
-            <a th:href="${Kakaolocation}">
-        <img src="/kakao_login_medium_narrow.png" alt="카카오 로그인 버튼" >
-    </a>
-            <a th:href="${Googlelocation}">
-        <img src="/web_light_sq_SU@1x.png" alt="구글 로그인 버튼" >
-    </a>
-            <a th:href="${Naverlocation}">
-        <img src="/btnG_123.png" alt="네이버 로그인 버튼" >
-    </a>
-    <br>
-    <br>
-    <div>
-     <a class="btn btn-primary" sec:authorize="isAnonymous()" th:href="@{/user/find-id}">아이디 찾기</a>
-     <a class="btn btn-primary" sec:authorize="isAnonymous()" th:href="@{/user/find-password}">비밀번호 찾기</a>
+
+            <div class="mb-3">
+                <label for="username" class="form-label">사용자ID</label>
+                <input type="text" name="username" id="username" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <input type="password" name="password" id="password" class="form-control">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class ="btn btn-info">로그인</button>
+            </div>
+
+            <div class="links-container mt-3">
+<a th:href="${Kakaolocation}" class="social-login-button kakao-btn">
+    <img src="/kakao11.png" alt="카카오 아이콘" class="platform-logo">
+    <span>카카오 로그인</span>
+</a>
+
+<a th:href="${Googlelocation}" class="social-login-button google-btn">
+    <img src="/google.png" alt="네이버 아이콘" class="platform-logo">
+    <span>구글 로그인</span>
+</a>
+                
+<a th:href="${Naverlocation}" class="social-login-button naver-btn">
+    <img src="/naver_icon.png" alt="네이버 아이콘" class="platform-logo">
+    <span>네이버 로그인</span>
+</a>
+            </div>
+
+            <div class="links-container">
+                <a class ="btn btn-info" sec:authorize="isAnonymous()" th:href="@{/user/find-id}">아이디 찾기</a>
+                <a class ="btn btn-info" sec:authorize="isAnonymous()" th:href="@{/user/find-password}">비밀번호 찾기</a>
+            </div>
+        </form>
     </div>
-    </form>
 </div>
 
-<script layout:fragment="script" type="text/javascript"
-	th:inline="javascript">
-	// FlashAttribute에 담긴 'message' 변수를 자바스크립트로 가져옴
-	const message = /*[[${message}]]*/null;
+<script layout:fragment="script" type="text/javascript" th:inline="javascript">
+    // Thymeleaf의 th:inline="javascript"를 통해 서버에서 전달받은 'message'를 JavaScript 변수로 가져옵니다.
+    const message = /*[[${message}]]*/ null;
 
-	// 메시지가 존재하면 팝업을 띄움
-	if (message) {
-		alert(message);
-	}
+    // 메시지가 존재하면 팝업을 띄웁니다.
+    if (message) {
+        alert(message);
+    }
 </script>
 </html>

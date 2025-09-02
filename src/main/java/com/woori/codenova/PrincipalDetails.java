@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova;
 
 import java.util.ArrayList;
 import java.util.Collection;

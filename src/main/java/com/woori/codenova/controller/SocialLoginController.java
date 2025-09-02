@@ -28,13 +28,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.woori.codenova.ApiTest.NaverApi;
-import com.woori.codenova.ApiTest.NaverProfile;
 import com.woori.codenova.dto.GoogleInfResponse;
 import com.woori.codenova.dto.KakaoUserInfoResponseDto;
+import com.woori.codenova.dto.NaverProfile;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.entity.SocialUser;
 import com.woori.codenova.service.GoogleService;
+import com.woori.codenova.service.KakaoService;
+import com.woori.codenova.service.NaverApiService;
 import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.SocialUserService;
 import com.woori.codenova.service.UserService;
@@ -58,7 +59,7 @@ public class SocialLoginController {
 	private final PasswordEncoder passwordEncoder;
 	private final SendMailService sendMailService;
 	private final GoogleService googleService;
-	private final NaverApi naverApi;
+	private final NaverApiService naverApiService;
 
 	/**
 	 * 네이버 로그인 성공 후 리다이렉트되는 콜백 URL을 처리합니다.
@@ -71,8 +72,8 @@ public class SocialLoginController {
 	public RedirectView naverLoginCallback(@RequestParam("code") String authCode, @RequestParam("state") String state,
 			HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			RedirectAttributes redirectAttributes) {
-		String accessToken = naverApi.getAccessToken(authCode, state);
-		NaverProfile userInfo = naverApi.getUserInfo(accessToken);
+		String accessToken = naverApiService.getAccessToken(authCode, state);
+		NaverProfile userInfo = naverApiService.getUserInfo(accessToken);
 
 		String provider = "naver";
 		String providerId = userInfo.getId(); // 구글의 고유 식별 코드는 'sub' 입니다.
@@ -314,7 +315,8 @@ public class SocialLoginController {
 		// @ModelAttribute 어노테이션 덕분에 Flash Attribute로 받은 값들이
 		// 자동으로 Model에 다시 담겨서 Thymeleaf로 전달됩니다.
 		// 따라서 model.addAttribute(...)를 또 호출할 필요가 없습니다.
-
+		String ShowPlatform = provider.toUpperCase();
+		model.addAttribute("ShowPlatform", ShowPlatform);
 		return "check_Integration"; // 실제 html 파일 경로
 	}
 

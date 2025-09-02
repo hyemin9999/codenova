@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.woori.codenova.CheckEmailcode;
-import com.woori.codenova.ApiTest.SendFindIdEmailReq;
-import com.woori.codenova.ApiTest.SendFindIdEmailRes;
-import com.woori.codenova.ApiTest.SendResetPasswordEmailReq;
-import com.woori.codenova.ApiTest.SendResetPasswordEmailRes;
+import com.woori.codenova.dto.CheckEmailcode;
+import com.woori.codenova.dto.SendFindIdEmailReq;
+import com.woori.codenova.dto.SendFindIdEmailRes;
+import com.woori.codenova.dto.SendResetPasswordEmailReq;
+import com.woori.codenova.dto.SendResetPasswordEmailRes;
+import com.woori.codenova.service.KakaoService;
 import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.UserService;
 
