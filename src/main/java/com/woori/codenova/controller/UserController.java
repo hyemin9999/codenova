@@ -13,8 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.woori.codenova.InvalidUuidException;
 import com.woori.codenova.NonExistentMemberException;
-import com.woori.codenova.UserFindIdForm;
-import com.woori.codenova.ApiTest.ResetPasswordReq;
+import com.woori.codenova.dto.ResetPasswordReq;
+import com.woori.codenova.form.UserFindIdForm;
 import com.woori.codenova.form.UserForm;
 import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.UserService;

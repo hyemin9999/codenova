@@ -1,4 +1,4 @@
-package com.woori.codenova;
+package com.woori.codenova.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
