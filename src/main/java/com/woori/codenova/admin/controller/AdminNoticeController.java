@@ -39,10 +39,6 @@ public class AdminNoticeController {
 	private final String redirect_list = "redirect:/admin/notice/list";
 	private final String redirect_detail = "redirect:/admin/notice/detail/%s";
 
-//	private final String notice_list =  "admin/notice_list";
-//	private final String notice_detail = "admin/notice_detail";
-//	private final String notice_form = "admin/notice_form";
-
 	@GetMapping("/list")
 	@PreAuthorize("isAuthenticated()")
 	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
