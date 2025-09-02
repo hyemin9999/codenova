@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

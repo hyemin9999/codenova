@@ -9,20 +9,14 @@ import org.springframework.stereotype.Service;
 
 import com.woori.codenova.DataNotFoundException;
 import com.woori.codenova.NonExistentMemberException;
-import com.woori.codenova.ApiTest.ApiProps;
-import com.woori.codenova.ApiTest.KakaoUserInfoResponseDto;
-import com.woori.codenova.ApiTest.RedisService;
+import com.woori.codenova.dto.KakaoUserInfoResponseDto;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.UserForm;
 import com.woori.codenova.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
-
-//import com.mysite.sbb.DataNotFoundException;
-
 import lombok.RequiredArgsConstructor;
 
-//@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -32,7 +26,6 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	// 이메일 인증 및 비밀번호 재설정에 사용
-	private final ApiProps props;
 	private final RedisService redisService;
 
 	@Value("${social.secret-key}")
@@ -52,14 +45,9 @@ public class UserService {
 		user.setUsername(username);
 		user.setEmail(email);
 		user.setCreateDate(LocalDateTime.now());
-		// user.setPassword(password);
 		// 아랫줄에서 불러온것으로 대체됨
 		// 주석 처리한건 위에 final로 선언되어 가져온것
 		user.setPassword(passwordEncoder.encode(password));
-		user.setProvider(provider);
-		if (!"local".equals(provider)) {
-			user.setProviderId(userInfo.getId().toString());
-		}
 		this.userRepository.save(user);
 		return user;
 	}
@@ -86,14 +74,12 @@ public class UserService {
 	public void resetPassword(String uuid, String newPassword) {
 		String email = redisService.getValues(uuid);
 		if (email == null) {
-//			throw new InvalidUuidException();
 			throw new IllegalArgumentException("링크가 유효하지 않거나 만료되었습니다.");
 		}
 		SiteUser user = userRepository.findByEmail(email).orElseThrow(NonExistentMemberException::new);
 
-		user.updatePassword(passwordEncoder.encode(newPassword));
-		// UUId 사용이후 redis에서 삭제하여 재사용을 방지한다.
-//		redisService.deleteValues(email);
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
 		// 이메일 삭제하면 uuid가 그대로 남아있으니 주의바람
 		redisService.deleteValues(uuid);
 	}
@@ -157,38 +143,18 @@ public class UserService {
 		// 모든 검증 통과 후 로직 진행
 	}
 
-	// provider을 사용해서 어떤 회원가입인지 구분 기존:local 카카오:kakao
-	public Optional<SiteUser> findByProviderAndProviderId(String provider, String providerId) {
-		return userRepository.findByProviderAndProviderId(provider, providerId);
-	}
-
 	public Optional<SiteUser> findByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 
 	@Transactional
 	public void linkSocialAccount(SiteUser user, String provider, String providerId) {
-		user.setProvider(provider);
-		user.setProviderId(providerId);
 		userRepository.save(user);
 	}
 
 	@Transactional
 	public SiteUser registerNewSocialUser(UserForm userForm, KakaoUserInfoResponseDto userInfo) {
 		SiteUser user = new SiteUser();
-
-		// 1. UserForm에서 정보 설정
-//		user.setUsername(userForm.getUsername());
-//		user.setPassword(passwordEncoder.encode(userForm.getPassword1())); // 비밀번호 암호화
-
-		// 2. KakaoUserInfoResponseDto에서 정보 설정
-//		user.setEmail(userInfo.getKakaoAccount().getEmail());
-		user.setProvider("kakao");
-		user.setProviderId(userInfo.getId().toString());
-
-		// 3. 기타 정보 설정
-//		user.setCareteDate(LocalDateTime.now());
-		// newUser.setAuthority(...); // 기본 권한 설정
 
 		return userRepository.save(user);
 	}
@@ -201,4 +167,18 @@ public class UserService {
 
 		userRepository.save(item);
 	}
+
+	@Transactional
+	public SiteUser Socialcreate(SiteUser siteUser) {
+		return userRepository.save(siteUser);
+	}
+
+	public SiteUser createAndSaveSocialUser(String nickname, String email) {
+		SiteUser newSiteUser = new SiteUser();
+		newSiteUser.setUsername(nickname);
+		newSiteUser.setEmail(email);
+		// socialCreate와 유사하게 비밀번호 등 설정
+		return userRepository.save(newSiteUser);
+	}
+
 }

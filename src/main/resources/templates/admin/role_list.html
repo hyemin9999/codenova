@@ -114,12 +114,12 @@
 </div>
 <script layout:fragment="script" type="text/javascript"
 	th:inline="javascript">
-	$(document).ready(function() {
-		const message = /*[[${message}]]*/'';
-		if (message.length != 0) {
-			$('#message').text(message);
-			$('#modal').modal('show');
-		}
-	});
+    $(document).ready(function () {
+        const message = /*[[${message}]]*/'';
+        if (message.length != 0) {
+            $('#message').text(message);
+            $('#modal').modal('show');
+        }
+    });
 </script>
 </html>

@@ -34,3 +34,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Application config
+application.yml
+application.properties

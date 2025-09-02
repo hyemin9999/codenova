@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.woori.codenova.dto.CheckEmailcode;
+import com.woori.codenova.dto.SendFindIdEmailReq;
+import com.woori.codenova.dto.SendFindIdEmailRes;
+import com.woori.codenova.dto.SendResetPasswordEmailReq;
+import com.woori.codenova.dto.SendResetPasswordEmailRes;
+import com.woori.codenova.service.KakaoService;
+import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.UserService;
 
 import groovy.util.logging.Slf4j;
@@ -37,6 +44,7 @@ public class ApiController {
 	public SendFindIdEmailRes sendFindEmail(@Validated @RequestBody SendFindIdEmailReq sendFindEmailReq) {
 		userService.checkUserByEmail(sendFindEmailReq.getEmail());
 		String uuid = mailService.sendFindIdEmail(sendFindEmailReq.getEmail());
+//		mailService.EmailSendCountChecker(uuid);
 		return SendFindIdEmailRes.builder().uuid(uuid).build();
 	}
 
@@ -50,7 +58,7 @@ public class ApiController {
 
 	@PostMapping("/checkListUuid")
 	public ResponseEntity<String> cehckListUuidText(@RequestBody CheckEmailcode checkList, Model model) {
-		String uuidtext = checkList.getUuid();
+		String uuidtext = checkList.getUuid().toUpperCase();
 		String email = checkList.getEmail();
 		try {
 			userService.CheckEmailCodeText(email, uuidtext);
@@ -61,12 +69,5 @@ public class ApiController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message1\": \"" + e.getMessage() + "\"}");
 		}
 	}
-
-//	@GetMapping("/callback")
-//	public ResponseEntity<?> callback(@RequestParam("code") String code) throws IOException {
-//		String accessToken = kakaoService.getAccessTokenFromKakao(code);
-//		KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
-//		return new ResponseEntity<>(HttpStatus.OK);
-//	}
 
 }

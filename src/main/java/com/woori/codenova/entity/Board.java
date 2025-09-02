@@ -37,7 +37,8 @@ public class Board {
 	// TEXT 타입: 긴 본문(마크다운 등)을 저장하기 위함, NOT NULL
 	private String contents; // 게시글 내용
 
-	@Column(columnDefinition = "integer default 0", nullable = false)
+	@Column(nullable = false)
+	@ColumnDefault("0")
 	private int viewCount;
 
 	@Column(nullable = false) // NOT NULL
@@ -52,19 +53,15 @@ public class Board {
 	private LocalDateTime deleteDate; // 삭제 일시(소프트 삭제 시각 기록용)
 
 	@ManyToOne // 다대일: 여러 Board가 한 명의 SiteUser(author)를 참조
-	@JoinColumn(name = "user_id") // FK 컬럼명 지정 (board.user_id → site_user.id)
+	@JoinColumn(name = "userId") // FK 컬럼명 지정 (board.user_id → site_user.id)
 	private SiteUser author; // 작성자
 
 	// 게시판(게시글 분류)
-	@ManyToOne // (fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "categoryId", nullable = false)
 	private Category category;
 
-	@OneToMany(mappedBy = "board", // 연관관계의 주인은 Comment.board (FK는 comment 테이블에 존재)
-			cascade = CascadeType.REMOVE, // 부모(Board) 삭제 시 자식(Comment)도 함께 삭제 전이
-			// 또는 CascadeType.ALL: 저장/병합/삭제 등 모든 연산 전이(범위가 넓으므로 의도 없으면 REMOVE 권장)
-			orphanRemoval = true // 컬렉션에서 제거된 자식(Comment)을 고아로 보고 DB에서도 삭제
-	)
+	@OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Comment> commentList; // 이 게시글에 달린 모든 댓글(양방향: Comment.board)
 
 	// 업로드 파일
@@ -72,17 +69,11 @@ public class Board {
 	private List<UploadFile> uploadFile;
 
 	@ManyToMany // 다대다: 게시글-사용자 간 '추천' 관계
-	@JoinTable(name = "Board_Voter", // 조인(중간) 테이블 이름
-			joinColumns = @JoinColumn(name = "board_id"), // 현재 엔티티(Board)를 참조하는 FK
-			inverseJoinColumns = @JoinColumn(name = "user_id") // 반대편 엔티티(SiteUser)를 참조하는 FK
-	)
+	@JoinTable(name = "boardVoter", joinColumns = @JoinColumn(name = "boardId"), inverseJoinColumns = @JoinColumn(name = "userId"))
 	Set<SiteUser> voter; // 이 게시글을 추천한 사용자 집합(Set: 중복 추천 방지에 유리)
 
 	@ManyToMany // 다대다: 게시글-사용자 간 '추천' 관계
-	@JoinTable(name = "Board_Favorite", // 조인(중간) 테이블 이름
-			joinColumns = @JoinColumn(name = "board_id"), // 현재 엔티티(Board)를 참조하는 FK
-			inverseJoinColumns = @JoinColumn(name = "user_id") // 반대편 엔티티(SiteUser)를 참조하는 FK
-	)
+	@JoinTable(name = "boardFavorite", joinColumns = @JoinColumn(name = "boardId"), inverseJoinColumns = @JoinColumn(name = "userId"))
 	Set<SiteUser> favorite; // 이 게시글을 추천한 사용자 집합(Set: 중복 추천 방지에 유리)
 
 }

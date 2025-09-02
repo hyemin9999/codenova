@@ -1,0 +1,58 @@
+@charset "UTF-8";
+/* 전체 폼을 감싸는 컨테이너 스타일 */
+.login-form-container {
+	max-width: 500px;
+	margin: 40px auto; /* 위아래 여백 추가 및 자동 중앙 정렬 */
+}
+
+/* 소셜 로그인 버튼 공통 스타일 */
+.social-login-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	border-radius: 5px;
+	text-decoration: none;
+	color: black;
+	font-weight: bold;
+	font-size: 14px;
+	margin: 5px;
+	border: 1px solid #ccc;
+	flex-grow: 1; /* 버튼들이 동일한 너비를 갖도록 설정 */
+}
+
+/* 각 소셜 버튼의 고유 스타일 */
+.kakao-btn {
+	background-color: #FEE500;
+	border-color: #FEE500;
+}
+
+.google-btn {
+	background-color: #FFFFFF;
+}
+
+.naver-btn {
+	background-color: #03C75A;
+	color: white;
+	border-color: #03C75A;
+}
+
+/*         /* 소셜 로그인 버튼 아이콘 스타일 (선택 사항) */
+* /
+	/*         .social-login-button img { */
+	/*             height: 20px; */
+	/*             margin-right: 8px; */
+	/*         } */
+	/* 링크 컨테이너 Flexbox 설정 */
+        .links-container {
+	display: flex;
+	justify-content: center;
+	gap: 10px; /* 버튼 사이의 간격 */
+	margin-top: 15px;
+}
+
+.social-login-button .platform-logo {
+	height: 20px; /* 이미지 높이 지정 */
+	width: auto; /* 너비는 비율에 맞게 자동 조절 */
+	margin-right: 8px; /* 이미지와 텍스트 사이 간격 */
+}
