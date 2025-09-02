@@ -4,8 +4,9 @@
 
 <!-- 콘텐츠 본문 영역 정의: 이 div의 내용이 layout.html의 layout:fragment="content" 위치에 주입됨 -->
 <div layout:fragment="content" class="container my-3">
+
 	<!-- 폼 제목 -->
-	<h5 class="border-bottom pb-2">[[${menuName}]] 게시판</h5>
+	<h5 class="my-3 border-bottom pb-2">게시글 작성</h5>
 	<div class="row">
 		<div class="col">
 			<!-- 게시글 작성/수정을 위한 폼
@@ -28,6 +29,7 @@
 					<input type="text" th:field="*{subject}" class="form-control">
 				</div>
 
+
 				<!-- 내용 입력 필드 -->
 				<div class="mb-3">
 					<label for="contents" class="form-label">내용</label>
@@ -35,7 +37,7 @@
 					<!-- (기존 textarea 대체) Toast UI Editor를 붙일 컨테이너
                  - 실제로는 이 div에 자바스크립트로 에디터 인스턴스를 생성하여 표시 -->
 					<!-- <textarea th:field="*{contents}" class="form-control" rows="10"></textarea> -->
-					<div id="contents" class="form-control"></div>
+					<div id="contents" name="contents" class="form-control"></div>
 
 					<!-- 서버 전송용 숨김 필드
                  - 최종적으로 에디터의 마크다운 문자열을 이 input(name="contents")에 넣어
@@ -49,6 +51,19 @@
 					<a class="btn btn-outline-info" th:href="@{/board/list}">취소</a>
 				</div>
 			</form>
+
+			<div class="btn d-block text-center btn-outline-info aibtn"
+				id="aiBtn">AI</div>
+			<div id="aiPopup" class="ai-popup" style="display: none;">
+				<div class="ai-popup-content">
+					<span class="ai-popup-close" id="aiPopupClose">&times;</span>
+					<div id="aiResponse" class="ai-response"></div>
+					<div class="ai-prompt-group mt-3">
+						<textarea id="aiPrompt" placeholder="입력" class="ai-prompt"></textarea>
+						<button id="aiSendBtn" class="ai-send-btn">전송</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -57,54 +72,42 @@
      - th:inline="javascript" : [[...]] 등의 Thymeleaf 인라인 표현식이 JS 문자열로 안전하게 렌더링되도록 함 -->
 <script layout:fragment="script" type="text/javascript"
 	th:inline="javascript">
-
-	// Toast UI Editor 인스턴스 생성
-	// - el: 에디터를 붙일 DOM 요소
-	// - initialEditType: 초기 편집 모드(markdown 또는 wysiwyg)
-	// - initialValue: 초기 내용(빈 문자열로 시작 후 setMarkdown으로 다시 세팅)
-	// - previewStyle: 미리보기 레이아웃(tab/vertical)
-	// - toolbarItems: 보여줄 툴바 버튼 구성
 	const editor = new toastui.Editor({
-			el : document.querySelector('#contents'),
-			height : '500px', 
-			initialEditType : 'markdown', 
-			initialValue : '',
-			previewStyle : 'vertical',
-			placeholder : '내용을 입력해 주세요.',
-			  hooks: {
-				   async addImageBlobHook(blob, callback) { 
-					   try {
-		                    const formData = new FormData();
-		                    formData.append('image', blob);
-		                    formData.append('type', "board");
-		                    formData.append('mode',  /*[[${mode}]]*/'');
-
-		                    const response = await fetch('/tui-editor/image-upload', {
-		                        method : 'POST',
-		                        body : formData,
-		                        headers: {
-		                        	 'X-CSRF-Token':  $('#_csrf').attr('value')
-		                        }, 
-		                    });
-
-		                    const json = await response.json();		                 
-		                    //console.log("filename :: "+json.saveFilename);
-		                    
-		                    // TODO :: 업로드한 파일정보를 게시글 저장/수정 시 연결해야함.
-		                    
-		                    const imageUrl = `/tui-editor/image-print?filename=${json.saveFilename}`;
-		                    callback(imageUrl, 'image alt attribute');
-
-		                } catch (error) {
-		                    console.error('업로드 실패 : ', error);
-		                }
-			      },
-			    },
-		});
-
+		el: document.querySelector('#contents'),
+		height: '500px',
+		initialEditType: 'markdown',
+		initialValue: '',
+		previewStyle: 'vertical',
+		placeholder: '내용을 입력해 주세요.',
+		hooks: {
+			async addImageBlobHook(blob, callback) {
+				try {
+					const formData = new FormData();
+					formData.append('image', blob);
+					formData.append('type', "board");
+					formData.append('mode',  /*[[${mode}]]*/'');
+	
+					const response = await fetch('/tui-editor/image-upload', {
+						method: 'POST',
+						body: formData,
+						headers: { 'X-CSRF-Token': $('#_csrf').attr('value') },
+					});
+	
+					const json = await response.json();
+	
+					const imageUrl = `/tui-editor/image-print?filename=${json.saveFilename}`;
+					callback(imageUrl, 'image alt attribute');
+	
+				} catch (error) {
+					console.error('업로드 실패 : ', error);
+				}
+			},
+		},
+	});
+	
 	// 서버에서 받은 기존 내용(마크다운)을 에디터에 세팅
-		editor.setMarkdown(document.querySelector('#ecp1').value);
-
+	editor.setMarkdown(document.querySelector('#ecp1').value);
+	
 	// 폼 제출 직전, 에디터의 마크다운 문자열을 숨김 필드(#ecp)에 주입하여 서버로 전송
 	document.querySelector('form').addEventListener('submit', function(event) {
 		document.querySelector('#ecp1').value = '';
@@ -115,5 +118,142 @@
 		// URL 인코딩하지 않고 그대로 전송(컨트롤러에서 URLDecoder 사용 시 이중 인코딩 주의)
 		document.querySelector('#ecp').value = encodedC;
 	});
+	// AI 시작
+	const AI_HISTORY_KEY = 'aiHistory';
+	let aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+		{ role: 'user', parts: [{ text: '' }] }
+	];
+	
+	let lastUserPrompt = '';
+	// --- AI 전송/중지 상태 관리 변수 추가 ---
+	let isAiRequesting = false;
+	let aiAbortController = null;
+	
+	// 스킨별 시스템 프롬프트 생성 함수
+	function getPromptBySkin(skin) {
+		let tempPrompt = '';
+		tempPrompt += '코드도우미';
+		tempPrompt += '나는 할아버지다';
+		tempPrompt += '말투를 무조건 셈으로 끝낸다.';
+		tempPrompt += '텍스트 받은내용을 해석하거나 풀이하는걸 중점으로 한다..';
+	
+	
+		return tempPrompt;
+	}
+	
+	function showAiResponse(text) {
+		document.getElementById('aiResponse').innerHTML =
+			`<div class="ai-user-prompt-small">[명령] ${lastUserPrompt}</div>\n   <div>${text}</div>`;
+	}
+	
+	function saveAiHistory() {
+		localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory));
+	}
+	
+	function loadAiHistory() {
+		aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+			{ role: 'user', parts: [{ text: getPromptBySkin(currentSkin) }] }
+		];
+	}
+	
+	// --- 버튼 상태 토글 함수 ---
+	function setAiButtonState(state) {
+		const btn = document.getElementById('aiSendBtn');
+		if (state === 'send') {
+			btn.textContent = '전송';
+			btn.classList.remove('stop');
+			btn.classList.add('send');
+		} else {
+			btn.textContent = '중지';
+			btn.classList.remove('send');
+			btn.classList.add('stop');
+		}
+	}
+	
+	document.getElementById('aiBtn').addEventListener('click', function() {
+		document.getElementById('aiPopup').style.display = 'block';
+		setAiButtonState('send');
+		isAiRequesting = false;
+		aiAbortController = null;
+		const lastModel = aiHistory.slice().reverse().find(m => m.role === 'model');
+		if (lastModel) showAiResponse(lastModel.parts[0].text);
+	});
+	
+	document.getElementById('aiPopupClose').addEventListener('click', function() {
+		document.getElementById('aiPopup').style.display = 'none';
+	});
+	// AI 전송/중지 버튼 이벤트
+	document.getElementById('aiSendBtn').addEventListener('click', async function() {
+		lastUserPrompt = document.getElementById('aiPrompt').value;
+	
+		if (isAiRequesting) {
+			// 중지 버튼 동작: 요청 중단
+			if (aiAbortController) aiAbortController.abort();
+			isAiRequesting = false;
+			setAiButtonState('send');
+			showAiResponse('요청이 중지되었습니다.');
+			return;
+		}
+		// 이미 요청 중이면 무시(중복 방지)
+		if (isAiRequesting) return;
+		isAiRequesting = true;
+		setAiButtonState('stop');
+		aiAbortController = new AbortController();
+		const pageContent = document.getElementById('contents')?.innerText || '';
+		aiHistory[1] = { role: 'user', parts: [{ text: pageContent }] };
+		// 사용자 입력 프롬프트 push
+		aiHistory.push({ role: 'user', parts: [{ text: lastUserPrompt || '' }] });
+	
+		// turn 제한: 시스템 프롬프트/페이지컨텍스트 제외하고 최근 3개만 유지
+		let userModelTurns = aiHistory.slice(2).filter(m => m.role === 'user' || m.role === 'model');
+		if (userModelTurns.length > 3) {
+			userModelTurns = userModelTurns.slice(userModelTurns.length - 3);
+			aiHistory = [aiHistory[0], aiHistory[1], ...userModelTurns];
+		}
+		saveAiHistory();
+		document.getElementById('aiPrompt').value = '';
+		document.getElementById('aiPrompt').focus();
+	
+		showAiResponse('응답을 불러오는 중...');
+		try {
+			const response = await fetch('/api/ai/gemini', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': $('#_csrf').attr('value') },
+				body: JSON.stringify({ contents: aiHistory }),
+	
+				signal: aiAbortController.signal
+			});
+	
+			const data = await response.json();
+			const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '응답이 없습니다.';
+			showAiResponse(aiText);
+			aiHistory.push({ role: 'model', parts: [{ text: aiText }] });
+			// turn 제한 다시 적용
+			let userModelTurns2 = aiHistory.slice(1).filter(m => m.role === 'user' || m.role === 'model');
+			if (userModelTurns2.length > 10) {
+				userModelTurns2 = userModelTurns2.slice(userModelTurns2.length - 10);
+				aiHistory = [aiHistory[0], ...userModelTurns2];
+			}
+			saveAiHistory();
+		} catch (e) {
+			if (e.name === 'AbortError') {
+				showAiResponse('요청이 중지되었습니다.');
+			} else {
+				showAiResponse('에러 발생: ' + e);
+			}
+		} finally {
+			isAiRequesting = false;
+			setAiButtonState('send');
+		}
+	});
+	// 페이지 로드시 히스토리 복원 및 시스템 프롬프트 보장
+	loadAiHistory();
+	
+	// 스킨 변경 시 시스템 프롬프트 갱신
+	function changeSkin(skinName) {
+		document.cookie = 'selectedSkin=' + skinName + '; path=/; max-age=31536000; SameSite=Lax';
+		setSystemPromptBySkin(skinName);
+		location.reload();
+	}
 </script>
 </html>
