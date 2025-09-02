@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/admin_layout}"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<div layout:fragment="content" class="container my-3">
+
+	<h5 class="border-bottom pb-2">공지사항 관리</h5>
+	<div class="row">
+		<div class="col">
+			<form method="post" th:object="${noticeForm}" id="form">
+				<input type="hidden" th:name="${_csrf.parameterName}"
+					th:value="${_csrf.token}" id="_csrf" />
+				<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+				<div class="mb-3">
+					<label for="subject" class="form-label">제목</label><input
+						type="text" th:field="*{subject}" class="form-control">
+				</div>
+				<div class="mb-3">
+					<label for="content" class="form-label">내용</label>
+					<div id="content" class="form-control"></div>
+					<input type="hidden" name="content" id="ecp"><input
+						type="hidden" id="ecp1" th:field="*{content}"><input
+						type="hidden" id="fileids" th:field=*{fileids}>
+				</div>
+				<div class="align-r">
+					<input type="submit" value="저장" class="btn btn-info my-2">
+					<a class="btn btn-outline-info" th:href="@{/admin/notice/list}">취소</a>
+				</div>
+			</form>
+		</div>
+	</div>
+
+<!-- 	<div class="ai-prompt-group mt-3"> -->
+<!-- 		<button id="aiSendBtn" class="ai-send-btn">전송</button> -->
+<!-- 	</div> -->
+
+</div>
+<script layout:fragment="script" th:inline="javascript">
+
+	const editor = new toastui.Editor({
+	    el : content_element, 
+		height : '500px', 
+		initialEditType : 'markdown',
+		hideModeSwitch: true,
+		initialValue : '',
+		previewStyle : 'vertical', 
+		placeholder : '내용을 입력해 주세요.',
+		hooks: {
+			async addImageBlobHook(blob, callback) {
+				try {
+					const formData = new FormData();
+	                    formData.append('image', blob);
+	                    formData.append('type', "notice");
+	                    formData.append('mode', /*[[${mode}]]*/'');
+	                	
+						const response = await fetch('/tui-editor/image-upload', {
+							method: 'POST',
+							body: formData,
+							headers: { 'X-CSRF-Token': $('#_csrf').attr('value') },
+						});
+						const json = await response.json();
+						if (json.id != null) {
+							files.push(json.id)
+							document.querySelector('#fileids').value = files;
+		
+							const imageUrl = `/tui-editor/image-print?filename=${json.saveFilename}`;
+							callback(imageUrl, 'image alt attribute');
+						} else {
+							modal_show(failed_message);
+						}
+	                } catch (error) {
+						modal_show(failed_message);
+						console.error(failed_message + " :: ", error);
+					}
+	        	},
+		    },
+	});
+	
+	editor.setMarkdown(document.querySelector('#ecp1').value);
+
+	document.querySelector('form').addEventListener('submit',
+		function(event) {
+			document.querySelector('#ecp1').value = '';
+			const content = editor.getMarkdown();
+			const encodedC = encodeURIComponent(content);
+			document.querySelector('#ecp').value = encodedC;
+		});
+	
+	$(document).ready(function() {
+		const error_message = /*[[${message}]]*/'';
+		if (error_message != null) {
+			modal_show(error_message);
+		}
+
+		$('#modal').on('hide.bs.modal', function(event) {
+			window.location.href = '/admin/notice/';
+		});
+	});
+	
+
+	
+	
+	// TODO ::  에디터에 소스나 뭐 질문을 등록하고 AI관련 버튼을 클릭하면 모달이 뜨면서 AI응답이 나왔으면 좋겠어!!!
+      
+//       const AI_HISTORY_KEY = 'aiHistory';
+//       let aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+//           { role: 'user', parts: [{ text: '' }] }
+//       ];
+
+//       let lastUserPrompt = '';
+// //       let currentSkin ='common';
+
+//       // --- AI 전송/중지 상태 관리 변수 추가 ---
+//       let isAiRequesting = false;
+//       let aiAbortController = null;
+
+//       function showAiResponse(text) {
+                    
+// //           document.getElementById('aiResponse').innerHTML =
+// //               `<div class="ai-user-prompt-small">[명령] ${lastUserPrompt}</div>\n   <div>${text}</div>`;
+              
+// //           editor.setHTML(document.getElementById('aiResponse').innerHTML);
+//                editor.setHTML(`<div class="ai-user-prompt-small">[명령] ${lastUserPrompt}</div>\n   <div>${text}</div>`);
+//       }
+
+//       function saveAiHistory() {
+//           localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory));
+//       }
+
+//       function loadAiHistory() {
+//           aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+//               { role: 'user', parts: [{ text: getPromptBySkin('common') }] }
+//           ];
+//       }
+
+//       // --- 버튼 상태 토글 함수 ---
+//       function setAiButtonState(state) {
+//           const btn = document.getElementById('aiSendBtn');
+//           if (state === 'send') {
+//               btn.textContent = '전송';
+//               btn.classList.remove('stop');
+//               btn.classList.add('send');
+//           } else {
+//               btn.textContent = '중지';
+//               btn.classList.remove('send');
+//               btn.classList.add('stop');
+//           }
+//       }
+
+//       // AI 전송/중지 버튼 이벤트   %%%%%%%%%%%%%%%%%%%%%%%%
+//       document.getElementById('aiSendBtn').addEventListener('click', async function() {
+          
+          
+// //          console.log(editor.getHtml());
+         
+//      	const content = editor.getMarkdown();
+          
+//          lastUserPrompt =content// editor.getHtml();// encodedC;  //document.getElementById('aiPrompt').value;
+
+//           if (isAiRequesting) {
+//               // 중지 버튼 동작: 요청 중단
+//               if (aiAbortController) aiAbortController.abort();
+//               isAiRequesting = false;
+//               setAiButtonState('send');
+//               showAiResponse('요청이 중지되었습니다.');
+//               return;
+//           }
+//           // 이미 요청 중이면 무시(중복 방지)
+//           if (isAiRequesting) return;
+//           isAiRequesting = true;
+//           setAiButtonState('stop');
+//           aiAbortController = new AbortController();
+//           const aiskin ='common';
+//           const pageContent = document.querySelector('.aiview')?.innerText || '';
+//           aiHistory[1] = { role: 'user', parts: [{ text: pageContent }] };
+//           // 사용자 입력 프롬프트 push
+//           aiHistory.push({ role: 'user', parts: [{ text: lastUserPrompt || '' }] });
+
+//           // turn 제한: 시스템 프롬프트/페이지컨텍스트 제외하고 최근 3개만 유지
+//           let userModelTurns = aiHistory.slice(2).filter(m => m.role === 'user' || m.role === 'model');
+//           if (userModelTurns.length > 3) {
+//               userModelTurns = userModelTurns.slice(userModelTurns.length - 3);
+//               aiHistory = [aiHistory[0], aiHistory[1], ...userModelTurns];
+//           }
+//           saveAiHistory();
+
+//           showAiResponse('응답을 불러오는 중...');
+//           try {
+//               const response = await fetch('/api/ai/gemini', {
+//                   method: 'POST',
+//                   headers: { 'Content-Type': 'application/json',
+//                       'X-CSRF-Token': $('#_csrf').attr('value')},
+//                   body: JSON.stringify({ contents: aiHistory }),
+//                   signal: aiAbortController.signal
+//               });
+
+//               const data = await response.json();
+//               const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '응답이 없습니다.';
+//               showAiResponse(aiText);
+//               aiHistory.push({ role: 'model', parts: [{ text: aiText }] });
+//               // turn 제한 다시 적용
+//               let userModelTurns2 = aiHistory.slice(1).filter(m => m.role === 'user' || m.role === 'model');
+//               if (userModelTurns2.length > 10) {
+//                   userModelTurns2 = userModelTurns2.slice(userModelTurns2.length - 10);
+//                   aiHistory = [aiHistory[0], ...userModelTurns2];
+//               }
+//               saveAiHistory();
+//           } catch (e) {
+//               if (e.name === 'AbortError') {
+//                   showAiResponse('요청이 중지되었습니다.');
+//               } else {
+//                   showAiResponse('에러 발생: ' + e);
+//               }
+//           } finally {
+//               isAiRequesting = false;
+//               setAiButtonState('send');
+//           }
+//       });
+//       // 페이지 로드시 히스토리 복원 및 시스템 프롬프트 보장
+//       loadAiHistory();
+      
+  </script>
+
+</html>

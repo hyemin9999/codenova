@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html layout:decorate="~{admin/layout}"
+<html layout:decorate="~{layout/admin_layout}"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<div layout:fragment="content" class="container my-3"
+<main layout:fragment="content" class="container my-3"
 	th:unless="${item} == null">
 
 	<h5 class="border-bottom pb-2">공지사항 관리</h5>
@@ -43,14 +43,12 @@
 			</div>
 		</div>
 	</div>
-</div>
-<script layout:fragment="script" type="text/javascript"
-	th:inline="javascript">
+</main>
+<script layout:fragment="script" th:inline="javascript">
     $(document).ready(function () {
-        const message = /*[[${message}]]*/'';
-        if (message.length != 0) {
-            $('#message').text(message);
-            $('#modal').modal('show');
+        const error_message = /*[[${message}]]*/'';
+        if (error_message != null) {
+            modal_show(error_message);
         }
 
         $('#modal').on('hide.bs.modal', function (event) {
@@ -58,5 +56,4 @@
         });
     });
 </script>
-
 </html>

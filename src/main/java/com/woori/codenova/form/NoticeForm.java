@@ -17,5 +17,6 @@ public class NoticeForm {
 	@NotEmpty(message = "내용은 필수항목입니다.")
 	private String content;
 
-	private List<String> filenames = new ArrayList<>();
+	private List<Long> fileids = new ArrayList<>();
+
 }
