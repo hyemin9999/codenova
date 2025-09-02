@@ -52,37 +52,37 @@
 </div>
 <script layout:fragment="script" type="text/javascript"
 	th:inline="javascript">
-	function onDisplay(d) {
-		const pwd_element = document.getElementById("pwd");
-		if (pwd_element) {
-			if (!d) {
-				pwd_element.style.display = 'block';
-			} else {
-				pwd_element.style.display = 'none';
-			}
-		}
+    function onDisplay(d) {
+        const pwd_element = document.getElementById("pwd");
+        if (pwd_element) {
+            if (!d) {
+                pwd_element.style.display = 'block';
+            } else {
+                pwd_element.style.display = 'none';
+            }
+        }
 
-		const pwdchange_elements = document.getElementsByClassName("pwdchange");
-		Array.from(pwdchange_elements).forEach(
-				function(element) {
-					if (d) {
-						element.style.display = 'block';
-					} else {
-						element.style.display = 'none';
-						const alert_elements = document
-								.getElementsByClassName("alert alert-danger");
-						Array.from(alert_elements).forEach(function(element) {
-							element.remove();
-						});
-					}
-				});
-	}
-	const mode = /*[[${mode}]]*/'';
+        const pwdchange_elements = document.getElementsByClassName("pwdchange");
+        Array.from(pwdchange_elements).forEach(
+                function (element) {
+                    if (d) {
+                        element.style.display = 'block';
+                    } else {
+                        element.style.display = 'none';
+                        const alert_elements = document
+                                .getElementsByClassName("alert alert-danger");
+                        Array.from(alert_elements).forEach(function (element) {
+                            element.remove();
+                        });
+                    }
+                });
+    }
+    const mode = /*[[${mode}]]*/'';
 
-	console.log(mode);
+    console.log(mode);
 
-	if (mode == 'modify') {
-		onDisplay(true);
-	}
+    if (mode == 'modify') {
+        onDisplay(true);
+    }
 </script>
 </html>

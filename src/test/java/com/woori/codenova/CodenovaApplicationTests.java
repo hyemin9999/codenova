@@ -195,7 +195,7 @@ class CodenovaApplicationTests {
 
 	// 테스트 데이터 300개 생성
 
-	@Test
+//	@Test
 	void testJpa_12() {
 		SiteUser u1 = userRepository.findByUsername("admin").orElse(null);
 		Category c2 = categoryRepository.findByname("자유게시판").orElse(null);
@@ -209,8 +209,6 @@ class CodenovaApplicationTests {
 
 //	@Test
 	void insertRoles() {
-		// 역할 초기값 ==> 슈퍼 관리자(1) insert
-
 		Role r2 = new Role();
 		r2.setName("관리자");
 		r2.setGrade(1);
@@ -220,7 +218,6 @@ class CodenovaApplicationTests {
 
 //	@Test
 	void insertUsers() {
-		// 사용자 초기값 ==> 사용자(user), 관리자(admin) insert
 		SiteUser u1 = new SiteUser();
 		u1.setUsername("admin");
 		u1.setPassword(passwordEncoder.encode("1234"));
@@ -236,8 +233,8 @@ class CodenovaApplicationTests {
 		userRepository.save(u2);
 	}
 
-//	@Test
-	@Transactional // 트랜잭션 추가
+	@Test
+	@Transactional
 	@Rollback(value = false)
 	void insertUser_Authority() {
 
@@ -255,19 +252,16 @@ class CodenovaApplicationTests {
 //	@Test
 	void insertCategory() {
 
-		// 자유게시판
 		Category c2 = new Category();
 		c2.setName("자유게시판");
 		c2.setCreateDate(LocalDateTime.now());
 		categoryRepository.save(c2);
 
-		// Java게시판
 		Category c3 = new Category();
 		c3.setName("Java게시판");
 		c3.setCreateDate(LocalDateTime.now());
 		categoryRepository.save(c3);
 
-		// 자유게시판
 		Category c4 = new Category();
 		c4.setName("SQL게시판");
 		c4.setCreateDate(LocalDateTime.now());

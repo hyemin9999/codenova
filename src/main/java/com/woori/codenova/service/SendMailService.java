@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
@@ -126,4 +126,5 @@ public class SendMailService {
 		redisService.setValuesWitchTimeout(email, uuid, uuidValidTime);
 		// 찾는키 , 해당값 , 만료시간 /
 	}
+
 }

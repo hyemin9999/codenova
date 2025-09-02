@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>카카오 연동 페이지</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container my-3">
+
+		<h2>계정 연동 확인</h2>
+		<p>
+			<span th:text="${ShowPlatform}"></span> 계정(<b th:text="${email}">user@email.com</b>)을
+			기존 저희 서비스 계정과 연결하시겠습니까?
+		</p>
+		<form th:action="@{/user/link/process}" method="post">
+
+			<input type="hidden" name="provider" th:value="${provider}" /> <input
+				type="hidden" name="providerId" th:value="${providerId}" /> <input
+				type="hidden" name="email" th:value="${email}" />
+
+			<button class="btn btn-info" type="submit">예, 연동합니다.</button>
+			<a href="/" class="btn btn-info">아니요, 다음에 하겠습니다.</a>
+		</form>
+	</div>
+</body>
+</html>

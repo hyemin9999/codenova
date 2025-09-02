@@ -26,22 +26,25 @@ public class SecurityConfig {
 	// 모든 페이지에 접근 가능
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+
 				.requestMatchers(new AntPathRequestMatcher("/admin/user/**")).hasRole("ADMIN")
 				.requestMatchers(new AntPathRequestMatcher("/admin/role/**")).hasRole("ADMIN")
 				.requestMatchers(new AntPathRequestMatcher("/admin/category/**")).hasRole("ADMIN")
 				.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "MANAGER")
-				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-				// DB나 특정링크 접속권한을 주지만 내부 데이터 접근불가
-				// 즉 로그인창만 넘어가며 나머진 거부됨
+				.requestMatchers(new AntPathRequestMatcher("/user/login"),
+						new AntPathRequestMatcher("/user/find-password"), new AntPathRequestMatcher("/user/find-id"))
+				.anonymous().requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 				.csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
-				// h2-console을 보안에서 허용한다.
-				// 즉 접근경로가 h2-console 뿐인데 그걸로 접속하는걸 허용한다
 				.headers((headers) -> headers.addHeaderWriter(
 						new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-				// 로그인 페이지 -> /user/login , 로그인 성공시 -> / 로 돌아간다
 				.formLogin((formLogin) -> formLogin.loginPage("/user/login").defaultSuccessUrl("/"))
 				.logout(logout -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-						.logoutSuccessUrl("/").invalidateHttpSession(true));
+						.logoutSuccessUrl("/").invalidateHttpSession(true))
+				.exceptionHandling((exceptionHandling) -> exceptionHandling
+						.accessDeniedHandler((request, response, accessDeniedException) -> {
+							response.sendRedirect("/");
+						}));
+
 		return http.build();
 	}
 

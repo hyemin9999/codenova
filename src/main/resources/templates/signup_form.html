@@ -1,10 +1,8 @@
-
 <html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta name="_csrf2" th:content="${_csrf.token}" />
 <meta name="_csrf_header2" th:content="${_csrf.headerName}" />
-<script src="typeit.js"></script>
 </head>
 
 <div layout:fragment="content" class="container my-3">
@@ -31,7 +29,7 @@
 					<label for="email" class="form-label">이메일</label> <input
 						type="email" id="email" th:field="*{email}" class="form-control">
 					<button id="sendSmsAuth"
-						class="certificationIssue sendSmsAuth btnStroke" type="button">인증번호발송</button>
+						class="certificationIssue btn btn-primary btnStroke" type="button">인증번호발송</button>
 					<button id="modifyEmail" class="btn btn-primary" type="button"
 						disabled>이메일 수정</button>
 					<p class="editPhoneTitle" id="emailMessage"></p>
@@ -47,6 +45,16 @@
 					<p id="authMessage"></p>
 				</div>
 				<button type="submit" class="btn btn-primary" id="clear1" disabled>회원가입</button>
+				<!-- 	</form> -->
+				<br>
+				<!-- 	<form> -->
+				<a th:href="${Kakaolocation}"> <img
+					src="/kakao_login_medium_narrow.png" alt="카카오 로그인 버튼">
+				</a> <a th:href="${Googlelocation}"> <img
+					src="/web_light_sq_SU@1x.png" alt="구글 로그인 버튼">
+				</a> <a th:href="${Naverlocation}"> <img src="/btnG_123.png"
+					alt="네이버 로그인 버튼">
+				</a>
 			</form>
 		</div>
 	</div>
@@ -128,10 +136,6 @@ $('.certificationIssue').on("click", function() {
 		 });
 		 
 // ================================= 이메일 인증코드 발송 로직 ==========
-//             const clear12 = document.getElementById('clear1');
-//             const sendCheck = document.getElementById('sendSmsAuth');
-//             const textCheck1 = document.getElementById('textCheck');
-//             const modifyEmail = document.getElementById('modifyEmail');
             const csrfToken = document.querySelector('meta[name="_csrf2"]').getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header2"]').getAttribute('content');
 	
@@ -140,6 +144,16 @@ $('.certificationIssue').on("click", function() {
 //             sendCheck.disabled = false;
             const email = document.getElementById('email').value
             const CheckOkNum = document.getElementById('checkSmsAuth');
+              // 인증메일발송 버튼을 10초간 비활성화
+              sendCheck.disabled = true;
+              sendCheck.textContent = '10초 대기 중...';
+
+              // 10초 후에 버튼 활성화
+              setTimeout(() => {
+            	 sendCheck.disabled = false;
+            	 sendCheck.textContent = '인증번호발송';
+              }, 10000); // 10000밀리초 = 10초
+//             });
             
 
             fetch('/api/checkEmail', {
@@ -161,24 +175,20 @@ $('.certificationIssue').on("click", function() {
                 document.getElementById('emailMessage').innerText = '이메일 확인 메일이 발송되었습니다.';
                 document.getElementById('emailMessage').style.color = 'green';
 //                 alert('비밀번호 재설정 이메일이 발송되었습니다.');
-				
+				//sendSmsAuth 인증버튼 발송
 //                 console.log('UUID:', data.uuid);
 				CheckOkNum.disabled = false;
+				//발송 버튼 잠궈버리기
+// 				sendCheck.disabled = false;
             })
             .catch(error => {
                 document.getElementById('emailMessage').innerText = error.message;
                 document.getElementById('emailMessage').style.color = 'red';
             });
         });
-        
+        //여기가 인증하기 버튼 구역
         document.getElementById('checkSmsAuth').addEventListener('click', function(event) {
         	event.preventDefault();
-//             const CheckOkNum = document.getElementById('checkSmsAuth');
-//             const clear12 = document.getElementById('clear1');
-//             const sendCheck = document.getElementById('sendSmsAuth');
-//             const textCheck1 = document.getElementById('textCheck');
-//             const modifyEmail = document.getElementById('modifyEmail');
-// 			 const authMessage = document.getElementById('authMessage');
 			 // ====
         	const email = document.getElementById('email').value;
         	const uuidText = document.getElementById('textCheck').value;
@@ -235,11 +245,6 @@ $('.certificationIssue').on("click", function() {
                 
         document.getElementById('modifyEmail').addEventListener('click', function() {
 //         	event.preventDefault();
-//             const CheckOkNum = document.getElementById('checkSmsAuth');
-//             const clear12 = document.getElementById('clear1');
-//             const sendCheck = document.getElementById('sendSmsAuth');
-//             const textCheck1 = document.getElementById('textCheck');
-//             const modifyEmail = document.getElementById('modifyEmail');
 			 const authMessage = document.getElementById('authMessage');
 			 // ====
         	const email = document.getElementById('email').value;
@@ -249,8 +254,6 @@ $('.certificationIssue').on("click", function() {
             sessionStorage.removeItem('verifiedEmail');
             
             // 이메일 필드 활성화 및 값 초기화
-//             document.getElementById('email').readOnly = false;
-//             document.getElementById('email').value = '';
             emailInput.readOnly = false;
             emailInput.value = ''; // 값을 비워줍니다.
 

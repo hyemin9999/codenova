@@ -1,0 +1,24 @@
+Merge branch 'f/user' of https://github.com/hyemin9999/CodeNova into f/use# Please enter a commit message to explain why this merge is necessary,
+# especially if it merges an updated upstream into a topic branch.
+#
+# Lines starting with '#' will be ignored, and an empty message aborts
+# the commit.
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please run
+#	git update-ref -d MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch f/user
+# Your branch and 'origin/f/user' have diverged,
+# and have 30 and 1 different commits each, respectively.
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	modified:   README.md
+#

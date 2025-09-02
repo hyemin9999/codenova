@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,6 +6,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.woori.codenova.dto.KakaoTokenResponseDto;
+import com.woori.codenova.dto.KakaoUserInfoResponseDto;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,13 @@ public class KakaoService {
 		this.clientId = clientId;
 		KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
 		KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
+	}
+
+	public KakaoUserInfoResponseDto getaccessToken(String authCode) {
+
+//	KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
+		String accessToken = getAccessTokenFromKakao(authCode);
+		return getUserInfo(accessToken);
 	}
 
 	public String getAccessTokenFromKakao(String code) {

@@ -1,4 +1,4 @@
-package com.woori.codenova.ApiTest;
+package com.woori.codenova;
 
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +19,6 @@ import lombok.RequiredArgsConstructor;
 public class RedisRepositoryConfig {
 
 	private final RedisProperties redisProperties;
-
-//	@Bean
-//	public RedisConnectionFactory redisConnectionFactory() {
-//		return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
-//	}
 
 	@Bean
 	RedisConnectionFactory redisConnectionFactory() {
