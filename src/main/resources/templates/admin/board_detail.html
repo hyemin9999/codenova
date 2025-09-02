@@ -6,69 +6,75 @@
 
 <div layout:fragment="content" class="container my-3"
 	th:unless="${item} == null">
-	<h5 class="my-3 border-bottom pb-2">게시판</h5>
-	<div class="card my-3">
-		<div class="card-body">
-			<h3 class="border-bottom py-2" th:text="${item.subject}"></h3>
-			<div id="viewer" class="card-text viewer"></div>
-			<input type="hidden" id="ecp1" th:value="${item.contents}">
-			<div class="d-flex justify-content-between mt-2">
-				<div class="mt-3">
-					<a th:href="@{|/admin/board/modify/${item.id}|}"
-						class="btn btn-sm btn-outline-info"
-						sec:authorize="isAuthenticated()"
-						th:if="${item.author != null and #authentication.getPrincipal().getUsername() == item.author.username}"
-						th:text="수정"></a> <a href="javascript:void(0);"
-						th:data-uri="@{|/admin/board/delete/${item.id}|}"
-						class="delete btn btn-sm btn-outline-info"
-						sec:authorize="isAuthenticated()"
-						th:if="${item.author != null and #authentication.getPrincipal().getUsername() == item.author.username}"
-						th:text="삭제"></a>
-				</div>
-				<div
-					class="badge bg-secondary bg-opacity-10 text-dark p-2 text-start">
-					<div class="mb-2" th:if="${item.author !=null}">
-						<span th:text="${item.author.username}"></span>
-					</div>
-					<div
-						th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></div>
-				</div>
+	<h5 class="border-bottom pb-2">[[${menuName}]] 게시판</h5>
 
+	<div class="row">
+		<div class="col">
+
+			<div class="card my-3">
+				<div class="card-body">
+					<h3 class="border-bottom py-2" th:text="${item.subject}"></h3>
+					<div id="viewer" class="card-text viewer"></div>
+					<input type="hidden" id="ecp1" th:value="${item.contents}">
+					<div class="d-flex justify-content-between mt-2">
+						<div class="mt-3">
+							<a th:href="@{|/admin/board/modify/${item.id}|}"
+								class="btn btn-sm btn-outline-info"
+								sec:authorize="isAuthenticated()"
+								th:if="${item.author != null and #authentication.getPrincipal().getUsername() == item.author.username}"
+								th:text="수정"></a> <a href="javascript:void(0);"
+								th:data-uri="@{|/admin/board/delete/${item.id}|}"
+								class="delete btn btn-sm btn-outline-info"
+								sec:authorize="isAuthenticated()"
+								th:if="${item.author != null and #authentication.getPrincipal().getUsername() == item.author.username}"
+								th:text="삭제"></a>
+						</div>
+						<div
+							class="badge bg-secondary bg-opacity-10 text-dark p-2 text-start">
+							<div class="mb-2" th:if="${item.author !=null}">
+								<span th:text="${item.author.username}"></span>
+							</div>
+							<div
+								th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+						</div>
+
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
-	<div class="d-flex justify-content-between mt-2 align-b">
-		<span th:text="|${#lists.size(item.commentList)}개의 댓글이 있습니다.|"></span>
-		<a class="btn btn-info" th:href="@{/admin/board/list}">목록</a>
-	</div>
-	<div class="card my-3" th:each="citem, list : ${item.commentList}"
-		th:if="${citem != null and !citem.isDelete}"
-		th:classappend="${list.count % 2 == 1} ? bg-light">
-		<a th:id="|comment_${citem.id}|"></a>
-		<div class="card-body">
-			<div class="card-text"
-				th:utext="${@commonUtil.markdown(citem.contents)}"></div>
-			<div class="d-flex justify-content-between mt-2">
-				<div class="mt-3">
-					<a th:href="@{|/admin/comment/modify/${citem.id}|}"
-						class="btn btn-sm btn-outline-info"
-						sec:authorize="isAuthenticated()"
-						th:if="${citem.author != null and #authentication.getPrincipal.getUsername() == citem.author.username}"
-						th:text="수정"></a> <a href="javascript:void(0);"
-						th:data-uri="@{|/admin/comment/delete/${citem.id}|}"
-						class="delete btn btn-sm btn-outline-info"
-						sec:authorize="isAuthenticated()"
-						th:if="${citem.author != null and #authentication.getPrincipal.getUsername() == citem.author.username}"
-						th:text="삭제"></a>
-				</div>
-				<div
-					class="badge bg-secondary bg-opacity-10 text-dark p-2 text-start">
-					<div class="mb-2" th:if="${citem.author !=null}">
-						<span th:text="${citem.author.username}"></span>
-					</div>
-					<div
-						th:text="${#temporals.format(citem.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+			<div class="d-flex justify-content-between mt-2 align-b">
+				<span th:text="|${#lists.size(item.commentList)}개의 댓글이 있습니다.|"></span>
+				<a class="btn btn-info" th:href="@{/admin/board/list}">목록</a>
+			</div>
+			<div class="card my-3" th:each="citem, list : ${item.commentList}"
+				th:if="${citem != null and !citem.isDelete}"
+				th:classappend="${list.count % 2 == 1} ? bg-light">
+				<a th:id="|comment_${citem.id}|"></a>
+				<div class="card-body">
+					<div class="card-text"
+						th:utext="${@commonUtil.markdown(citem.contents)}"></div>
+					<div class="d-flex justify-content-between mt-2">
+						<div class="mt-3">
+							<a th:href="@{|/admin/comment/modify/${citem.id}|}"
+								class="btn btn-sm btn-outline-info"
+								sec:authorize="isAuthenticated()"
+								th:if="${citem.author != null and #authentication.getPrincipal.getUsername() == citem.author.username}"
+								th:text="수정"></a> <a href="javascript:void(0);"
+								th:data-uri="@{|/admin/comment/delete/${citem.id}|}"
+								class="delete btn btn-sm btn-outline-info"
+								sec:authorize="isAuthenticated()"
+								th:if="${citem.author != null and #authentication.getPrincipal.getUsername() == citem.author.username}"
+								th:text="삭제"></a>
+						</div>
+						<div
+							class="badge bg-secondary bg-opacity-10 text-dark p-2 text-start">
+							<div class="mb-2" th:if="${citem.author !=null}">
+								<span th:text="${citem.author.username}"></span>
+							</div>
+							<div
+								th:text="${#temporals.format(citem.createDate, 'yyyy-MM-dd HH:mm')}"></div>
 
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -76,16 +82,16 @@
 </div>
 <script layout:fragment="script" type="text/javascript"
 	th:inline="javascript">
-	$(document).ready(function() {
-		const message = /*[[${message}]]*/'';
-		if (message.length != 0) {
-			$('#message').text(message);
-			$('#modal').modal('show');
-		}
+    $(document).ready(function () {
+        const message = /*[[${message}]]*/'';
+        if (message.length != 0) {
+            $('#message').text(message);
+            $('#modal').modal('show');
+        }
 
-		$('#modal').on('hide.bs.modal', function(event) {
-			window.location.href = '/admin/board/';
-		});
-	});
+        $('#modal').on('hide.bs.modal', function (event) {
+            window.location.href = '/admin/board/';
+        });
+    });
 </script>
 </html>
