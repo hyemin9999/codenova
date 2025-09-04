@@ -1,259 +1,248 @@
 <!-- 기본 레이아웃(layout.html)을 상속 -->
 <html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-<!-- 콘텐츠 본문 영역 정의: 이 div의 내용이 layout.html의 layout:fragment="content" 위치에 주입됨 -->
-<div layout:fragment="content" class="container my-3">
+<div layout:fragment="content" class="container">
 
-	<!-- 폼 제목 -->
-	<h5 class="my-3 border-bottom pb-2">게시글 작성</h5>
-	<div class="row">
-		<div class="col">
-			<!-- 게시글 작성/수정을 위한 폼
-         - th:object 로 BoardForm를 바인딩하여 하위 th:field="*{...}"에서 접근 가능
-         - method="post" : POST 전송 -->
-			<form th:object="${boardForm}" method="post">
-				<!-- CSRF 토큰: Spring Security 활성화 시 필수. 서버가 제공하는 파라미터/값을 그대로 숨김 필드에 주입 -->
-				<input type="hidden" th:name="${_csrf.parameterName}" id="_csrf"
-					th:value="${_csrf.token}" />
+  <h5 class="my-3 border-bottom pb-2">게시글 작성</h5>
 
-				<!-- 유효성 검사 오류 표시 영역
-             - form_errors.html 의 formErrorsFragment를 포함
-             - BindingResult가 존재하는 경우에만 내부에서 에러를 렌더링 -->
-				<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+  <form th:object="${boardForm}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" id="_csrf"
+           th:value="${_csrf.token}" />
 
-				<!-- 제목 입력 필드 -->
-				<div class="mb-3">
-					<label for="subject" class="form-label">제목</label>
-					<!-- th:field="*{subject}" : boardForm.subject 와 양방향 바인딩 -->
-					<input type="text" th:field="*{subject}" class="form-control">
-				</div>
+    <div th:replace="~{form_errors :: formErrorsFragment}"></div>
 
+    <div class="mb-3">
+      <label for="subject" class="form-label">제목</label>
+      <input type="text" th:field="*{subject}" class="form-control">
+    </div>
 
-				<!-- 내용 입력 필드 -->
-				<div class="mb-3">
-					<label for="contents" class="form-label">내용</label>
+    <div class="mb-3">
+      <label for="contents" class="form-label">내용</label>
+      <div id="contents" name="contents" class="form-control"></div>
+      <input type="hidden" name="contents" id="ecp">
+      <input type="hidden" id="ecp1" th:field="*{contents}">
+    </div>
 
-					<!-- (기존 textarea 대체) Toast UI Editor를 붙일 컨테이너
-                 - 실제로는 이 div에 자바스크립트로 에디터 인스턴스를 생성하여 표시 -->
-					<!-- <textarea th:field="*{contents}" class="form-control" rows="10"></textarea> -->
-					<div id="contents" name="contents" class="form-control"></div>
+    <div class="d-flex align-items-center">
+      <button type="button" id="aiBtn" class="btn btn-outline-secondary my-2">AI</button>
+      <div class="ms-auto d-flex gap-2">
+        <input type="submit" value="확인" class="btn btn-info my-2">
+        <a class="btn btn-outline-info my-2" th:href="@{/board/list}">취소</a>
+      </div>
+    </div>
+  </form>
 
-					<!-- 서버 전송용 숨김 필드
-                 - 최종적으로 에디터의 마크다운 문자열을 이 input(name="contents")에 넣어
-                   서버에서 boardForm.contents 로 받을 수 있게 함 -->
-					<input type="hidden" name="contents" id="ecp"><input
-						type="hidden" id="ecp1" th:field="*{contents}">
-				</div>
-				<div class="align-r">
-					<!-- 제출 버튼: 클릭 시 폼 submit → script에서 에디터 내용을 hidden 필드에 세팅 후 전송 -->
-					<input type="submit" value="확인" class="btn btn-info my-2">
-					<a class="btn btn-outline-info" th:href="@{/board/list}">취소</a>
-				</div>
-			</form>
+  <!-- 오버레이 -->
+  <div id="aiOverlay"
+       style="position:fixed; inset:0; z-index:9998; background:rgba(15,15,15,0.10);
+              backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+              opacity:0; transition:opacity .22s ease; display:none;"></div>
 
-			<div class="btn d-block text-center btn-outline-info aibtn"
-				id="aiBtn">AI</div>
-			<div id="aiPopup" class="ai-popup" style="display: none;">
-				<div class="ai-popup-content">
-					<span class="ai-popup-close" id="aiPopupClose">&times;</span>
-					<div id="aiResponse" class="ai-response"></div>
-					<div class="ai-prompt-group mt-3">
-						<textarea id="aiPrompt" placeholder="입력" class="ai-prompt"></textarea>
-						<button id="aiSendBtn" class="ai-send-btn">전송</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <!-- AI 모달 -->
+  <div id="aiPopup" role="dialog" aria-modal="true" aria-labelledby="aiTitle"
+       style="position:fixed; z-index:9999; left:50%; top:50%;
+              transform:translate(-50%,-50%) scale(0.98);
+              width:min(92vw, 560px); max-height:86vh; overflow:hidden;
+              border:1px solid rgba(255,255,255,0.28);
+              border-radius:18px; padding:16px 16px 12px 16px;
+              background:rgba(255,255,255,0.65);
+              box-shadow:0 10px 30px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+              backdrop-filter:saturate(180%) blur(16px);
+              opacity:0; transition:opacity .22s ease, transform .22s ease;
+              display:none;">
+    <button id="aiPopupClose" aria-label="Close"
+            style="position:absolute; top:10px; right:12px; width:32px; height:32px;
+                   border-radius:999px; font-size:20px; cursor:pointer;">×</button>
+
+    <h3 id="aiTitle" style="margin:0 36px 10px 2px;">AI</h3>
+
+    <div id="aiResponse"
+         style="margin:0 2px 12px 2px; padding:12px; border-radius:14px;
+                background:rgba(255,255,255,0.55); max-height:44vh; overflow:auto;"></div>
+
+    <div class="ai-prompt-group mt-3" style="display:flex; gap:10px; align-items:flex-end;">
+      <textarea id="aiPrompt" placeholder="입력"
+                style="flex:1; min-height:72px; max-height:30vh; padding:12px; border-radius:14px;"></textarea>
+      <button id="aiSendBtn"
+              style="flex:0 0 auto; height:44px; padding:0 16px; border-radius:12px; border:none;
+                     background:#0a84ff; color:#fff; font-weight:600; cursor:pointer;">전송</button>
+    </div>
+  </div>
 </div>
 
-<!-- 페이지 전용 스크립트 블록
-     - th:inline="javascript" : [[...]] 등의 Thymeleaf 인라인 표현식이 JS 문자열로 안전하게 렌더링되도록 함 -->
-<script layout:fragment="script" type="text/javascript"
-	th:inline="javascript">
-	const editor = new toastui.Editor({
-		el: document.querySelector('#contents'),
-		height: '500px',
-		initialEditType: 'markdown',
-		initialValue: '',
-		previewStyle: 'vertical',
-		placeholder: '내용을 입력해 주세요.',
-		hooks: {
-			async addImageBlobHook(blob, callback) {
-				try {
-					const formData = new FormData();
-					formData.append('image', blob);
-					formData.append('type', "board");
-					formData.append('mode',  /*[[${mode}]]*/'');
-	
-					const response = await fetch('/tui-editor/image-upload', {
-						method: 'POST',
-						body: formData,
-						headers: { 'X-CSRF-Token': $('#_csrf').attr('value') },
-					});
-	
-					const json = await response.json();
-	
-					const imageUrl = `/tui-editor/image-print?filename=${json.saveFilename}`;
-					callback(imageUrl, 'image alt attribute');
-	
-				} catch (error) {
-					console.error('업로드 실패 : ', error);
-				}
-			},
-		},
-	});
-	
-	// 서버에서 받은 기존 내용(마크다운)을 에디터에 세팅
-	editor.setMarkdown(document.querySelector('#ecp1').value);
-	
-	// 폼 제출 직전, 에디터의 마크다운 문자열을 숨김 필드(#ecp)에 주입하여 서버로 전송
-	document.querySelector('form').addEventListener('submit', function(event) {
-		document.querySelector('#ecp1').value = '';
-		// 에디터의 현재 내용(Markdown) 추출
-		const content = editor.getMarkdown();
-		const encodedC = encodeURIComponent(content);
-		// 숨겨진 input(name="contents")에 설정(컨트롤러에서 BoardForm.contents로 수신)
-		// URL 인코딩하지 않고 그대로 전송(컨트롤러에서 URLDecoder 사용 시 이중 인코딩 주의)
-		document.querySelector('#ecp').value = encodedC;
-	});
-	// AI 시작
-	const AI_HISTORY_KEY = 'aiHistory';
-	let aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
-		{ role: 'user', parts: [{ text: '' }] }
-	];
-	
-	let lastUserPrompt = '';
-	// --- AI 전송/중지 상태 관리 변수 추가 ---
-	let isAiRequesting = false;
-	let aiAbortController = null;
-	
-	// 스킨별 시스템 프롬프트 생성 함수
-	function getPromptBySkin(skin) {
-		let tempPrompt = '';
-		tempPrompt += '코드도우미';
-		tempPrompt += '나는 할아버지다';
-		tempPrompt += '말투를 무조건 셈으로 끝낸다.';
-		tempPrompt += '텍스트 받은내용을 해석하거나 풀이하는걸 중점으로 한다..';
-	
-	
-		return tempPrompt;
-	}
-	
-	function showAiResponse(text) {
-		document.getElementById('aiResponse').innerHTML =
-			`<div class="ai-user-prompt-small">[명령] ${lastUserPrompt}</div>\n   <div>${text}</div>`;
-	}
-	
-	function saveAiHistory() {
-		localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory));
-	}
-	
-	function loadAiHistory() {
-		aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
-			{ role: 'user', parts: [{ text: getPromptBySkin(currentSkin) }] }
-		];
-	}
-	
-	// --- 버튼 상태 토글 함수 ---
-	function setAiButtonState(state) {
-		const btn = document.getElementById('aiSendBtn');
-		if (state === 'send') {
-			btn.textContent = '전송';
-			btn.classList.remove('stop');
-			btn.classList.add('send');
-		} else {
-			btn.textContent = '중지';
-			btn.classList.remove('send');
-			btn.classList.add('stop');
-		}
-	}
-	
-	document.getElementById('aiBtn').addEventListener('click', function() {
-		document.getElementById('aiPopup').style.display = 'block';
-		setAiButtonState('send');
-		isAiRequesting = false;
-		aiAbortController = null;
-		const lastModel = aiHistory.slice().reverse().find(m => m.role === 'model');
-		if (lastModel) showAiResponse(lastModel.parts[0].text);
-	});
-	
-	document.getElementById('aiPopupClose').addEventListener('click', function() {
-		document.getElementById('aiPopup').style.display = 'none';
-	});
-	// AI 전송/중지 버튼 이벤트
-	document.getElementById('aiSendBtn').addEventListener('click', async function() {
-		lastUserPrompt = document.getElementById('aiPrompt').value;
-	
-		if (isAiRequesting) {
-			// 중지 버튼 동작: 요청 중단
-			if (aiAbortController) aiAbortController.abort();
-			isAiRequesting = false;
-			setAiButtonState('send');
-			showAiResponse('요청이 중지되었습니다.');
-			return;
-		}
-		// 이미 요청 중이면 무시(중복 방지)
-		if (isAiRequesting) return;
-		isAiRequesting = true;
-		setAiButtonState('stop');
-		aiAbortController = new AbortController();
-		const pageContent = document.getElementById('contents')?.innerText || '';
-		aiHistory[1] = { role: 'user', parts: [{ text: pageContent }] };
-		// 사용자 입력 프롬프트 push
-		aiHistory.push({ role: 'user', parts: [{ text: lastUserPrompt || '' }] });
-	
-		// turn 제한: 시스템 프롬프트/페이지컨텍스트 제외하고 최근 3개만 유지
-		let userModelTurns = aiHistory.slice(2).filter(m => m.role === 'user' || m.role === 'model');
-		if (userModelTurns.length > 3) {
-			userModelTurns = userModelTurns.slice(userModelTurns.length - 3);
-			aiHistory = [aiHistory[0], aiHistory[1], ...userModelTurns];
-		}
-		saveAiHistory();
-		document.getElementById('aiPrompt').value = '';
-		document.getElementById('aiPrompt').focus();
-	
-		showAiResponse('응답을 불러오는 중...');
-		try {
-			const response = await fetch('/api/ai/gemini', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': $('#_csrf').attr('value') },
-				body: JSON.stringify({ contents: aiHistory }),
-	
-				signal: aiAbortController.signal
-			});
-	
-			const data = await response.json();
-			const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '응답이 없습니다.';
-			showAiResponse(aiText);
-			aiHistory.push({ role: 'model', parts: [{ text: aiText }] });
-			// turn 제한 다시 적용
-			let userModelTurns2 = aiHistory.slice(1).filter(m => m.role === 'user' || m.role === 'model');
-			if (userModelTurns2.length > 10) {
-				userModelTurns2 = userModelTurns2.slice(userModelTurns2.length - 10);
-				aiHistory = [aiHistory[0], ...userModelTurns2];
-			}
-			saveAiHistory();
-		} catch (e) {
-			if (e.name === 'AbortError') {
-				showAiResponse('요청이 중지되었습니다.');
-			} else {
-				showAiResponse('에러 발생: ' + e);
-			}
-		} finally {
-			isAiRequesting = false;
-			setAiButtonState('send');
-		}
-	});
-	// 페이지 로드시 히스토리 복원 및 시스템 프롬프트 보장
-	loadAiHistory();
-	
-	// 스킨 변경 시 시스템 프롬프트 갱신
-	function changeSkin(skinName) {
-		document.cookie = 'selectedSkin=' + skinName + '; path=/; max-age=31536000; SameSite=Lax';
-		setSystemPromptBySkin(skinName);
-		location.reload();
-	}
+<script layout:fragment="script" type="text/javascript" th:inline="javascript">
+  // --- Toast UI Editor 초기화 ---
+  const editor = new toastui.Editor({
+    el: document.querySelector('#contents'),
+    height: '500px',
+    initialEditType: 'markdown',
+    initialValue: '',
+    previewStyle: 'vertical',
+    placeholder: '내용을 입력해 주세요.',
+    hooks: {
+      async addImageBlobHook(blob, callback) {
+        try {
+          const formData = new FormData();
+          formData.append('image', blob);
+          formData.append('type', "board");
+          formData.append('mode',  /*[[${mode}]]*/'');
+
+          const response = await fetch('/tui-editor/image-upload', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRF-Token': $('#_csrf').attr('value') },
+          });
+
+          const json = await response.json();
+          const imageUrl = `/tui-editor/image-print?filename=${json.saveFilename}`;
+          callback(imageUrl, 'image alt attribute');
+        } catch (error) {
+          console.error('업로드 실패 : ', error);
+        }
+      },
+    },
+  });
+
+  // 서버에서 받은 기존 내용 세팅
+  editor.setMarkdown(document.querySelector('#ecp1').value);
+
+  // --- 폼 제출 시 editor 내용 숨김 필드에 넣기 ---
+  document.querySelector('form').addEventListener('submit', function(event) {
+    document.querySelector('#ecp1').value = '';
+    const content = editor.getMarkdown();
+    const encodedC = encodeURIComponent(content);
+    document.querySelector('#ecp').value = encodedC;
+  });
+
+  // --- AI 관련 상태 ---
+  const AI_HISTORY_KEY = 'aiHistory';
+  let aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [];
+  let lastUserPrompt = '';
+  let isAiRequesting = false;
+  let aiAbortController = null;
+
+  // 시스템 프롬프트
+  function getPromptBySkin() {
+    return [
+      "코드도우미",
+      "텍스트 받은내용을 해석하거나 풀이하는걸 중점으로 한다.",
+      "위에 써져있는 텍스트를 중심으로 대화한다.",
+      "[중요] 답변은 항상 정확히 5줄로 제한한다."
+    ].join("\n");
+  }
+
+  // AI 응답 표시
+  function showAiResponse(text) {
+    document.getElementById('aiResponse').innerHTML =
+      '<div style="font-size:12px;color:#6b7280;margin-bottom:8px;">[명령] '
+      + (lastUserPrompt || '')
+      + '</div><div>' + (text || '') + '</div>';
+  }
+
+  function saveAiHistory() {
+    localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory));
+  }
+
+  function loadAiHistory() {
+    aiHistory = JSON.parse(localStorage.getItem(AI_HISTORY_KEY)) || [
+      { role: 'user', parts: [{ text: getPromptBySkin() }] }
+    ];
+  }
+
+  // --- 모달 열기/닫기 ---
+  function openAiModal() {
+    const overlay = document.getElementById('aiOverlay');
+    const popup = document.getElementById('aiPopup');
+    const prompt = document.getElementById('aiPrompt');
+    overlay.style.display = 'block';
+    popup.style.display = 'block';
+    void overlay.offsetHeight; void popup.offsetHeight;
+    overlay.style.opacity = '1';
+    popup.style.opacity = '1';
+    popup.style.transform = 'translate(-50%,-50%) scale(1)';
+    document.body.style.overflow = 'hidden';
+    setTimeout(()=>{ try{ prompt && prompt.focus(); }catch(e){} }, 80);
+  }
+
+  function closeAiModal() {
+    const overlay = document.getElementById('aiOverlay');
+    const popup = document.getElementById('aiPopup');
+    overlay.style.opacity = '0';
+    popup.style.opacity = '0';
+    popup.style.transform = 'translate(-50%,-50%) scale(0.98)';
+    setTimeout(()=>{
+      overlay.style.display = 'none';
+      popup.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 220);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('aiOverlay');
+    if (overlay) overlay.addEventListener('click', closeAiModal);
+  });
+
+  // --- 버튼 이벤트 ---
+  document.getElementById('aiBtn').addEventListener('click', function() {
+    openAiModal();
+    isAiRequesting = false;
+    aiAbortController = null;
+  });
+
+  document.getElementById('aiPopupClose').addEventListener('click', function() {
+    closeAiModal();
+  });
+
+  document.getElementById('aiSendBtn').addEventListener('click', async function() {
+    lastUserPrompt = document.getElementById('aiPrompt').value;
+
+    if (isAiRequesting) {
+      if (aiAbortController) aiAbortController.abort();
+      isAiRequesting = false;
+      showAiResponse('요청이 중지되었습니다.');
+      return;
+    }
+
+    isAiRequesting = true;
+    aiAbortController = new AbortController();
+
+    // 📌 editor 내용 가져오기
+    const pageContent = editor.getMarkdown();
+
+    aiHistory = [
+      { role: 'user', parts: [{ text: getPromptBySkin() }] },
+      { role: 'user', parts: [{ text: pageContent }] },
+      { role: 'user', parts: [{ text: lastUserPrompt || '' }] }
+    ];
+
+    saveAiHistory();
+    document.getElementById('aiPrompt').value = '';
+    showAiResponse('응답을 불러오는 중...');
+
+    try {
+      const csrfToken = document.getElementById('_csrf')?.value || '';
+      const response = await fetch('/api/ai/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ contents: aiHistory }),
+        signal: aiAbortController.signal
+      });
+
+      const data = await response.json();
+      const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '응답이 없습니다.';
+      showAiResponse(aiText);
+      aiHistory.push({ role: 'model', parts: [{ text: aiText }] });
+      saveAiHistory();
+    } catch (e) {
+      showAiResponse('에러 발생: ' + e.message);
+    } finally {
+      isAiRequesting = false;
+    }
+  });
+
+  // --- 초기화 ---
+  loadAiHistory();
 </script>
+
 </html>
