@@ -15,7 +15,6 @@ import com.woori.codenova.dto.AiDTO;
 
 @Service
 public class AiService {
-
 	// API 키 나눠쓰기
 	private static final String[] API_KEYS = { "" };
 
