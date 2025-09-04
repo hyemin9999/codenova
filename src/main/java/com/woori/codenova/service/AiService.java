@@ -14,9 +14,8 @@ public class AiService {
 
     // API 키 나눠쓰기
     private static final String[] API_KEYS = {
-    		"AIzaSyAWsTqOJfvLnOS5hmSduv_UQDgY4oJyxY8",
-    		"AIzaSyDInbWveChBOHgOqbX1XbgoEe8ZSKKTm7U",
-    		"AIzaSyDpg-2dbyMLIhXugvCTGAOlPN7Y5KsR39g"
+
+
     };
 
     private final AtomicInteger index = new AtomicInteger(0);
