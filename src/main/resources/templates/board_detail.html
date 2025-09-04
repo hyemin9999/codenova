@@ -214,20 +214,21 @@
             });
 
     // 추천/즐겨찾기 토글
-    Array.from(document.getElementsByClassName("recommend")).forEach(
-            function (el) {
-                el.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    location.href = this.dataset.uri;
-                });
-            });
-    Array.from(document.getElementsByClassName("favorite")).forEach(
-            function (el) {
-                el.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    location.href = this.dataset.uri;
-                });
-            });
+		// 기존 이벤트 리스너 제거 후 다시 등록
+		document.querySelectorAll(".recommend, .favorite").forEach(function (el) {
+		    let clone = el.cloneNode(true); // 이벤트 없는 복제본 생성
+		    el.parentNode.replaceChild(clone, el); // 교체
+		});
+		
+		// 새 핸들러 1개만 등록
+		document.querySelectorAll(".recommend, .favorite").forEach(function (el) {
+		    el.addEventListener("click", function (e) {
+		        e.preventDefault();
+		        e.stopPropagation(); // 혹시 버블링 중복 방지
+		        location.href = this.dataset.uri;
+		    });
+		});
+
 
     // 댓글 페이지 이동
     Array.from(document.getElementsByClassName("cpage-link")).forEach(
