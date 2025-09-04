@@ -158,6 +158,7 @@ public class SocialLoginController {
 		String providerId = userInfo.getId().toString();
 		String email = userInfo.getKakaoAccount().getEmail();
 		String nickname = userInfo.getKakaoAccount().getProfile().getNickName();
+		log.info("체크체크");
 		return processSocialLogin(provider, providerId, email, nickname, session, request, response,
 				redirectAttributes);
 	}
@@ -204,7 +205,9 @@ public class SocialLoginController {
 			Optional<SiteUser> userByEmailOptional = userService.findByEmail(email);
 			if (userByEmailOptional.isPresent()) {
 // CASE C-1: 이메일이 같은 로컬 회원이 이미 존재 -> 소셜 계정 생성 후 연동
+				log.info("DB에 이미 이메일 존재 확인 / 계정연동 필요 케이스 확인");
 				SiteUser existingSiteUser = userByEmailOptional.get();
+				log.info("DB에서 이메일 값 추출 {}.. 객체로 넘기겠음", existingSiteUser);
 				return createNewSocialUserAndLogin(provider, providerId, email, nickname, session, request, response,
 						existingSiteUser);
 			} else {
@@ -246,14 +249,14 @@ public class SocialLoginController {
 
 	private RedirectView createNewSocialUserAndLogin(String provider, String providerId, String email, String nickname,
 			HttpSession session, HttpServletRequest request, HttpServletResponse response, SiteUser existingSiteUser) {
-
+		log.info("createNewSocial에 도착 이메일값 {}", existingSiteUser);
 		// 2. 신규 SocialUser 생성 및 저장
 		SocialUser newSocialUser = new SocialUser();
 		newSocialUser.setNickname(nickname);
 		newSocialUser.setEmail(email);
 		newSocialUser.setProvider(provider);
 		newSocialUser.setProviderId(providerId);
-
+		log.info("소셜 계정 생성전 로그체크중");
 		// ★★★ 중요: SiteUser와 SocialUser를 서로 연결
 		newSocialUser.setSiteUser(existingSiteUser);
 
