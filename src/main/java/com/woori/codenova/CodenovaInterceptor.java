@@ -11,12 +11,12 @@ import com.woori.codenova.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class CategoryInterceptor implements HandlerInterceptor {
+public class CodenovaInterceptor implements HandlerInterceptor {
 
 	private final CategoryRepository categoryRepository;
 	private final UserRepository userRepository;
 
-	public CategoryInterceptor(CategoryRepository categoryRepository, UserRepository userRepository) {
+	public CodenovaInterceptor(CategoryRepository categoryRepository, UserRepository userRepository) {
 		this.categoryRepository = categoryRepository;
 		this.userRepository = userRepository;
 	}

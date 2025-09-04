@@ -39,6 +39,8 @@ public class AdminRoleController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminRoleForm adminRoleForm,
 			BindingResult bindingResult) {
 
+//		System.out.println("list role :: GET ::");
+
 		list(model, page, kw, adminRoleForm, "list");
 
 		return "admin/role_list";
@@ -49,6 +51,8 @@ public class AdminRoleController {
 	public String create(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminRoleForm adminRoleForm,
 			BindingResult bindingResult) {
+
+//		System.out.println("list role :: POST ::");
 
 		list(model, page, kw, adminRoleForm, "create");
 
@@ -66,12 +70,21 @@ public class AdminRoleController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, AdminRoleForm adminRoleForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Integer id) {
 
+		System.out.println("list/id role :: GET ::");
+
 		listById(model, page, kw, principal, adminRoleForm, id, "list");
 
 		Role item = this.adminRoleService.getItem(id);
 		if (item == null) {
+//			System.out.println("message ::: 존재");
 			model.addAttribute("message", "존재하지 않는 역할 입니다.");
+//			bindingResult.reject("존재하지 않는 역할 입니다.");
 		}
+
+//		if (bindingResult.hasErrors()) {
+//			System.out.println("message ::: admin/role_list");
+//			return "admin/role_list";
+//		}
 
 		return "admin/role_list";
 	}
@@ -82,15 +95,24 @@ public class AdminRoleController {
 			@RequestParam(value = "kw", defaultValue = "") String kw, @Valid AdminRoleForm adminRoleForm,
 			BindingResult bindingResult, Principal principal, @PathVariable("id") Integer id) {
 
+//		System.out.println("list/id role :: POST ::");
+//		System.out.println("message :: id ::: " + id);
+
 		listById(model, page, kw, principal, adminRoleForm, id, "modify");
 
 		Role item = this.adminRoleService.getItem(id);
 		if (item == null) {
-			model.addAttribute("message", "존재하지 않는 역할 입니다.");
 			bindingResult.reject("존재하지 않는 역할 입니다.");
+			model.addAttribute("message", "존재하지 않는 역할 입니다.");
+//			return "admin/role_list";
+
 		}
 
+//		System.out.println("message list ::: " + id);
+
 		if (bindingResult.hasErrors()) {
+//			model.addAttribute("message", "역할 이름은 필수입력입니다.");
+//			System.out.println("message ::: admin/role_list");
 			return "admin/role_list";
 		}
 
@@ -104,9 +126,17 @@ public class AdminRoleController {
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/delete/{id}")
-	public String delete(Principal principal, @PathVariable("id") Integer id) {
+	public String delete(Model model, Principal principal, @PathVariable("id") Integer id,
+			AdminRoleForm adminRoleForm) {
 
-//		Role item = this.adminRoleService.getItem(id);
+		Role item = this.adminRoleService.getItem(id);
+		if (item == null) {
+			model.addAttribute("message", "존재하지 않는 역할 입니다.");
+			list(model, 0, "", adminRoleForm, "list");
+
+			return "admin/role_list";
+		}
+
 //		item.getAuthority().clear();
 
 //		if (!item.getAuthor().getUsername().equals(principal.getName())) {
@@ -167,6 +197,7 @@ public class AdminRoleController {
 //				&& user.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) {
 //			model.addAttribute("mode", "modify");
 //		}
+
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.woori.codenova.admin.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.woori.codenova.admin.form.AdminCategoryForm;
 import com.woori.codenova.admin.service.AdminCategoryService;
+import com.woori.codenova.admin.service.AdminRoleService;
 import com.woori.codenova.admin.service.AdminUserService;
 import com.woori.codenova.entity.Category;
+import com.woori.codenova.entity.Role;
 import com.woori.codenova.entity.SiteUser;
 
 import jakarta.validation.Valid;
@@ -29,6 +32,10 @@ public class AdminCategoryController {
 
 	private final AdminCategoryService adminCategoryService;
 	private final AdminUserService adminUserService;
+	private final AdminRoleService adminRoleService;
+
+	private final String category_list = "admin/category";
+	private final String redirect_list = "redirect:/admin/category";
 
 	@GetMapping("/list")
 	@PreAuthorize("isAuthenticated()")
@@ -38,7 +45,7 @@ public class AdminCategoryController {
 
 		list(model, page, kw, adminCategoryForm, "list");
 
-		return "admin/category_list";
+		return category_list;
 	}
 
 	@GetMapping("/list/{id}")
@@ -62,7 +69,7 @@ public class AdminCategoryController {
 			model.addAttribute("mode", "modify");
 		}
 
-		return "admin/category_list";
+		return category_list;
 	}
 
 	@PostMapping("/list")
@@ -72,13 +79,12 @@ public class AdminCategoryController {
 			BindingResult bindingResult) {
 
 		list(model, page, kw, adminCategoryForm, "create");
-
 		if (bindingResult.hasErrors()) {
-			return "admin/category_list";
+			return category_list;
 		}
 
 		this.adminCategoryService.create(adminCategoryForm.getName());
-		return "redirect:/admin/category/list";
+		return redirect_list;
 	}
 
 	@PostMapping("/list/{id}")
@@ -89,10 +95,12 @@ public class AdminCategoryController {
 
 		listById(model, page, kw, principal, adminCategoryForm, id, "modify");
 
+		if (bindingResult.hasErrors()) {
+			return category_list;
+		}
+
 		Category item = this.adminCategoryService.getitem(id);
-		if (item != null) {
-			adminCategoryForm.setName(item.getName());
-		} else {
+		if (item == null) {
 			model.addAttribute("message", "존재하지 않는 게시판 입니다.");
 		}
 
@@ -102,32 +110,37 @@ public class AdminCategoryController {
 			model.addAttribute("mode", "modify");
 		}
 
-		if (bindingResult.hasErrors()) {
-			return "admin/category_list";
-		}
-
 //		Category item = this.categoryService.getitem(id);
 //		if (!item.getAuthor().getUsername().equals(principal.getName())) {
 //			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
 //		}
 
 		this.adminCategoryService.modify(item, adminCategoryForm.getName());
-		return "redirect:/admin/category/list";
+		return redirect_list;
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/delete/{id}")
-	public String delete(Principal principal, @PathVariable("id") Integer id) {
+	public String delete(Model model, Principal principal, @PathVariable("id") Integer id) {
 
-//		Category item = this.adminCategoryService.getitem(id);
-//		if (!item.getAuthor().getUsername().equals(principal.getName())) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-//		}
+		Category item = this.adminCategoryService.getitem(id);
 
-		// TODO :: 카테고리 삭제시 게시글 (댓글)삭제됨, 검색어도 삭제여부 확인
+		SiteUser user = this.adminUserService.getItem(principal.getName());
+		if (user != null && !user.getAuthority().isEmpty()
+				&& user.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) {
+			model.addAttribute("message", "삭제권한이 없습니다.");
+		}
 
-//		this.categoryService.delete(item);
-		return "redirect:/admin/category/list";
+		item.getFavorite().clear();
+		List<Role> rlist = adminRoleService.deleteList(item);
+		if (rlist != null && !rlist.isEmpty()) {
+			for (Role role : rlist) {
+				role.getAuthority().clear();
+			}
+		}
+
+		this.adminCategoryService.delete(item);
+		return redirect_list;
 	}
 
 	public void list(Model model, Integer page, String kw, AdminCategoryForm adminCategoryForm, String mode) {
@@ -154,12 +167,6 @@ public class AdminCategoryController {
 		if (mode == "list" && item != null) {
 			adminCategoryForm.setName(item.getName());
 		}
-
-//		SiteUser user = this.adminUserService.getItem(principal.getName());
-//		if (user != null && !user.getAuthority().isEmpty()
-//				&& user.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) {
-//			model.addAttribute("mode", "modify");
-//		}
-
 	}
+
 }
