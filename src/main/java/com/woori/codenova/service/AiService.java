@@ -16,6 +16,7 @@ import com.woori.codenova.dto.AiDTO;
 @Service
 public class AiService {
 	// API 키 나눠쓰기
+	// 키 넣어서 확인
 	private static final String[] API_KEYS = { "" };
 
 	private final AtomicInteger index = new AtomicInteger(0);
