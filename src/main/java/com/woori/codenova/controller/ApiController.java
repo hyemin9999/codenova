@@ -14,7 +14,6 @@ import com.woori.codenova.dto.SendFindIdEmailReq;
 import com.woori.codenova.dto.SendFindIdEmailRes;
 import com.woori.codenova.dto.SendResetPasswordEmailReq;
 import com.woori.codenova.dto.SendResetPasswordEmailRes;
-import com.woori.codenova.service.KakaoService;
 import com.woori.codenova.service.SendMailService;
 import com.woori.codenova.service.UserService;
 
@@ -30,7 +29,7 @@ public class ApiController {
 
 	private final SendMailService mailService;
 	private final UserService userService;
-	private final KakaoService kakaoService;
+//	private final KakaoService kakaoService;
 
 	@PostMapping("/send-reset-password")
 	public SendResetPasswordEmailRes sendResetPasswrod(

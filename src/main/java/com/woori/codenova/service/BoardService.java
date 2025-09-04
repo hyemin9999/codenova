@@ -45,60 +45,53 @@ public class BoardService {
 	 */
 
 	private Specification<Board> search(String kw, String field, Integer categoryId) {
-		return new Specification<Board>() {
-			private static final long serialVersionUID = 1L;
+	    return (Root<Board> q, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+	        query.distinct(true);
 
-			@Override
-			public Predicate toPredicate(Root<Board> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				query.distinct(true);
+	        Join<Board, SiteUser> u1 = q.join("author", JoinType.LEFT);
+	        Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
+	        Join<Board, Category> ca = q.join("category", JoinType.LEFT);
 
-				Join<Board, SiteUser> u1 = q.join("author", JoinType.LEFT);
-				Join<Board, Comment> a = q.join("commentList", JoinType.LEFT);
-//				Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
+	        // 기본 카테고리 조건 (0이면 전체)
+	        Predicate predicate = cb.conjunction();
+	        if (categoryId != null && categoryId != 0) {
+	            predicate = cb.and(predicate, cb.equal(ca.get("id"), categoryId));
+	        }
 
-				Join<Board, Category> ca = q.join("category", JoinType.LEFT);
+	        if (kw != null && !kw.isBlank()) {
+	            Predicate byTitle   = cb.like(q.get("subject"), "%" + kw + "%");
+	            Predicate byContent = cb.like(q.get("contents"), "%" + kw + "%");
+	            Predicate byAuthor  = cb.like(u1.get("username"), "%" + kw + "%");
+	            Predicate byCmt     = cb.like(a.get("contents"), "%" + kw + "%");
 
-				Predicate byTitle = cb.like(q.get("subject"), "%" + kw + "%"); // 제목
-				Predicate byContent = cb.like(q.get("contents"), "%" + kw + "%"); // 내용
-				Predicate byAuthor = cb.like(u1.get("username"), "%" + kw + "%"); // 글쓴이(작성자)
-				Predicate byCmt = cb.like(a.get("contents"), "%" + kw + "%"); // 댓글 내용
-//				Predicate byCmtUser = cb.like(u2.get("username"), "%" + kw + "%"); // 댓글 작성자
+	            switch (field) {
+	                case "title":
+	                    predicate = cb.and(predicate, byTitle);
+	                    break;
+	                case "content":
+	                    predicate = cb.and(predicate, byContent);
+	                    break;
+	                case "author":
+	                    predicate = cb.and(predicate, byAuthor);
+	                    break;
+	                case "comment":
+	                    predicate = cb.and(predicate, byCmt);
+	                    break;
+	                case "title_content":
+	                    predicate = cb.and(predicate, cb.or(byTitle, byContent));
+	                    break;
+	                case "all":
+	                default:
+	                    predicate = cb.and(predicate,
+	                        cb.or(byTitle, byContent, byAuthor, byCmt));
+	                    break;
+	            }
+	        }
 
-				Predicate category = cb.equal(ca.get("id"), categoryId); // 게시판
-
-				// ✅ 선택한 검색대상에 맞춰 조건 분기
-				// BoardService.java - search(kw, field) 안의 switch 문만 교체
-				switch (field) {
-				case "title":
-					return byTitle;
-				case "content":
-					return byContent;
-				case "author":
-					return byAuthor;
-				case "comment":
-					return byCmt;
-				case "title_content": // ✅ 새 분기: 제목+내용만
-					return cb.or(byTitle, byContent);
-				// case "comment_author": return byCmtUser; // (선택) 댓글쓴이 전용
-				case "all":
-				default:
-
-					Predicate all = cb.and(cb.or(byTitle, byContent), category);
-
-					// 제목+내용(+작성자/댓글/댓글작성자) — 기존처럼 확장 검색
-					// return cb.or(byTitle, byContent);
-					if (categoryId != 0) {
-						return cb.and(all, category);
-
-					} else {
-						// ✅ 전체: 제목/내용/글쓴이/댓글내용/댓글쓴이
-						return all;
-					}
-				}
-
-			}
-		};
+	        return predicate;
+	    };
 	}
+
 
 	// ✅ 게시글 전체 목록 조회 (페이징 없이 전부 반환)
 	// BoardService.java
