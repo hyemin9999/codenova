@@ -33,9 +33,12 @@ public interface UserRepository extends JpaRepository<SiteUser, Long> {
 
 	List<SiteUser> findAll(Specification<SiteUser> specification);
 
-	@Query(value = "select distinct c.* from site_user u " + "right join user_authority ua on ua.user_id = u.id "
-			+ "right join role_authority ra on ra.role_id = ua.role_id "
-			+ "right join category c on c.id = ra.category_id " + "where u.id = :uid ", nativeQuery = true)
+//	@Query(value = "select distinct c.* from site_user u " + "right join user_authority ua on ua.user_id = u.id "
+//			+ "right join role_authority ra on ra.role_id = ua.role_id "
+//			+ "right join category c on c.id = ra.category_id " + "where u.id = :uid ", nativeQuery = true)
+//	List<Category> findCategoriesByUserId(@Param("uid") Long uid);
+	@Query(value = "select distinct c.* from site_user u " + "join user_authority ua on ua.user_id = u.id "
+			+ "join role_authority ra on ra.role_id = ua.role_id " + "join category c on c.id = ra.category_id "
+			+ "where u.id = :uid ", nativeQuery = true)
 	List<Category> findCategoriesByUserId(@Param("uid") Long uid);
-
 }

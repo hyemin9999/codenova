@@ -34,17 +34,18 @@ input[type=submit] {
 	border-bottom-width: var(--bs-border-width) !important;
 }
 
-.table.notice th:nth-child(3), .table.board th:nth-child(3) {
+.table.board th:nth-child(3) {
 	width: 100px;
 }
 
-.table.notice th:nth-child(4), .table.board th:nth-child(4), .table.category th:nth-child(3),
+.table.notice th:nth-child(5), .table.board th:nth-child(4), .table.category th:nth-child(3),
 	.table.role th:nth-child(3), table.user th:nth-child(5) {
 	width: 150px;
 }
 
-.table.board th:nth-child(5), .table.board th:nth-child(6), .table.notice th:nth-child(5),
-	.table.user th:nth-child(2) {
+.table.notice th:nth-child(2), .table.notice th:nth-child(4), .table.notice th:nth-child(6),
+	.table.board th:nth-child(5), .table.board th:nth-child(6), .table.user th:nth-child(2)
+	{
 	width: 80px;
 }
 
@@ -55,6 +56,10 @@ input[type=submit] {
 
 .table.category td, .table.role td {
 	vertical-align: middle;;
+}
+
+.table .th_delete {
+	width: 80px;
 }
 
 .btn-info {

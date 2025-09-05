@@ -15,7 +15,7 @@ public class NoticeForm {
 	@Size(max = 200) // 크기
 	private String subject;
 	@NotEmpty(message = "내용은 필수항목입니다.")
-	private String content;
+	private String contents;
 
 	private List<Long> fileids = new ArrayList<>();
 

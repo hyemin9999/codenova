@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html layout:decorate="~{admin/layout}"
+<html layout:decorate="~{layout/admin_layout}"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-<div layout:fragment="content" class="container-fluid my-3 px-4">
+<main layout:fragment="content" class="container-fluid my-3 px-4">
 
 	<h5 class="border-bottom pb-2">역할 관리</h5>
 	<div class="row">
@@ -25,11 +25,11 @@
 						<th>번호</th>
 						<th>역할 이름</th>
 						<th>생성일</th>
-						<!-- 						<th th:if="${#authorization.expression('hasRole(''ADMIN'')')}"></th> -->
+						<th class="th_delete"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:if="${!paging.isEmpty()}" class="text-center"
+					<tr th:if="${!paging.isEmpty()}" class="text-center align-middle"
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
@@ -37,10 +37,10 @@
 							th:href="@{|/admin/role/list/${item.id}|}" th:text="${item.name}"></a></td>
 						<td
 							th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-						<!-- 						<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a -->
-						<!-- 							href="javascript:void(0);" -->
-						<!-- 							class="delete btn btn-sm btn-outline-info" -->
-						<!-- 							th:data-uri="@{|/admin/role/delete/${item.id}|}" th:text="삭제"></a></td> -->
+						<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a
+							href="javascript:void(0);"
+							class="delete btn btn-sm btn-outline-info"
+							th:data-uri="@{|/admin/role/delete/${item.id}|}" th:text="삭제"></a></td>
 					</tr>
 					<tr class="text-center" th:if="${paging.isEmpty()}">
 						<td colspan="4">역할이 존재하지 않습니다.</td>
@@ -111,14 +111,12 @@
 			</form>
 		</div>
 	</div>
-</div>
-<script layout:fragment="script" type="text/javascript"
-	th:inline="javascript">
+</main>
+<script layout:fragment="script" th:inline="javascript">
     $(document).ready(function () {
-        const message = /*[[${message}]]*/'';
-        if (message.length != 0) {
-            $('#message').text(message);
-            $('#modal').modal('show');
+        const error_message = /*[[${message}]]*/'';
+        if (error_message != null) {
+            modal_show(error_message);
         }
     });
 </script>

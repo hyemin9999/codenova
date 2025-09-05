@@ -168,7 +168,7 @@ public class BoardController {
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 
 		// 게시글 생성
-		this.boardService.create(boardForm.getSubject(), con, siteUser, null);
+		this.boardService.create(boardForm.getSubject(), con, siteUser, null, null);
 
 		// 생성 뒤 목록으로 리다이렉트(새로고침 중복 제출 방지: PRG 패턴)
 		return "redirect:/board/list";
@@ -194,7 +194,7 @@ public class BoardController {
 		SiteUser author = this.userService.getUser(principal.getName());
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
 
-		this.boardService.create(boardForm.getSubject(), con, author, cid);
+		this.boardService.create(boardForm.getSubject(), con, author, cid, boardForm.getFileids());
 		return "redirect:/board/list/" + cid;
 	}
 
@@ -244,7 +244,7 @@ public class BoardController {
 
 		// 내용 디코딩 후 수정 반영
 		String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
-		this.boardService.modify(board, boardForm.getSubject(), con);
+		this.boardService.modify(board, boardForm.getSubject(), con, boardForm.getFileids());
 
 		// 수정 후 상세 페이지로 이동
 		return String.format("redirect:/board/detail/%s", id);

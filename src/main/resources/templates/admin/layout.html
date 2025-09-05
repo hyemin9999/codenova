@@ -6,15 +6,19 @@
 <head th:replace="~{fragment/header :: headerFragment}"></head>
 
 <body class="d-flex flex-column h-100">
+
 	<nav th:replace="~{admin/navbar :: navbarFragment}"></nav>
+	<nav th:replace="~{fragment/category_navbar :: navbarFragment}"></nav>
 
 	<main layout:fragment="content"></main>
 
 	<div th:replace="~{fragment/scripts :: scriptFragment}"></div>
 
-	<th:block type="text/javascript" charset="utf-8"
-		layout:fragment="script"></th:block>
+	<div th:replace="~{admin/modal :: alertModal}"></div>
 
-	<footer th:replace="~{fragment/footer :: footerFragment}"></footer>
+	<th:block layout:fragment="script" charset="utf-8"
+		type="text/javascript"></th:block>
+
+	<footer th:replace="~{footer :: footer}"></footer>
 </body>
 </html>

@@ -1,38 +1,30 @@
 <!DOCTYPE html>
+
 <html layout:decorate="~{layout/admin_layout}"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<main layout:fragment="content" class="container my-3">
+<main layout:fragment="content" class="container-fluid my-3 px-4">
 
-	<h5 class="border-bottom pb-2">공지사항 관리</h5>
+	<h5 class="border-bottom pb-2">게시판 관리</h5>
 	<div class="row">
-		<div class="col">
+		<div class="col-6">
 			<div class="row my-2">
 				<div class="col-6"></div>
 				<div class="col-6">
 					<div class="input-group">
-						<select id="search_field_select" class="form-select"
-							style="max-width: 140px;">
-							<option value="all" th:selected="${field} == 'all'">제목+내용</option>
-							<option value="title" th:selected="${field} == 'title'">제목</option>
-							<option value="content" th:selected="${field} == 'content'">내용</option>
-							<option value="author" th:selected="${field} == 'author'">작성자</option>
-						</select> <input type="text" id="search_kw" class="form-control"
+						<input type="text" id="search_kw" class="form-control"
 							th:value="${kw}">
 						<button class="btn btn-outline-info" type="button" id="btn_search">검색</button>
 					</div>
 				</div>
 			</div>
 
-			<table class="table notice">
+			<table class="table category">
 				<thead class="table-info">
 					<tr class="text-center">
 						<th>번호</th>
-						<th>게시판</th>
-						<th>제목</th>
-						<th>작성자</th>
-						<th>작성일</th>
-						<th>조회</th>
+						<th>게시판 이름</th>
+						<th>생성일</th>
 						<th class="th_delete"></th>
 					</tr>
 				</thead>
@@ -41,22 +33,19 @@
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
-						<td><span>Java</span></td>
 						<td class="text-start"><a
-							th:href="@{|/admin/notice/detail/${item.id}|}"
-							th:text="${item.subject}"></a></td>
-						<td><span th:if="${item.author != null}"
-							th:text="${item.author.username}"></span></td>
+							th:href="@{|/admin/category/list/${item.id}|}"
+							th:text="${item.name}"></a></td>
 						<td
 							th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-						<td th:text="${item.viewCount}"></td>
 						<td><a href="javascript:void(0);"
 							class="delete btn btn-sm btn-outline-info"
-							th:classappend="${item.author != null and #authentication.getPrincipal().getUsername() != item.author.username} ? disabled-link"
-							th:data-uri="@{|/admin/notice/delete/${item.id}|}" th:text="삭제"></a></td>
+							th:data-uri="@{|/admin/category/delete/${item.id}|}"
+							th:if="${#authorization.expression('hasRole(''ADMIN'')')} and ${item.id != 1} "
+							th:text="삭제"></a></td>
 					</tr>
 					<tr class="text-center" th:if="${paging.isEmpty()}">
-						<td colspan="7">공지사항이 존재하지 않습니다.</td>
+						<td colspan="4">게시판이 존재하지 않습니다.</td>
 					</tr>
 				</tbody>
 			</table>
@@ -76,20 +65,46 @@
 					<li class="page-item"
 						th:classappend="${!paging.hasNext} ? 'disabled'"><a
 						class="page-link" href="javascript:void(0)"
-						th:data-page="${paging.number+1}"><span>다음</span> </a></li>
+						th:data-page="${paging.number+1}"> <span>다음</span>
+					</a></li>
 				</ul>
 			</div>
-			<div class="align-r">
-				<a th:href="@{/admin/notice/create}" class="btn btn-info">등록</a>
-			</div>
-
-			<form th:action="@{/admin/notice/list}" method="get" id="searchForm">
-				<input type="hidden" id="kw" name="kw" th:value="${kw}"><input
-					type="hidden" id="field" name="field" th:value="${field}"><input
+			<form th:action="@{/admin/category/list}" method="get"
+				id="searchForm">
+				<input type="hidden" id="kw" name="kw" th:value="${kw}"> <input
 					type="hidden" id="page" name="page" th:value="${paging.number}">
+			</form>
+		</div>
+		<div class="col-6">
+			<form method="post" th:object="${adminCategoryForm}">
+				<h6 class="my-3 border-bottom pb-2 pt-2 title">게시판 정보</h6>
+				<div class="card my-3">
+					<div class="card-body">
+						<input type="hidden" th:name="${_csrf.parameterName}"
+							th:value="${_csrf.token}" id="_csrf" />
+						<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+						<div class="mb-3">
+							<label for="name" class="form-label">게시판 이름</label><input
+								type="text" th:field="*{name}" class="form-control">
+						</div>
+						<div class="align-r">
+							<input type="submit" value="저장" class="btn btn-info my-2">
+							<a class="btn btn-outline-info" th:href="@{/admin/category/list}">취소</a>
+						</div>
+					</div>
+				</div>
 			</form>
 		</div>
 	</div>
 </main>
 
+<script layout:fragment="script" th:inline="javascript">
+    $(document).ready(function () {
+        const error_message = /*[[${message}]]*/'';
+        if (error_message != null) {
+            modal_show(error_message);
+        }
+    });
+</script>
 </html>

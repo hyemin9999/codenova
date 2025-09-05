@@ -83,7 +83,7 @@ public class AdminNoticeController {
 	@PostMapping("/create")
 	public String create(Model model, @Valid NoticeForm noticeForm, BindingResult bindingResult, Principal principal) {
 
-		String con = URLDecoder.decode(noticeForm.getContent(), StandardCharsets.UTF_8);
+		String con = URLDecoder.decode(noticeForm.getContents(), StandardCharsets.UTF_8);
 
 		model.addAttribute("skin", "common");
 
@@ -91,7 +91,7 @@ public class AdminNoticeController {
 			model.addAttribute("mode", "create");
 			model.addAttribute("item", new Notice());
 			noticeForm.setSubject(noticeForm.getSubject());
-			noticeForm.setContent(con);
+			noticeForm.setContents(con);
 
 			return notice_form;
 		}
@@ -111,7 +111,7 @@ public class AdminNoticeController {
 			model.addAttribute("message", "수정 권한이 없습니다.");
 		}
 		noticeForm.setSubject(item.getSubject());
-		noticeForm.setContent(item.getContents());
+		noticeForm.setContents(item.getContents());
 
 		return notice_form;
 	}
@@ -121,12 +121,12 @@ public class AdminNoticeController {
 	public String modify(Model model, @Valid NoticeForm noticeForm, BindingResult bindingResult, Principal principal,
 			@PathVariable("id") Integer id) {
 
-		String con = URLDecoder.decode(noticeForm.getContent(), StandardCharsets.UTF_8);
+		String con = URLDecoder.decode(noticeForm.getContents(), StandardCharsets.UTF_8);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("mode", "mofidy");
 			noticeForm.setSubject(noticeForm.getSubject());
-			noticeForm.setContent(con);
+			noticeForm.setContents(con);
 			return notice_form;
 		}
 		Notice item = this.adminNoticeService.getItem(id);

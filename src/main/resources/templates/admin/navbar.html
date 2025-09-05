@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{admin/layout}"
-	xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -35,10 +34,9 @@
 					sec:authorize="hasRole('ADMIN')" th:href="@{/admin/category/list}">게시판
 						관리</a></li>
 				<li class="nav-item"><a class="nav-link"
-					th:href="@{/admin/board/list}">게시글 관리</a></li>
+					th:href="@{/admin/board/list/0}">게시글 관리</a></li>
 				<li class="nav-item"><a class="nav-link"
 					th:href="@{/admin/notice/list}">공지사항 관리</a></li>
-
 			</ul>
 		</div>
 	</div>
