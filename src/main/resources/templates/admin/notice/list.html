@@ -2,15 +2,13 @@
 <html layout:decorate="~{layout/admin_layout}"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<main layout:fragment="content" class="container-fluid my-3 px-4">
+<main layout:fragment="content" class="container my-3">
 
 	<h5 class="border-bottom pb-2">공지사항 관리</h5>
 	<div class="row">
 		<div class="col">
 			<div class="row my-2">
-				<div class="col-6">
-					<a th:href="@{/admin/notice/create}" class="btn btn-info">등록</a>
-				</div>
+				<div class="col-6"></div>
 				<div class="col-6">
 					<div class="input-group">
 						<select id="search_field_select" class="form-select"
@@ -30,18 +28,20 @@
 				<thead class="table-info">
 					<tr class="text-center">
 						<th>번호</th>
+						<th>게시판</th>
 						<th>제목</th>
 						<th>작성자</th>
 						<th>작성일</th>
 						<th>조회</th>
-						<th></th>
+						<th class="th_delete"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:unless="${#lists.isEmpty(paging)}" class="text-center"
+					<tr th:if="${!paging.isEmpty()}" class="text-center align-middle"
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
+						<td><span>Java</span></td>
 						<td class="text-start"><a
 							th:href="@{|/admin/notice/detail/${item.id}|}"
 							th:text="${item.subject}"></a></td>
@@ -55,13 +55,13 @@
 							th:classappend="${item.author != null and #authentication.getPrincipal().getUsername() != item.author.username} ? disabled-link"
 							th:data-uri="@{|/admin/notice/delete/${item.id}|}" th:text="삭제"></a></td>
 					</tr>
-					<tr class="text-center" th:if="${#lists.isEmpty(paging)}">
-						<td colspan="6">공지사항이 존재하지 않습니다.</td>
+					<tr class="text-center" th:if="${paging.isEmpty()}">
+						<td colspan="7">공지사항이 존재하지 않습니다.</td>
 					</tr>
 				</tbody>
 			</table>
 
-			<div th:unless="${#lists.isEmpty(paging)}">
+			<div th:if="${!paging.isEmpty()}">
 				<ul class="pagination justify-content-center">
 					<li class="page-item"
 						th:classappend="${!paging.hasPrevious} ? 'disabled'"><a
@@ -78,6 +78,9 @@
 						class="page-link" href="javascript:void(0)"
 						th:data-page="${paging.number+1}"><span>다음</span> </a></li>
 				</ul>
+			</div>
+			<div class="align-r">
+				<a th:href="@{/admin/notice/create}" class="btn btn-info">등록</a>
 			</div>
 
 			<form th:action="@{/admin/notice/list}" method="get" id="searchForm">

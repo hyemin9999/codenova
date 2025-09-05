@@ -25,13 +25,17 @@ public class SecurityConfig {
 	// 403 error 발생
 	// 모든 페이지에 접근 가능
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-				.requestMatchers(new AntPathRequestMatcher("/admin/user/**"),
-						new AntPathRequestMatcher("/admin/role/**"), new AntPathRequestMatcher("/admin/category/**"))
-				.hasRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "MANAGER")
-				.requestMatchers(new AntPathRequestMatcher("/user/login"),
-						new AntPathRequestMatcher("/user/find-password"), new AntPathRequestMatcher("/user/find-id"))
-				.anonymous().requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+		http.exceptionHandling(handling -> handling.accessDeniedPage("/"))
+				.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+						.requestMatchers(new AntPathRequestMatcher("/admin/user/**"),
+								new AntPathRequestMatcher("/admin/role/**"),
+								new AntPathRequestMatcher("/admin/category/**"))
+						.hasRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/admin/**"))
+						.hasAnyRole("ADMIN", "MANAGER")
+						.requestMatchers(new AntPathRequestMatcher("/user/login"),
+								new AntPathRequestMatcher("/user/find-password"),
+								new AntPathRequestMatcher("/user/find-id"))
+						.anonymous().requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 				.csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
 				.headers((headers) -> headers.addHeaderWriter(
 						new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
@@ -46,6 +50,7 @@ public class SecurityConfig {
 		return http.build();
 	}
 
+	// 비밀번호 암호화
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

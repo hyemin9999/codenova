@@ -37,11 +37,11 @@
 							th:text="${item.name}"></a></td>
 						<td
 							th:text="${#temporals.format(item.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-						<!-- 						<td><a href="javascript:void(0);" -->
-						<!-- 							class="delete btn btn-sm btn-outline-info" -->
-						<!-- 							th:data-uri="@{|/admin/category/delete/${item.id}|}" -->
-						<!-- 							th:if="${#authorization.expression('hasRole(''ADMIN'')')} and ${item.id != 1} " -->
-						<!-- 							th:text="삭제"></a></td> -->
+						<td><a href="javascript:void(0);"
+							class="delete btn btn-sm btn-outline-info"
+							th:data-uri="@{|/admin/category/delete/${item.id}|}"
+							th:if="${#authorization.expression('hasRole(''ADMIN'')')} and ${item.id != 1} "
+							th:text="삭제"></a></td>
 					</tr>
 					<tr class="text-center" th:if="${paging.isEmpty()}">
 						<td colspan="4">게시판이 존재하지 않습니다.</td>

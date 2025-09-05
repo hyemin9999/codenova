@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Integer> {
@@ -21,4 +22,6 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
 
 	@Query(value = "SELECT * FROM Role " + "WHERE grade != 1 ORDER BY name ASC ", nativeQuery = true)
 	List<Role> findAllByGrade();
+
+	List<Role> findAllByAuthority(Category item);
 }

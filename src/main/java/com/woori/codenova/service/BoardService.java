@@ -19,8 +19,10 @@ import com.woori.codenova.entity.Board;
 import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Comment;
 import com.woori.codenova.entity.SiteUser;
+import com.woori.codenova.entity.UploadFile;
 import com.woori.codenova.repository.BoardRepository;
 import com.woori.codenova.repository.CategoryRepository;
+import com.woori.codenova.repository.UploadFileRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -37,6 +39,7 @@ public class BoardService {
 	// 의존성 주입: 게시글 저장소 (Spring Data JPA 프록시 구현체가 주입됨)
 	private final BoardRepository boardRepository;
 	private final CategoryRepository categoryRepository;
+	private final UploadFileRepository uploadFileRepository;
 
 	/**
 	 * 검색용 Specification 빌더 - 동적 쿼리를 위해 JPA Criteria 를 사용. - 제목/내용/작성자(username)/댓글
@@ -116,7 +119,7 @@ public class BoardService {
 	}
 
 	// ✅ 게시글 생성
-	public void create(String subject, String contents, SiteUser user, Integer cid) {
+	public void create(String subject, String contents, SiteUser user, Integer cid, List<Long> fileids) {
 		Board q = new Board(); // 새 엔티티 인스턴스 생성
 		q.setSubject(subject); // 제목 설정
 		q.setContents(contents); // 내용 설정(마크다운 등)
@@ -129,6 +132,7 @@ public class BoardService {
 		q.setCategory(citem);
 
 		this.boardRepository.save(q); // 영속화(INSERT)
+		setFileByBoard(fileids, q);
 	}
 
 //	public Page<Board> getList(Integer categoryId, int page, String kw, String field, int size) {
@@ -141,11 +145,12 @@ public class BoardService {
 //	}
 
 	// ✅ 게시글 수정
-	public void modify(Board board, String subject, String content) {
+	public void modify(Board board, String subject, String content, List<Long> fileids) {
 		board.setSubject(subject); // 제목 변경
 		board.setContents(content); // 내용 변경
 		board.setModifyDate(LocalDateTime.now()); // 수정 일시 갱신
 		this.boardRepository.save(board); // 더티 체킹 또는 merge 로 UPDATE 반영
+		setFileByBoard(fileids, board);
 	}
 
 	/**
@@ -189,4 +194,15 @@ public class BoardService {
 		return b; // 트랜잭션 커밋 시 UPDATE 발생
 	}
 
+	public void setFileByBoard(List<Long> fileids, Board item) {
+		if (fileids != null && fileids.size() != 0) {
+			for (Long fileid : fileids) {
+				UploadFile file = uploadFileRepository.findById(fileid).orElse(null);
+				if (file != null) {
+					file.setBoard(item);
+					uploadFileRepository.save(file);
+				}
+			}
+		}
+	}
 }

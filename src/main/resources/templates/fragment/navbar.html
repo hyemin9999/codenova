@@ -26,17 +26,16 @@
 					th:href="@{/notice/list}">공지사항</a></li>
 
 				<li class="nav-item dropdown"><a
-					class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+					class="nav-link dropdown-toggle" th:href="@{|/board/list/0|}" id="navbarDropdown"
 					role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						게시판</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<li th:unless="${#lists.isEmpty(menus)}" th:each="menu : ${menus}"><a
+						<li th:if="${!menus.isEmpty()}"  th:each="menu : ${menus}"><a
 							class="dropdown-item" th:href="@{|/board/list/${menu.id}|}"
 							th:text="${menu.name}"></a></li>
 					</ul></li>
 				<li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')"><a
 					class="nav-link" th:href="@{/admin}">관리자 페이지</a></li>
-
 			</ul>
 		</div>
 	</div>

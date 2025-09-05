@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout}"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<main layout:fragment="content" class="container my-3">
+
+	<h5 class="border-bottom pb-2">공지사항</h5>
+	<div class="row">
+		<div class="col">
+			<form method="post" th:object="${noticeForm}">
+				<input type="hidden" th:name="${_csrf.parameterName}"
+					th:value="${_csrf.token}" id="_csrf" />
+				<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+				<div class="mb-3">
+					<label for="subject" class="form-label">제목</label><input
+						type="text" th:field="*{subject}" class="form-control">
+				</div>
+				<div class="mb-3">
+					<label for="content" class="form-label">내용</label>
+					<div id="content" class="form-control"></div>
+					<input type="hidden" name="content" id="ecp"><input
+						type="hidden" id="ecp1" th:field="*{content}"><input
+						type="hidden" id="fileids" th:field=*{fileids}>
+				</div>
+				<div class="align-r">
+					<input type="submit" value="저장" class="btn btn-info my-2">
+					<a class="btn btn-outline-info" th:href="@{/notice/list}">취소</a>
+				</div>
+			</form>
+		</div>
+	</div>
+
+</main>
+<script layout:fragment="script" type="text/javascript"
+	th:inline="javascript">
+		
+	const editor = new toastui.Editor({
+		el: content_element,
+		height: '500px',
+		initialEditType: 'markdown',
+		initialValue: '',
+		previewStyle: 'vertical',
+		placeholder: '내용을 입력해 주세요.',
+		hooks: {
+			async addImageBlobHook(blob, callback) {
+				try {
+					const formData = new FormData();
+					formData.append('image', blob);
+					formData.append('type', "notice");
+					formData.append('mode',/*[[${mode}]]*/'');
+	
+					const response = await fetch('/tui-editor/image-upload', {
+						method: 'POST',
+						body: formData,
+						headers: { 'X-CSRF-Token': $('#_csrf').attr('value') },
+					});
+					const json = await response.json();
+					if (json.id != null) {
+						files.push(json.id)
+						document.querySelector('#fileids').value = files;
+	
+						const imageUrl = `/tui-editor/image-print?filename=${json.saveFilename}`;
+						callback(imageUrl, 'image alt attribute');
+					} else {
+						modal_show(failed_message);
+					}
+				} catch (error) {
+					modal_show(failed_message);
+					console.error(failed_message + " :: ", error);
+				}
+			},
+		},
+	});
+	
+	editor.setMarkdown(document.querySelector('#ecp1').value);
+
+	document.querySelector('form').addEventListener('submit',
+		function(event) {
+			document.querySelector('#ecp1').value = '';
+			const content = editor.getMarkdown();
+			const encodedC = encodeURIComponent(content);
+			document.querySelector('#ecp').value = encodedC;
+		});
+	
+	$(document).ready(function() {
+		const error_message = /*[[${message}]]*/'';
+		if (error_message != null) {
+			modal_show(error_message);
+		}
+	
+		$('#modal').on('hide.bs.modal', function(event) {
+			window.location.href = '/notice/';
+		});
+	});
+	</script>
+</html>

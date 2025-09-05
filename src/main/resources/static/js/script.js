@@ -4,12 +4,11 @@
 
 const page_element = document.getElementById('page');
 const kw_element = document.getElementById('kw');
-const search_kw_element = document.getElementById('search_kw');;
+const search_kw_element = document.getElementById('search_kw');
 const field_element = document.getElementById('field');
 const search_field_element = document.getElementById('search_field_select');
 const searchForm = document.getElementById('searchForm');
 
-// 페이지 번호/화살표 클릭 → page 값만 바꾸고 같은 폼 제출
 const page_elements = document.getElementsByClassName("page-link");
 if (page_elements.length > 0) {
 	Array.from(page_elements).forEach(function(element) {
@@ -28,6 +27,7 @@ if (btn_search != null) {
 		searchForm.submit();
 	});
 }
+
 if (search_kw_element != null) {
 	search_kw_element.addEventListener('keypress', function() {
 		if (event.keyCode === 13) {
@@ -39,31 +39,10 @@ if (search_kw_element != null) {
 	});
 }
 
-const search_kw = document.getElementById("search_kw");
-if (search_kw != null) {
-	search_kw.addEventListener('keypress', function() {
-		if (event.keyCode === 13) {
-			kw.value = this.value;
-			page.value = 0;
-			field.value = search_field.value;
-			searchForm.submit();
-		}
-	});
-}
-
-const page_size_select = document.getElementById("page_size_select");
-if (page_size_select != null) {
-	// 페이지당 개수 바꾸면 1페이지부터 재조회
-	page_size_select.addEventListener('change', function() {
-		page.value = 0;
-		searchForm.submit();
-	});
-}
-
-
 /**
  * detail.html
  */
+
 const delete_elements = document.getElementsByClassName("delete");
 if (delete_elements.length > 0) {
 	Array.from(delete_elements).forEach(function(element) {
@@ -96,20 +75,68 @@ if (favorite_elements.length > 0) {
 		});
 	});
 }
-
 /**
  * detail.html - editor
  */
-const ecp1 = document.querySelector('#ecp1');
+const ecp1_element = document.querySelector('#ecp1');
 const viewerElement = document.querySelector('#viewer');
 if (viewerElement) {
-	//	const viewer = new 
 	toastui.Editor.factory({
 		el: viewerElement,
 		viewer: true,
 		initialValue: ecp1.value
 	});
 }
+
+function onDisplay(d) {
+	const pwd_element = document.getElementById("pwd");
+	if (pwd_element) {
+		if (!d) {
+			pwd_element.style.display = 'flex';
+		} else {
+			pwd_element.style.display = 'none';
+		}
+	}
+
+	const pwdchange_element = document.getElementById("pwdchange");
+	const alert_elements = document.getElementsByClassName("alert alert-danger");
+	if (pwdchange_element) {
+		if (d) {
+			pwdchange_element.style.display = 'flex';
+		} else {
+			pwdchange_element.style.display = 'none';
+			Array.from(alert_elements).forEach(function(element) {
+				element.remove();
+			});
+		}
+	}
+}
+
+/**
+ * modal_show
+ */
+function modal_show(message) {
+	$('#message').text(message);
+	$('#modal').modal('show');
+}
+
+/**
+ * form.html
+ */
+var files = new Array();
+const failed_message = '이미지 업로드가 실패했습니다.';
+const contents_element = document.querySelector('#contents')
+
+
+
+
+
+
+
+
+
+
+
 
 
 

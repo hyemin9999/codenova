@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.repository.CategoryRepository;
+import com.woori.codenova.repository.RoleRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminCategoryService {
 	private final CategoryRepository categoryRepository;
+	private final RoleRepository roleRepository;
 
 	// 목록 - 페이징 - 검색
 	public Page<Category> getlist(int page, String kw) {
@@ -46,6 +48,16 @@ public class AdminCategoryService {
 
 	public List<Category> getAllByName() {
 		return categoryRepository.findAllByName();
+	}
+
+	public List<Category> addAllItem(List<Category> list) {
+
+		Category item = new Category();
+		item.setName("전체");
+		item.setId(0);
+		list.add(0, item);
+
+		return list;
 	}
 
 	// 조회 - 상세
@@ -78,6 +90,11 @@ public class AdminCategoryService {
 		// isDelete 처리가 복잡하니 일단 다 날림^^
 		this.categoryRepository.delete(item);
 	}
+
+//	public void deletelist(Role ritem)
+//	{
+//		categoryRepository.
+//	}
 
 	// 즐겨찾기
 	public void favorites(Category item, SiteUser siteUser) {

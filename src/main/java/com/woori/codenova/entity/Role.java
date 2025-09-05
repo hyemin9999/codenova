@@ -42,7 +42,7 @@ public class Role {
 
 	// 권한
 	@ManyToMany
-	@JoinTable(name = "roleAuthoriry", joinColumns = @JoinColumn(name = "roleId"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
+	@JoinTable(name = "roleAuthority", joinColumns = @JoinColumn(name = "roleId"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
 	Set<Category> authority;
 
 }

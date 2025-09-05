@@ -10,7 +10,8 @@ public class HomeController {
 	@GetMapping("/")
 	public String root() {
 		// "/" 경로로 들어오면 "/board/list"로 리다이렉트
-		return "redirect:/board/list";
+//		return "redirect:/board/list";
+		return "index";
 	}
 
 	// 이것이 선언되어야 redirect:/main 이 사용 가능해짐

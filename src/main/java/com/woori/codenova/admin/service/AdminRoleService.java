@@ -48,8 +48,11 @@ public class AdminRoleService {
 
 	// 목록 - 정렬 - 회원관리에서 사용
 	public List<Role> getlist() {
-		List<Role> list = roleReporitory.findAllByGrade();
-		return list;
+		return roleReporitory.findAllByGrade();
+	}
+
+	public List<Role> deleteList(Category citem) {
+		return roleReporitory.findAllByAuthority(citem);
 	}
 
 	// 조회 - 상세

@@ -57,6 +57,10 @@ input[type=submit] {
 	vertical-align: middle;;
 }
 
+.table .th_delete {
+	width: 80px;
+}
+
 .btn-info {
 	--bs-btn-color: var(--bs-white);
 	--bs-btn-hover-color: var(--bs-white);

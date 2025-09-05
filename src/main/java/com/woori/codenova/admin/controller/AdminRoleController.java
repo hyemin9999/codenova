@@ -31,7 +31,6 @@ public class AdminRoleController {
 
 	private final AdminRoleService adminRoleService;
 	private final AdminCategoryService adminCategoryService;
-//	private final AdminUserService adminUserService;
 
 	@GetMapping("/list")
 	@PreAuthorize("isAuthenticated()")
@@ -86,17 +85,14 @@ public class AdminRoleController {
 
 		Role item = this.adminRoleService.getItem(id);
 		if (item == null) {
-			model.addAttribute("message", "존재하지 않는 역할 입니다.");
 			bindingResult.reject("존재하지 않는 역할 입니다.");
+			model.addAttribute("message", "존재하지 않는 역할 입니다.");
+
 		}
 
 		if (bindingResult.hasErrors()) {
 			return "admin/role_list";
 		}
-
-//		if (!item.getAuthor().getUsername().equals(principal.getName())) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
-//		}
 
 		this.adminRoleService.modify(item, adminRoleForm.getName(), item.getGrade(), adminRoleForm.getSelectedList());
 		return "redirect:/admin/role/list";
@@ -104,21 +100,18 @@ public class AdminRoleController {
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/delete/{id}")
-	public String delete(Principal principal, @PathVariable("id") Integer id) {
+	public String delete(Model model, Principal principal, @PathVariable("id") Integer id,
+			AdminRoleForm adminRoleForm) {
 
-//		Role item = this.adminRoleService.getItem(id);
-//		item.getAuthority().clear();
+		Role item = this.adminRoleService.getItem(id);
+		if (item == null) {
+			model.addAttribute("message", "존재하지 않는 역할 입니다.");
+			list(model, 0, "", adminRoleForm, "list");
 
-//		if (!item.getAuthor().getUsername().equals(principal.getName())) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-//		}
+			return "admin/role_list";
+		}
 
-//		List<SiteUser> ulist = this.adminUserService.getList(id);
-//		for (SiteUser siteUser : ulist) {
-//			siteUser.getAuthority().remove(item);
-//		}
-
-//		this.adminRoleService.delete(item);
+		this.adminRoleService.delete(item);
 		return "redirect:/admin/role/list";
 	}
 
@@ -155,18 +148,10 @@ public class AdminRoleController {
 		if (mode == "list" && item != null) {
 
 			List<Category> selectedlist = new ArrayList<>(item.getAuthority());
-//			if ((selectedlist.size() + 1) == optionList.size()) {
-//				adminCategoryService.addAllItem(selectedlist);
-//			}
 
 			adminRoleForm.setSelectedList(selectedlist);
 		}
 
-//		SiteUser user = this.adminUserService.getItem(principal.getName());
-//		if (user != null && !user.getAuthority().isEmpty()
-//				&& user.getAuthority().stream().anyMatch(a -> a.getGrade().equals(1))) {
-//			model.addAttribute("mode", "modify");
-//		}
 	}
 
 }

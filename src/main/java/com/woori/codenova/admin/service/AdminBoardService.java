@@ -60,6 +60,14 @@ public class AdminBoardService {
 		return boardRepository.findByAuthor(id);
 	}
 
+//	public List<Board> getListByVorter(Long id) {
+//		return boardRepository.getVoterId(id);
+//	}
+//
+//	public List<Board> getListByFavorites(Long id) {
+//		return boardRepository.getFavoritesId(id);
+//	}
+
 	// 조회 - 조회수
 	public void setViewCount(Board item) {
 
