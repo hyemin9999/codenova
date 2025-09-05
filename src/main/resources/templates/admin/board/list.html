@@ -87,7 +87,7 @@
 			<div class="align-r">
 				<a th:href="@{|/admin/board/create/${cid}|}" class="btn btn-info">등록</a>
 			</div>
-			<form th:action="@{/admin/board/list}" method="get" id="searchForm">
+			<form th:action="@{/admin/board/list/${cid}}" method="get" id="searchForm">
 				<input type="hidden" id="kw" name="kw" th:value="${kw}"> <input
 					type="hidden" id="page" name="page" th:value="${paging.number}">
 			</form>

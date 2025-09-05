@@ -43,7 +43,11 @@ public class AdminBoardService {
 		Pageable pageable = PageRequest.of(page, 20, Sort.by(sorts));
 
 		if (cid == 0) {
-			cid = categoryRepository.findAllByName().get(0).getId();
+
+			List<Category> clist = categoryRepository.findAllByName();
+			if (clist != null && !clist.isEmpty()) {
+				cid = categoryRepository.findAllByName().get(0).getId();
+			}
 		}
 		Specification<Board> spec = search(kw, field, cid);
 
@@ -156,7 +160,12 @@ public class AdminBoardService {
 					return byAuthor;
 				case "all":
 				default:
-					return cb.and(cb.or(byTitle, byContent), category);
+					if (cid == 0) {
+						return cb.or(byTitle, byContent);
+					} else {
+						return cb.and(cb.or(byTitle, byContent), category);
+					}
+
 				}
 			}
 		};

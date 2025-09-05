@@ -19,9 +19,9 @@
 				</div>
 				<div class="mb-3">
 					<label for="content" class="form-label">내용</label>
-					<div id="content" class="form-control"></div>
-					<input type="hidden" name="content" id="ecp"><input
-						type="hidden" id="ecp1" th:field="*{content}"><input
+					<div id="contents" class="form-control"></div>
+					<input type="hidden" name="contents" id="ecp"><input
+						type="hidden" id="ecp1" th:field="*{contents}"><input
 						type="hidden" id="fileids" th:field=*{fileids}>
 				</div>
 				<div class="align-r">
@@ -37,7 +37,7 @@
 	th:inline="javascript">
 		
 	const editor = new toastui.Editor({
-		el: content_element,
+		el: contents_element,
 		height: '500px',
 		initialEditType: 'markdown',
 		initialValue: '',

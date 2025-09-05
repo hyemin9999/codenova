@@ -30,6 +30,7 @@
 				<thead class="table-info">
 					<tr class="text-center">
 						<th>번호</th>
+						<th>게시판</th>
 						<th>제목</th>
 						<th>작성자</th>
 						<th>작성일</th>
@@ -41,6 +42,7 @@
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
+						<td></td>
 						<td class="text-start"><a
 							th:href="@{|/notice/detail/${item.id}|}"
 							th:text="${item.subject}"></a></td>
@@ -73,9 +75,6 @@
 						class="page-link" href="javascript:void(0)"
 						th:data-page="${paging.number+1}"><span>다음</span> </a></li>
 				</ul>
-			</div>
-			<div class="align-r">
-				<a th:href="@{/notice/create}" class="btn btn-info">등록</a>
 			</div>
 
 			<form th:action="@{/notice/list}" method="get" id="searchForm">
