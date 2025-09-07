@@ -3,9 +3,10 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-<div layout:fragment="content" class="container my-3">
+<main layout:fragment="content" class="container my-3">
 
 	<h5 class="border-bottom pb-2">공지사항 관리</h5>
+	
 	<div class="row">
 		<div class="col">
 			<form method="post" th:object="${noticeForm}" id="form">
@@ -30,8 +31,7 @@
 			</form>
 		</div>
 	</div>
-
-</div>
+</main>
 <script layout:fragment="script" th:inline="javascript">
 
 	const editor = new toastui.Editor({
