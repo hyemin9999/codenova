@@ -49,36 +49,38 @@ public class CodenovaInterceptor implements HandlerInterceptor {
 
 		List<Category> menuList = getCategoryList();
 
-		if (url.startsWith("/board/") || url.startsWith("/admin/board/")) {
-			request.setAttribute("type", "board");
+		if (menuList != null && !menuList.isEmpty()) {
+			if (url.startsWith("/board/") || url.startsWith("/admin/board/")) {
+				request.setAttribute("type", "board");
 
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (authentication != null && authentication.getPrincipal() instanceof UserDetails
-					&& url.startsWith("/admin/board/")) {
-				UserDetails userDetails = (UserDetails) authentication.getPrincipal(); // 로그인한 사용자 정보 가져오기
-				if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MANAGER"))) {
-					menuList = getListByUsername(userDetails.getUsername());
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				if (authentication != null && authentication.getPrincipal() instanceof UserDetails
+						&& url.startsWith("/admin/board/")) {
+					UserDetails userDetails = (UserDetails) authentication.getPrincipal(); // 로그인한 사용자 정보 가져오기
+					if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MANAGER"))) {
+						menuList = getListByUsername(userDetails.getUsername());
+					}
+
 				}
 
-			}
+				Category item = menuList.get(0);
 
-			Category item = menuList.get(0);
+				String[] str = url.split("/");
 
-			String[] str = url.split("/");
-
-			if (str.length > 0) {
-				String last = str[str.length - 1];
-				if (last.matches("\\d+")) {
-					Integer cid = Integer.parseInt(str[str.length - 1]);
-					item = menuList.stream().filter(o -> o.getId().equals(cid)).findAny().orElse(item);
+				if (str.length > 0) {
+					String last = str[str.length - 1];
+					if (last.matches("\\d+")) {
+						Integer cid = Integer.parseInt(str[str.length - 1]);
+						item = menuList.stream().filter(o -> o.getId().equals(cid)).findAny().orElse(item);
+					}
 				}
+
+				request.setAttribute("cid", item.getId());
+				request.setAttribute("menuName", item.getName());
 			}
 
-			request.setAttribute("cid", item.getId());
-			request.setAttribute("menuName", item.getName());
+			request.setAttribute("menus", menuList);
 		}
-
-		request.setAttribute("menus", menuList);
 
 		return HandlerInterceptor.super.preHandle(request, response, handler);
 	}
