@@ -41,188 +41,197 @@ import lombok.extern.log4j.Log4j2;
 @Controller
 public class BoardController {
 
-    private final BoardService boardService;
-    private final UserService userService;
-    private final CommentService commentService;
-    private final SearchTextService searchTextService;
-    private final CategoryService categoryService;
+   private final BoardService boardService;
+   private final UserService userService;
+   private final CommentService commentService;
+   private final SearchTextService searchTextService;
+   private final CategoryService categoryService;
 
-    // ===============================================================
-    // 목록 페이지
-    // ===============================================================
-    @GetMapping("/list")
-    public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
-                       @RequestParam(value = "kw", defaultValue = "") String kw,
-                       @RequestParam(value = "field", defaultValue = "all") String field,
-                       @RequestParam(value = "size", defaultValue = "10") int size) {
+   // ===============================================================
+   // 목록 페이지
+   // ===============================================================
+   @GetMapping("/list")
+   public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+         @RequestParam(value = "kw", defaultValue = "") String kw,
+         @RequestParam(value = "field", defaultValue = "all") String field,
+         @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        switch (size) {
-            case 10: case 20: case 30: case 50: break;
-            default: size = 10;
-        }
+      switch (size) {
+      case 10:
+      case 20:
+      case 30:
+      case 50:
+         break;
+      default:
+         size = 10;
+      }
 
-        Page<Board> paging = this.boardService.getList(0, page, kw, field, size);
+      Page<Board> paging = this.boardService.getList(0, page, kw, field, size);
 
-        model.addAttribute("paging", paging);
-        model.addAttribute("kw", kw);
-        model.addAttribute("field", field);
-        model.addAttribute("size", size);
+      model.addAttribute("paging", paging);
+      model.addAttribute("kw", kw);
+      model.addAttribute("field", field);
+      model.addAttribute("size", size);
 
-        if (!kw.isBlank()) {
-            Category citem = categoryService.getItem(0);
-            searchTextService.create(kw, citem);
-        }
+      if (!kw.isBlank()) {
+         Category citem = categoryService.getItem(0);
+         searchTextService.create(kw, citem);
+      }
 
-        return "board_list";
-    }
+      return "board_list";
+   }
 
-    @GetMapping("/list/{cid}")
-    public String list(Model model, @PathVariable("cid") Integer cid,
-                       @RequestParam(value = "page", defaultValue = "0") int page,
-                       @RequestParam(value = "kw", defaultValue = "") String kw,
-                       @RequestParam(value = "field", defaultValue = "all") String field,
-                       @RequestParam(value = "size", defaultValue = "10") int size) {
+   @GetMapping("/list/{cid}")
+   public String list(Model model, @PathVariable("cid") Integer cid,
+         @RequestParam(value = "page", defaultValue = "0") int page,
+         @RequestParam(value = "kw", defaultValue = "") String kw,
+         @RequestParam(value = "field", defaultValue = "all") String field,
+         @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Page<Board> paging = this.boardService.getList(cid, page, kw, field, size);
+      Page<Board> paging = this.boardService.getList(cid, page, kw, field, size);
 
-        model.addAttribute("paging", paging);
-        model.addAttribute("kw", kw);
-        model.addAttribute("field", field);
-        model.addAttribute("size", size);
-        model.addAttribute("cid", cid);
+      model.addAttribute("paging", paging);
+      model.addAttribute("kw", kw);
+      model.addAttribute("field", field);
+      model.addAttribute("size", size);
+      model.addAttribute("cid", cid);
 
-        if (!kw.isBlank()) {
-            Category citem = categoryService.getItem(cid);
-            searchTextService.create(kw, citem);
-        }
-        return "board_list";
-    }
+      if (!kw.isBlank()) {
+         Category citem = categoryService.getItem(cid);
+         searchTextService.create(kw, citem);
+      }
+      return "board_list";
+   }
 
-    // ===============================================================
-    // 상세 페이지
-    // ===============================================================
-    @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm,
-                         @RequestParam(value = "cpage", defaultValue = "0") int cpage, Principal principal) {
+   // ===============================================================
+   // 상세 페이지
+   // ===============================================================
+   @GetMapping("/detail/{id}")
+   public String detail(Model model, @PathVariable("id") Integer id, CommentForm commentForm,
+         @RequestParam(value = "cpage", defaultValue = "0") int cpage, Principal principal) {
 
-        Board board = this.boardService.viewBoard(id);
-        Page<Comment> cpaging = this.commentService.getPageByBoard(board, cpage);
+      Board board = this.boardService.viewBoard(id);
+      Page<Comment> cpaging = this.commentService.getPageByBoard(board, cpage);
 
-        SiteUser me = (principal != null) ? this.userService.getUser(principal.getName()) : null;
+      SiteUser me = (principal != null) ? this.userService.getUser(principal.getName()) : null;
 
-        boolean favoritedBoard = (me != null) && board.getFavorite() != null && board.getFavorite().contains(me);
+      boolean favoritedBoard = (me != null) && board.getFavorite() != null && board.getFavorite().contains(me);
 
-        Map<Integer, Boolean> commentFavMap = new HashMap<>();
-        if (me != null) {
-            for (Comment c : cpaging.getContent()) {
-                boolean fav = (c.getFavorite() != null) && c.getFavorite().contains(me);
-                commentFavMap.put(c.getId(), fav);
-            }
-        }
+      Map<Integer, Boolean> commentFavMap = new HashMap<>();
+      if (me != null) {
+         for (Comment c : cpaging.getContent()) {
+            boolean fav = (c.getFavorite() != null) && c.getFavorite().contains(me);
+            commentFavMap.put(c.getId(), fav);
+         }
+      }
 
-        model.addAttribute("menuName", board.getCategory().getName());
-        model.addAttribute("board", board);
-        model.addAttribute("cpaging", cpaging);
-        model.addAttribute("favoritedBoard", favoritedBoard);
-        model.addAttribute("commentFavMap", commentFavMap);
-        model.addAttribute("cid", board.getCategory().getId());
+      model.addAttribute("menuName", board.getCategory().getName());
+      model.addAttribute("board", board);
+      model.addAttribute("cpaging", cpaging);
+      model.addAttribute("favoritedBoard", favoritedBoard);
+      model.addAttribute("commentFavMap", commentFavMap);
+      model.addAttribute("cid", board.getCategory().getId());
 
-        return "board_detail";
-    }
+      return "board_detail";
+   }
 
-    // ===============================================================
-    // 생성 폼
-    // ===============================================================
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/create/{cid}")
-    public String boardCreate(@PathVariable(name = "cid") Integer cid, BoardForm boardForm) {
-        return "board_form";
-    }
+   // ===============================================================
+   // 생성 폼
+   // ===============================================================
+   @PreAuthorize("isAuthenticated()")
+   @GetMapping("/create/{cid}")
+   public String boardCreate(Model model, @PathVariable(name = "cid") Integer cid, BoardForm boardForm) {
+      model.addAttribute("mode", "create");
+      return "board_form";
+   }
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/create/{cid}")
-    public String boardCreate(@PathVariable(name= "cid") Integer cid, @Valid BoardForm boardForm,
-                              BindingResult bindingResult, Principal principal) {
-        if (bindingResult.hasErrors()) return "board_form";
+   @PreAuthorize("isAuthenticated()")
+   @PostMapping("/create/{cid}")
+   public String boardCreate(Model model, @Valid BoardForm boardForm, BindingResult bindingResult, Principal principal,
+         @PathVariable(name = "cid") Integer cid, @RequestParam(value = "filse", defaultValue = "0") String files) {
+      if (bindingResult.hasErrors()) {
+         model.addAttribute("mode", "create");
+         return "board_form";
+      }
+      SiteUser siteUser = this.userService.getUser(principal.getName());
+      String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
+      this.boardService.create(boardForm.getSubject(), con, siteUser, cid, boardForm.getFileids());
 
-        SiteUser siteUser = this.userService.getUser(principal.getName());
-        String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
-        this.boardService.create(boardForm.getSubject(), con, siteUser, cid);
+      return "redirect:/board/list/{cid}";
+   }
 
-        return "redirect:/board/list/{cid}";
-    }
+   // ===============================================================
+   // 수정 폼 & 처리
+   // ===============================================================
+   @PreAuthorize("isAuthenticated()")
+   @GetMapping("/modify/{id}")
+   public String boardModify(Model model, BoardForm boardForm, @PathVariable("id") Integer id, Principal principal) {
+      Board board = this.boardService.getBoard(id);
+      model.addAttribute("mode", "modify");
+      if (!board.getAuthor().getUsername().equals(principal.getName())) {
+         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+      }
 
-    // ===============================================================
-    // 수정 폼 & 처리
-    // ===============================================================
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/modify/{id}")
-    public String boardModify(BoardForm boardForm, @PathVariable("id") Integer id, Principal principal) {
-        Board board = this.boardService.getBoard(id);
+      boardForm.setSubject(board.getSubject());
+      boardForm.setContents(board.getContents());
+      return "board_form";
+   }
 
-        if (!board.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
-        }
+   @PreAuthorize("isAuthenticated()")
+   @PostMapping("/modify/{id}")
+   public String boardModify(Model model, @Valid BoardForm boardForm, BindingResult bindingResult, Principal principal,
+         @PathVariable("id") Integer id) {
+      if (bindingResult.hasErrors()) {
+         model.addAttribute("mode", "mofidy");
+         return "board_form";
+      }
 
-        boardForm.setSubject(board.getSubject());
-        boardForm.setContents(board.getContents());
-        return "board_form";
-    }
+      Board board = this.boardService.getBoard(id);
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/modify/{id}")
-    public String boardModify(@Valid BoardForm boardForm, BindingResult bindingResult, Principal principal,
-                              @PathVariable("id") Integer id) {
-        if (bindingResult.hasErrors()) {
-            return "board_form";
-        }
+      if (!board.getAuthor().getUsername().equals(principal.getName())) {
+         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+      }
 
-        Board board = this.boardService.getBoard(id);
+      String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
+      this.boardService.modify(board, boardForm.getSubject(), con, boardForm.getFileids());
 
-        if (!board.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
-        }
+      return String.format("redirect:/board/detail/%s", id);
+   }
 
-        String con = URLDecoder.decode(boardForm.getContents(), StandardCharsets.UTF_8);
-        this.boardService.modify(board, boardForm.getSubject(), con);
+   // ===============================================================
+   // 삭제
+   // ===============================================================
+   @PreAuthorize("isAuthenticated()")
+   @GetMapping("/delete/{id}")
+   public String boardDelete(Principal principal, @PathVariable("id") Integer id) {
+      Board board = this.boardService.getBoard(id);
 
-        return String.format("redirect:/board/detail/%s", id);
-    }
+      if (!board.getAuthor().getUsername().equals(principal.getName())) {
+         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+      }
 
-    // ===============================================================
-    // 삭제
-    // ===============================================================
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/delete/{id}")
-    public String boardDelete(Principal principal, @PathVariable("id") Integer id) {
-        Board board = this.boardService.getBoard(id);
+      this.boardService.delete(board);
+      return "redirect:/";
+   }
 
-        if (!board.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-        }
+   // ===============================================================
+   // 추천
+   // ===============================================================
+   @PreAuthorize("isAuthenticated()")
+   @GetMapping("/vote/{id}")
+   public String boardVote(Principal principal, @PathVariable("id") Integer id) {
+      Board board = this.boardService.getBoard(id);
+      SiteUser siteUser = this.userService.getUser(principal.getName());
+      this.boardService.vote(board, siteUser);
+      return String.format("redirect:/board/detail/%s", id);
+   }
 
-        this.boardService.delete(board);
-        return "redirect:/";
-    }
-
-    // ===============================================================
-    // 추천
-    // ===============================================================
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/vote/{id}")
-    public String boardVote(Principal principal, @PathVariable("id") Integer id) {
-        Board board = this.boardService.getBoard(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.boardService.vote(board, siteUser);
-        return String.format("redirect:/board/detail/%s", id);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/favorite/{id}")
-    public String boardFavorite(Principal principal, @PathVariable("id") Integer id) {
-        Board board = this.boardService.getBoard(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.boardService.favorite(board, siteUser);
-        return String.format("redirect:/board/detail/%s", id);
-    }
+   @PreAuthorize("isAuthenticated()")
+   @GetMapping("/favorite/{id}")
+   public String boardFavorite(Principal principal, @PathVariable("id") Integer id) {
+      Board board = this.boardService.getBoard(id);
+      SiteUser siteUser = this.userService.getUser(principal.getName());
+      this.boardService.favorite(board, siteUser);
+      return String.format("redirect:/board/detail/%s", id);
+   }
 }

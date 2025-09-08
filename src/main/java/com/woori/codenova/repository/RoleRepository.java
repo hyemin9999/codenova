@@ -19,6 +19,6 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
 
 	Optional<Role> findByGrade(Integer grade);
 
-	@Query(value = "SELECT * FROM Role " + "WHERE grade != 1 ORDER BY name ASC ", nativeQuery = true)
+	@Query(value = "SELECT * FROM role " + "WHERE grade != 1 ORDER BY name ASC ", nativeQuery = true)
 	List<Role> findAllByGrade();
 }

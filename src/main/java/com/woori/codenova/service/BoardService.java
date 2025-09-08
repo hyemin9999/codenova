@@ -116,7 +116,7 @@ public class BoardService {
 	}
 
 	// ✅ 게시글 생성
-	public void create(String subject, String contents, SiteUser user, Integer cid) {
+	public void create(String subject, String contents, SiteUser user, Integer cid, List<Long> fileids) {
 		Board q = new Board(); // 새 엔티티 인스턴스 생성
 		q.setSubject(subject); // 제목 설정
 		q.setContents(contents); // 내용 설정(마크다운 등)
@@ -141,7 +141,7 @@ public class BoardService {
 //	}
 
 	// ✅ 게시글 수정
-	public void modify(Board board, String subject, String content) {
+	public void modify(Board board, String subject, String content, List<Long> fileids) {
 		board.setSubject(subject); // 제목 변경
 		board.setContents(content); // 내용 변경
 		board.setModifyDate(LocalDateTime.now()); // 수정 일시 갱신

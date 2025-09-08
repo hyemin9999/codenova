@@ -19,6 +19,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
 //	List<Category> findAll(Specification<Category> specification);
 
-	@Query(value = "SELECT * FROM Category " + "ORDER BY name ASC ", nativeQuery = true)
+	@Query(value = "SELECT * FROM category " + "ORDER BY name ASC ", nativeQuery = true)
 	List<Category> findAllByName();
 }

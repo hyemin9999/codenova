@@ -60,8 +60,8 @@ public class UploadFileService {
 			image.transferTo(uploadFile);
 
 			UploadFile item = new UploadFile();
-			if (mode == "mofidy") { // 수정일때
-				if (type == "board") {// 게시글일때
+			if ("modify".equals(mode)) { // 수정일때
+				if ("board".equals(type)) {// 게시글일때
 					item.setBoard(boardRepository.findById(Integer.parseInt(id)).orElse(null));
 				} else { // 공지사항일때
 					item.setNotice(noticeRepository.findById(Integer.parseInt(id)).orElse(null));

@@ -34,9 +34,10 @@ import com.woori.codenova.dto.AiDTO;
 public class AiService {
     
     /** API 키 배열 (여러 개일 경우 순환 사용) */
-    private static final String[] API_KEYS = { 
-        // TODO: 실제 API 키를 등록하거나, 환경변수/설정파일(application.yml)로 분리 권장
-        "" 
+    private static final String[] API_KEYS = {
+    		"AIzaSyAWsTqOJfvLnOS5hmSduv_UQDgY4oJyxY8",
+    		"AIzaSyDInbWveChBOHgOqbX1XbgoEe8ZSKKTm7U",
+    		"AIzaSyDpg-2dbyMLIhXugvCTGAOlPN7Y5KsR39g"
     };
 
     /** API 키 인덱스를 Round-Robin 방식으로 관리하는 카운터 */
