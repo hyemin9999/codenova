@@ -13,7 +13,7 @@
 			<ul class="navbar-nav me-auto mb-lg-0">
 				<li class="nav-item" th:each="menu : ${menus}"><a
 					class="nav-link" th:href="@{|/admin/board/list/${menu.id}|}"
-					th:text="${menu.name}"></a></li>
+					th:text="|${menu.name} 게시판|"></a></li>
 			</ul>
 		</div>
 	</div>

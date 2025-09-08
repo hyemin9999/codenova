@@ -28,13 +28,13 @@
 					th:unless="${menus != null && !menus.isEmpty()}"><a
 					class="nav-link" th:href="@{/board/list/0}">게시판</a></li>
 				<li class="nav-item dropdown"
-					th:if="${menus == null && !menus.isEmpty()}"><a
+					th:if="${menus != null && !menus.isEmpty()}"><a
 					class="nav-link dropdown-toggle" th:href="@{|/board/list/0|}"
 					id="navbarDropdown" role="button" data-bs-toggle="dropdown"
 					aria-expanded="false"> 게시판</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li th:each="menu : ${menus}"><a class="dropdown-item"
-							th:href="@{|/board/list/${menu.id}|}" th:text="${menu.name}"></a></li>
+							th:href="@{|/board/list/${menu.id}|}" th:text="|${menu.name} 게시판|"></a></li>
 					</ul></li>
 				<li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')"><a
 					class="nav-link" th:href="@{/admin}">관리자 페이지</a></li>
