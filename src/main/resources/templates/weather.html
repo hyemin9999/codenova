@@ -98,7 +98,12 @@ select {
 	<div id="main-card">현재 기온 정보를 불러오는 중...</div>
 	<div id="forecast-container">예보 정보를 불러오는 중...</div>
 
+	<div id="status"></div>
 	<script>
+    const select = document.getElementById('city-select');
+    const mainCard = document.getElementById('main-card');
+    const container = document.getElementById('forecast-container');
+
     // 도시 좌표
     const cityCoords = {
         seoul: { name: '서울', nx: 60, ny: 127 },
@@ -129,28 +134,27 @@ select {
     // 강수 형태 텍스트
     const ptyMap = { '0': '없음', '1': '비', '2': '비/눈', '3': '눈', '4': '소나기' };
 
-    const mainCard = document.getElementById('main-card');
-    const container = document.getElementById('forecast-container');
-    const select = document.getElementById('city-select');
-
-    // 하늘 상태 이미지 매핑
+    // 하늘 이미지
     const skyImgMap = {
-        '1': 'weather/background/GOOD.png',     // 맑음
-        '3': 'weather/background/HELL.png',    // 구름 많음
-        '4': 'weather/background/BAD.png'   // 흐림
+        '1': 'weather/background/GOOD.png',
+        '3': 'weather/background/HELL.png',
+        '4': 'weather/background/BAD.png'
     };
 
-    // 밤용 이미지 (맑음 전용)
-    const nightSkyImg = 'weather/NIGHT.png';
+    // 밤용 이미지
+    const nightSkyImg = 'weather/background/NIGHT.png';
 
-    // 강수 상태 이미지 매핑
+    // 강수 상태 아이콘
     const ptyImgMap = {
-        '0': 'weather/SUN.png',      // 없음
-        '1': 'weather/RAIN.png',      // 비
-        '2': 'weather/RAINSNOW.png', // 비/눈
-        '3': 'weather/SNOW.png',      // 눈
-        '4': 'weather/RAIN.png'     // 소나기
+        '0': 'weather/SUN.png',
+        '1': 'weather/RAIN.png',
+        '2': 'weather/RAINSNOW.png',
+        '3': 'weather/SNOW.png',
+        '4': 'weather/RAIN.png'
     };
+
+    // 밤에 맑을 때 달 아이콘
+    const moonImg = 'weather/MOON.png';
 
     // 도시 셀렉트바 변경 시
     select.addEventListener('change', () => {
@@ -214,7 +218,7 @@ select {
                 const currentTime = `${current.time.slice(0, 2)}시`;
                 const currentHour = parseInt(current.time.slice(0, 2));
 
-                // 하늘 상태 (20시부터 05시까지는 밤 사진 씀)
+                // 배경 이미지 선택 (20시부터 05시까지는 밤 배경 사용)
                 let currentSkyImg;
                 if (currentData.SKY === '1' && (currentHour >= 20 || currentHour < 5)) {
                     currentSkyImg = nightSkyImg;
@@ -222,25 +226,29 @@ select {
                     currentSkyImg = skyImgMap[currentData.SKY] || 'images/default.png';
                 }
 
-                const currentPtyImg = ptyImgMap[currentData.PTY] || 'images/default.png';
+                // 강수 형태 아이콘 선택
+                let currentPtyImg = ptyImgMap[currentData.PTY] || 'images/default.png';
+
+                // 밤 시간(20시 ~ 다음날 5시)이고, 강수형태가 없으면(PTY: 0), MOON 이미지 사용
+                if ((currentHour >= 20 || currentHour < 5) && currentData.PTY === '0') {
+                    currentPtyImg = moonImg;
+                }
 
                 // 메인 카드 렌더링
                 mainCard.innerHTML = `
-      <div class="main-card">
-        <h2>${cityName} 현재 (${currentTime}) 기준</h2>
-        <div>
-        <div class="value">${currentData.TMP}℃</div>
-<div style="width:245px; height:137px; position: relative;">
-    <img src="${currentSkyImg}" style="width:245px;height:137px;object-fit:cover;">
-    <img src="${currentPtyImg}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 70%; max-height: 70%;z-index: 9999;
-    object-fit: contain">
-</div>
-        <div>강수확률: ${currentData.POP}%</div>
-      </div>
-      </div>
-    `;
-
-
+                                      <div class="main-card">
+                                        <h2>${cityName} 현재 (${currentTime}) 기준</h2>
+                                        <div>
+                                        <div class="value">${currentData.TMP}℃</div>
+                                <div style="width:245px; height:137px; position: relative;">
+                                    <img src="${currentSkyImg}" style="width:245px;height:137px;object-fit:cover;">
+                                    <img src="${currentPtyImg}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 70%; max-height: 70%;z-index: 9999;
+                                    object-fit: contain">
+                                </div>
+                                        <div>강수확률: ${currentData.POP}%</div>
+                                      </div>
+                                      </div>
+                                    `;
 
                 // 예보 카드 렌더링 (텍스트 그대로)
                 container.innerHTML = '';
@@ -275,21 +283,22 @@ select {
                     const time = `${entry.time.slice(0,2)}시`;
                     const data = entry.data;
 
-// 강수형태 이미지 (없으면 기본)
+                    // 강수형태 이미지 (없으면 기본)
                     const ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
 
-// 이미지 영역 + 정보 영역
-                    itemDiv.innerHTML = `<div class="pty-icon" style="text-align:center;  margin-bottom:5px; width:100%; height:60px;">
-        <img src="${ptyImg}" style="max-width:100%; max-height:100%; object-fit: contain">
-    </div>
-    <div class="time">${time}</div>
-    <div class="desc">
-        <div>기온: ${data.TMP}℃</div>
-        <div>강수확률: ${data.POP}%</div>
-        <div>하늘상태: ${skyMap[data.SKY] || data.SKY}</div>
-    </div>`;
+                    // 이미지 영역 + 정보 영역
+                    itemDiv.innerHTML = `
+                        <div class="pty-icon" style="text-align:center;  margin-bottom:5px; width:100%; height:60px;">
+                            <img src="${ptyImg}" style="max-width:100%; max-height:100%; object-fit: contain">
+                        </div>
+                        <div class="time">${time}</div>
+                        <div class="desc">
+                            <div>기온: ${data.TMP}℃</div>
+                            <div>강수확률: ${data.POP}%</div>
+                            <div>하늘상태: ${skyMap[data.SKY] || data.SKY}</div>
+                        </div>
+                    `;
                     rowDiv.appendChild(itemDiv);
-
 
                     let desc = '';
                     for (const cat of ['TMP', 'POP', 'SKY', 'PTY']) {
@@ -304,7 +313,6 @@ select {
                             }
                         }
                     }
-
                 });
             })
             .catch(err => {
@@ -314,11 +322,39 @@ select {
             });
     }
 
-    // 초기 로딩은 서울이 국룰
-    const defaultCity = 'seoul';
-    const { nx, ny, name } = cityCoords[defaultCity];
-    fetchForecast(nx, ny, name);
-</script>
+    (async function () {
+        try {
+            const res = await fetch("https://ipapi.co/json/");
+            const { region } = await res.json();
+            console.log("IP 기반 위치:", region);
 
+            let matchedKey = null;
+
+            for (const key in cityCoords) {
+                if (key.toLowerCase() === region.toLowerCase()) {
+                    matchedKey = key;
+                    break;
+                }
+            }
+
+            if (matchedKey) {
+                const { nx, ny, name } = cityCoords[matchedKey];
+                document.getElementById("city-select").value = matchedKey;
+                fetchForecast(nx, ny, name);
+            } else {
+                console.warn("IP 기반 매칭 실패 → 인천으로 설정");
+                document.getElementById("city-select").value = "incheon";
+                const { nx, ny, name } = cityCoords["incheon"];
+                fetchForecast(nx, ny, name);
+            }
+        } catch (e) {
+            console.error("IP API 호출 실패:", e);
+            // 실패시 인천
+            document.getElementById("city-select").value = "incheon";
+            const { nx, ny, name } = cityCoords["incheon"];
+            fetchForecast(nx, ny, name);
+        }
+    })();
+</script>
 </body>
 </html>
