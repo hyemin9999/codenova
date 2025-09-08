@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,7 +54,7 @@ class CodenovaApplicationTests {
 //	@Test
 	void testJpa_01() {
 
-		Category c2 = categoryRepository.findByname("Java게시판").orElse(null);
+		Category c2 = categoryRepository.findByname("Java").orElse(null);
 		SiteUser u1 = userRepository.findByUsername("user").orElse(null);
 
 		// 질문 저장하기
@@ -70,7 +71,7 @@ class CodenovaApplicationTests {
 		q1.setCategory(c2);
 		boardRepository.save(q1);
 
-		Category c3 = categoryRepository.findByname("SQL게시판").orElse(null);
+		Category c3 = categoryRepository.findByname("SQL").orElse(null);
 		Board q2 = new Board();
 		q2.setSubject("두 번째 게시글 테스트");
 		q2.setContents("이 게시글은 두 번째 테스트입니다. 수정/삭제도 포함됩니다.");
@@ -191,15 +192,20 @@ class CodenovaApplicationTests {
 
 	// 테스트 데이터 300개 생성
 
-//	@Test
+	@Test
 	void testJpa_12() {
 		SiteUser u1 = userRepository.findByUsername("admin").orElse(null);
-		Category c2 = categoryRepository.findByname("자유게시판").orElse(null);
+
+		Category c2 = categoryRepository.findByname("Spring boot").orElse(null);
+//		Category c3 = categoryRepository.findByname("SQL").orElse(null);
+//		Category c4 = categoryRepository.findByname("Java").orElse(null);
 		for (int i = 1; i <= 300; i++) {
+
 			String subject = String.format("테스트 데이터입니다:[%03d]", i);
 			String contents = "내용무";
-
 			this.boardService.create(subject, contents, u1, c2.getId(), null);
+//			this.boardService.create(subject, contents, u1, c2.getId(), null);
+//			this.boardService.create(subject, contents, u1, c4.getId(), null);
 		}
 	}
 

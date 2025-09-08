@@ -63,6 +63,11 @@ dependencies {
 	implementation 'org.commonmark:commonmark:0.21.0'
 
 	
+	implementation 'io.springfox:springfox-boot-starter:3.0.0' // 예시 의존성
+		// weather
+	implementation 'org.jsoup:jsoup:1.21.2'
+	
+	
 	//mail 8.13일자 추가 현재 이메일 인증 테스트중
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	//Swagger3 8.13일자 추가 swagger3 @operation 써볼려고 추가함
@@ -75,9 +80,6 @@ dependencies {
 
     // 나머지 의존성들
     implementation 'com.google.code.gson:gson:2.9.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-    
 }
 
 

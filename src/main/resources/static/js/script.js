@@ -39,6 +39,15 @@ if (search_kw_element != null) {
 	});
 }
 
+const page_size_select = document.getElementById("page_size_select");
+if (page_size_select != null) {
+	// 페이지당 개수 바꾸면 1페이지부터 재조회
+	page_size_select.addEventListener('change', function() {
+		page.value = 0;
+		searchForm.submit();
+	});
+}
+
 /**
  * detail.html
  */
@@ -58,7 +67,10 @@ const recommend_elements = document.getElementsByClassName("recommend");
 if (recommend_elements.length > 0) {
 	Array.from(recommend_elements).forEach(function(element) {
 		element.addEventListener('click', function() {
-			if (confirm("정말로 추천하시겠습니까?")) {
+			const badge = this.querySelector(".badge");
+			const count = badge ? parseInt(badge.innerText, 10) : 0;
+
+			if (confirm(count > 0 ? "정말로 추천을 취소하시겠습니까?" : "정말로 추천하시겠습니까?")) {
 				location.href = this.dataset.uri;
 			}
 		});
@@ -69,7 +81,10 @@ const favorite_elements = document.getElementsByClassName("favorite");
 if (favorite_elements.length > 0) {
 	Array.from(favorite_elements).forEach(function(element) {
 		element.addEventListener('click', function() {
-			if (confirm("정말로 즐겨찾기하시겠습니까?")) {
+			// 안의 아이콘(⭐/☆) 보고 상태 구분
+			const isFavorited = this.innerText.includes("⭐");
+
+			if (confirm(isFavorited ? "정말로 즐겨찾기를 취소하시겠습니까?" : "정말로 즐겨찾기하시겠습니까?")) {
 				location.href = this.dataset.uri;
 			}
 		});
