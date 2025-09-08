@@ -49,17 +49,22 @@ public class CodenovaInterceptor implements HandlerInterceptor {
 
 		List<Category> menuList = getCategoryList();
 
-		if (url.startsWith("/board/") || url.startsWith("/admin/board/")) {
-			request.setAttribute("type", "board");
+		if (url.startsWith("/board/") || url.startsWith("/admin/board/") || url.startsWith("/notice/")
+				|| url.startsWith("/admin/notice/")) {
 
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			if (authentication != null && authentication.getPrincipal() instanceof UserDetails
-					&& url.startsWith("/admin/board/")) {
+					&& (url.startsWith("/admin/board/") || url.startsWith("/admin/notice/"))) {
 				UserDetails userDetails = (UserDetails) authentication.getPrincipal(); // 로그인한 사용자 정보 가져오기
 				if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MANAGER"))) {
 					menuList = getListByUsername(userDetails.getUsername());
 				}
+			}
 
+			if (url.startsWith("/board/") || url.startsWith("/admin/board/")) {
+				request.setAttribute("type", "board");
+			} else {
+				request.setAttribute("type", "notice");
 			}
 
 			Category item = menuList.get(0);

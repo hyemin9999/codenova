@@ -39,7 +39,7 @@ public class HomeController {
 
 	@GetMapping(value = { "/board", "/board/" })
 	public String board() {
-		return "redirect:/board/list";
+		return "redirect:/board/list/0";
 	}
 
 	@GetMapping(value = { "/admin/u", "/admin/user", "/admin/user/", })
@@ -64,6 +64,6 @@ public class HomeController {
 
 	@GetMapping(value = { "/admin/b", "/admin/board", "/admin/board/" })
 	public String adminBoard() {
-		return "redirect:/admin/board/list";
+		return "redirect:/admin/board/list/0";
 	}
 }
