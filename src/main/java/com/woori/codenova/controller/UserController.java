@@ -50,6 +50,8 @@ public class UserController {
 	private String redirect_uri;
 	@Value("${google.client_id}")
 	private String googleclient_id;
+	@Value("${google.redirect_uri}")
+	private String googleredirect_uri;
 
 	// 회원가입 링크로 보내버림
 	@GetMapping("/signup")
@@ -60,8 +62,8 @@ public class UserController {
 		String Kakaolocation = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id
 				+ "&redirect_uri=" + redirect_uri;
 
-		String reqUrl = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + googleclient_id
-				+ "&redirect_uri=http://localhost:8080/api/v1/oauth2/google&response_type=code&scope=email%20profile%20openid&access_type=offline";
+		String reqUrl = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + googleclient_id + "&redirect_uri="
+				+ googleredirect_uri + "&response_type=code&scope=email%20profile%20openid&access_type=offline";
 
 		String Naverlocation = "https://nid.naver.com/oauth2.0/authorize?" + "response_type=code&client_id="
 				+ naverclient_id + "&state=" + stateUuid + "&redirect_uri=" + naverRedirect_uri;
