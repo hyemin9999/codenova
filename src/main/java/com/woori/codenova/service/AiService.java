@@ -2,6 +2,7 @@ package com.woori.codenova.service;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,9 @@ import com.woori.codenova.dto.AiDTO;
 @Service
 public class AiService {
 	// API 키 나눠쓰기
-	private static final String[] API_KEYS = { "" };
+//	private static final String[] API_KEYS = { "" };
+	@Value("${gemini.serviceKeys}")
+	private String[] API_KEYS;
 
 	private final AtomicInteger index = new AtomicInteger(0);
 
