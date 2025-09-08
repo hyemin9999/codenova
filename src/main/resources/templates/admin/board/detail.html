@@ -5,7 +5,7 @@
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <main layout:fragment="content" class="container my-3"
 	th:unless="${item} == null">
-	<h5 class="border-bottom pb-2">[[${menuName}]] 관리</h5>
+	<h5 class="border-bottom pb-2">[[${menuName}]] 게시글 관리</h5>
 
 	<div class="row">
 		<div class="col">
@@ -41,7 +41,7 @@
 			</div>
 			<div class="d-flex justify-content-between mt-2 align-b">
 				<span th:text="|${#lists.size(item.commentList)}개의 댓글이 있습니다.|"></span>
-				<a class="btn btn-info" th:href="@{/admin/board/list}">목록</a>
+				<a class="btn btn-info" th:href="@{|/admin/board/list/${cid}|}">목록</a>
 			</div>
 			<div class="card my-3" th:each="citem, list : ${item.commentList}"
 				th:if="${citem != null and !citem.isDelete}"
