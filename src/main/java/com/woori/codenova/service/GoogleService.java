@@ -13,9 +13,7 @@ import com.woori.codenova.dto.GoogleRequest;
 import com.woori.codenova.dto.GoogleResponse;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class GoogleService {
@@ -31,7 +29,6 @@ public class GoogleService {
 
 //	@RequestMapping(value = "/api/v1/oauth2/google", method = RequestMethod.POST)
 	public String loginUrlGoogle() {
-		log.info("테스트중입니다.{}값 확인중{}", googleClientId, googleClientPw);
 		String reqUrl = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + googleClientId + "&redirect_uri="
 				+ googleRedirect + "&response_type=code&scope=email%20profile%20openid&access_type=offline";
 		return reqUrl;

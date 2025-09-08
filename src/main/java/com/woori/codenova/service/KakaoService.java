@@ -12,14 +12,14 @@ import com.woori.codenova.dto.KakaoUserInfoResponseDto;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class KakaoService {
 
+	@Value("${kakao.redirect_uri}")
+	private String redirect_uri;
 	private String clientId;
 	private final String KAUTH_TOKEN_URL_HOST;
 	private final String KAUTH_USER_URL_HOST;
@@ -40,12 +40,12 @@ public class KakaoService {
 
 	public String getAccessTokenFromKakao(String code) {
 
-		String redirectUri = "http://localhost:8080/callback";
+//		String redirectUri = "${kakao"; 잠궈버리고 yml에 있는 kakao 경로로 대체함
 
 		KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
 				.uri(uriBuilder -> uriBuilder.scheme("https").path("/oauth/token")
 						.queryParam("grant_type", "authorization_code").queryParam("client_id", clientId)
-						.queryParam("redirect_uri", redirectUri).queryParam("code", code).build(true))
+						.queryParam("redirect_uri", redirect_uri).queryParam("code", code).build(true))
 				.header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
 				.retrieve()
 				// TODO : Custom Exception
@@ -55,12 +55,8 @@ public class KakaoService {
 						clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
 				.bodyToMono(KakaoTokenResponseDto.class).block();
 
-		log.info(" [Kakao Service] Access Token ------> {}", kakaoTokenResponseDto.getAccessToken());
-		log.info(" [Kakao Service] Refresh Token ------> {}", kakaoTokenResponseDto.getRefreshToken());
 		// 제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의
 		// 받기 요청을 거친 토큰 발급 요청인 경우
-		log.info(" [Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
-		log.info(" [Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
 
 		return kakaoTokenResponseDto.getAccessToken();
 	}
@@ -78,12 +74,6 @@ public class KakaoService {
 				.onStatus(HttpStatusCode::is5xxServerError,
 						clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
 				.bodyToMono(KakaoUserInfoResponseDto.class).block();
-
-		log.info("[ Kakao Service ] Auth ID ---> {}", userInfo.getId());
-		log.info("[ Kakao Service ] NickName ---> {}", userInfo.getKakaoAccount().getProfile().getNickName());
-		log.info("[ Kakao Service ] ProfileImageUrl ---> {}",
-				userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
-		log.info("[ Kakao Service ] Email ---> {}", userInfo.getKakaoAccount().getEmail());
 
 		return userInfo;
 	}

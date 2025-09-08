@@ -2,9 +2,11 @@
 <html layout:decorate="~{layout/admin_layout}"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <main layout:fragment="content" class="container my-3">
 
 	<h5 class="border-bottom pb-2">[[${menuName}]] 게시글 관리</h5>
+
 	<div class="row">
 		<div class="col">
 			<div class="row my-2">
@@ -41,7 +43,7 @@
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
-						<td class="text-start text-truncate"><a
+						<td class="text-start"><a
 							th:href="@{|/admin/board/detail/${item.id}|}"
 							th:text="${item.subject}"></a><span
 							class="text-danger small ms-2"

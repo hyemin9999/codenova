@@ -66,7 +66,6 @@ public class CodenovaInterceptor implements HandlerInterceptor {
 			} else {
 				request.setAttribute("type", "notice");
 			}
-
 			Category item = menuList.get(0);
 
 			String[] str = url.split("/");
