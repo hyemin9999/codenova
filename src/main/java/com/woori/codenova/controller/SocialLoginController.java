@@ -1,5 +1,6 @@
 package com.woori.codenova.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -250,6 +251,7 @@ public class SocialLoginController {
 		SiteUser newSiteUser = new SiteUser();
 		newSiteUser.setUsername(nickname); // 임시로 닉네임을 아이디로 사용. 정책에 따라 변경 가능
 		newSiteUser.setEmail(email);
+		newSiteUser.setCreateDate(LocalDateTime.now());
 		String passwordkey = (sendMailService.createCode());
 		newSiteUser.setPassword(passwordEncoder.encode(passwordkey));
 		// 소셜 로그인은 별도 비밀번호가 없으므로, socialCreate 같은 전용 메서드를 사용하는 것이 좋습니다.
