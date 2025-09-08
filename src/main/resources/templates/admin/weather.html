@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>도시별 3일치 날씨 예보</title>
+<title>3일치 날씨 예보</title>
 <style>
 body {
 	font-family: 'Segoe UI', sans-serif;
@@ -76,10 +76,8 @@ select {
 </style>
 </head>
 <body>
-	<h1>📅 도시별 3일치 날씨 예보</h1>
 
-	<label for="city-select">도시 선택:</label>
-	<select id="city-select">
+	<select id="city-select" hidden="hidden">
 		<option value="seoul">서울</option>
 		<option value="incheon">인천</option>
 		<option value="busan">부산</option>
@@ -98,227 +96,387 @@ select {
 	<div id="main-card">현재 기온 정보를 불러오는 중...</div>
 	<div id="forecast-container">예보 정보를 불러오는 중...</div>
 
+	<div id="status"></div>
 	<script>
-    // 도시 좌표
-    const cityCoords = {
-        seoul: { name: '서울', nx: 60, ny: 127 },
-        incheon: { name: '인천', nx: 55, ny: 124 },
-        busan: { name: '부산', nx: 98, ny: 76 },
-        daegu: { name: '대구', nx: 89, ny: 90 },
-        gwangju: { name: '광주', nx: 58, ny: 74 },
-        daejeon: { name: '대전', nx: 67, ny: 100 },
-        ulsan: { name: '울산', nx: 102, ny: 84 },
-        suwon: { name: '수원', nx: 60, ny: 121 },
-        cheongju: { name: '청주', nx: 69, ny: 106 },
-        jeonju: { name: '전주', nx: 63, ny: 89 },
-        chuncheon: { name: '춘천', nx: 73, ny: 134 },
-        gangneung: { name: '강릉', nx: 92, ny: 131 },
-        jeju: { name: '제주', nx: 52, ny: 38 }
-    };
+	const select = document.getElementById('city-select');
+	const mainCard = document.getElementById('main-card');
+	const container = document.getElementById('forecast-container');
 
-    // 카테고리 매핑
-    const categoryMap = {
-        TMP: '기온(℃)',
-        POP: '강수확률(%)',
-        SKY: '하늘상태',
-        PTY: '강수형태'
-    };
+	// 도시 좌표
+	const cityCoords = {
+		seoul: { name: '서울', nx: 60, ny: 127 },
+		incheon: { name: '인천', nx: 55, ny: 124 },
+		busan: { name: '부산', nx: 98, ny: 76 },
+		daegu: { name: '대구', nx: 89, ny: 90 },
+		gwangju: { name: '광주', nx: 58, ny: 74 },
+		daejeon: { name: '대전', nx: 67, ny: 100 },
+		ulsan: { name: '울산', nx: 102, ny: 84 },
+		suwon: { name: '수원', nx: 60, ny: 121 },
+		cheongju: { name: '청주', nx: 69, ny: 106 },
+		jeonju: { name: '전주', nx: 63, ny: 89 },
+		chuncheon: { name: '춘천', nx: 73, ny: 134 },
+		gangneung: { name: '강릉', nx: 92, ny: 131 },
+		jeju: { name: '제주', nx: 52, ny: 38 }
+	};
 
-    // 하늘 상태 텍스트
-    const skyMap = { '1': '맑음', '3': '구름 많음', '4': '흐림' };
-    // 강수 형태 텍스트
-    const ptyMap = { '0': '없음', '1': '비', '2': '비/눈', '3': '눈', '4': '소나기' };
+	// 카테고리 매핑
+	const categoryMap = {
+		TMP: '기온(℃)',
+		POP: '강수확률(%)',
+		SKY: '하늘상태',
+		PTY: '강수형태'
+	};
 
-    const mainCard = document.getElementById('main-card');
-    const container = document.getElementById('forecast-container');
-    const select = document.getElementById('city-select');
+	// 하늘 상태 텍스트
+	const skyMap = { '1': '맑음', '3': '구름 많음', '4': '흐림' };
+	// 강수 형태 텍스트
+	const ptyMap = { '0': '없음', '1': '비', '2': '비/눈', '3': '눈', '4': '소나기' };
 
-    // 하늘 상태 이미지 매핑
-    const skyImgMap = {
-        '1': 'weather/background/GOOD.png',     // 맑음
-        '3': 'weather/background/HELL.png',    // 구름 많음
-        '4': 'weather/background/BAD.png'   // 흐림
-    };
+	// 하늘 이미지
+	const skyImgMap = {
+		'1': '/weather/background/GOOD.png',
+		'3': '/weather/background/HELL.png',
+		'4': '/weather/background/BAD.png'
+	};
 
-    // 밤용 이미지 (맑음 전용)
-    const nightSkyImg = 'weather/NIGHT.png';
+	// 밤용 이미지
+	const nightSkyImg = '/weather/background/NIGHT.png';
 
-    // 강수 상태 이미지 매핑
-    const ptyImgMap = {
-        '0': 'weather/SUN.png',      // 없음
-        '1': 'weather/RAIN.png',      // 비
-        '2': 'weather/RAINSNOW.png', // 비/눈
-        '3': 'weather/SNOW.png',      // 눈
-        '4': 'weather/RAIN.png'     // 소나기
-    };
+	// 강수 상태 아이콘
+	const ptyImgMap = {
+		'0': '/weather/SUN.png',
+		'1': '/weather/RAIN.png',
+		'2': '/weather/RAINSNOW.png',
+		'3': '/weather/SNOW.png',
+		'4': '/weather/RAIN.png'
+	};
 
-    // 도시 셀렉트바 변경 시
-    select.addEventListener('change', () => {
-        const selected = select.value;
-        const { nx, ny, name } = cityCoords[selected];
-        fetchForecast(nx, ny, name);
-    });
+	// 밤에 맑을 때 달 아이콘
+	const moonImg = '/weather/MOON.png';
 
-    // 시간계산
-    function getBaseTime() {
-        const now = new Date();
-        const hour = now.getHours();
-        const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
-        let selected = baseHours[0];
-        for (let i = 0; i < baseHours.length; i++) {
-            if (hour >= baseHours[i]) selected = baseHours[i];
-        }
-        return String(selected).padStart(2, '0') + '00';
-    }
+//	     // 도시 셀렉트바 변경 시
+//	     select.addEventListener('change', () => {
+//	         const selected = select.value;
+//	         const { nx, ny, name } = cityCoords[selected];
+//	         fetchForecast(nx, ny, name);
+//	     });
 
-    // 데이터 파싱
-    function fetchForecast(nx, ny, cityName) {
-        mainCard.innerHTML = '현재 기온 정보를 불러오는 중...';
-        container.innerHTML = '예보 정보를 불러오는 중...';
+	// 시간계산
+	function getBaseTime() {
+		const now = new Date();
+		const hour = now.getHours();
+		const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
+		let selected = baseHours[0];
+		for (let i = 0; i < baseHours.length; i++) {
+			if (hour >= baseHours[i]) selected = baseHours[i];
+		}
+		return String(selected).padStart(2, '0') + '00';
+	}
 
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const dd = String(now.getDate()).padStart(2, '0');
-        const base_date = `${yyyy}${mm}${dd}`;
-        const base_time = getBaseTime();
+	// 데이터 파싱
+	function fetchForecast(nx, ny, cityName) {
+		mainCard.innerHTML = '현재 기온 정보를 불러오는 중...';
+		container.innerHTML = '예보 정보를 불러오는 중...';
 
-        const serviceKey = "[[${@environment.getProperty('weather.serviceKey')}]]";
-        const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?` +
-            `serviceKey=${serviceKey}&pageNo=1&numOfRows=1000&dataType=JSON` +
-            `&base_date=${base_date}&base_time=${base_time}&nx=${nx}&ny=${ny}`;
+		const now = new Date();
+		const yyyy = now.getFullYear();
+		const mm = String(now.getMonth() + 1).padStart(2, '0');
+		const dd = String(now.getDate()).padStart(2, '0');
+		const base_date = `${yyyy}${mm}${dd}`;
+		const base_time = getBaseTime();
 
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                const items = data.response.body.items.item;
-                const grouped = {};
+		const serviceKey = "[[${@environment.getProperty('weather.serviceKey')}]]";
+		const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?` +
+			`serviceKey=${serviceKey}&pageNo=1&numOfRows=1000&dataType=JSON` +
+			`&base_date=${base_date}&base_time=${base_time}&nx=${nx}&ny=${ny}`;
 
-                // 날짜, 시간별로 데이터 분류
-                items.forEach(item => {
-                    const date = item.fcstDate;
-                    const time = item.fcstTime;
-                    const key = `${date}-${time}`;
-                    if (!grouped[key]) grouped[key] = { date, time, data: {} };
-                    grouped[key].data[item.category] = item.fcstValue;
-                });
+		fetch(url)
+			.then(res => res.json())
+			.then(data => {
+				const items = data.response.body.items.item;
+				const grouped = {};
 
-                const sorted = Object.values(grouped).sort((a, b) => a.date + a.time > b.date + b.time ? 1 : -1);
+				// 날짜, 시간별로 데이터 분류
+				items.forEach(item => {
+					const date = item.fcstDate;
+					const time = item.fcstTime;
+					const key = `${date}-${time}`;
+					if (!grouped[key]) grouped[key] = { date, time, data: {} };
+					grouped[key].data[item.category] = item.fcstValue;
+				});
 
-                // 현재 시점 예보 추출
-                const nowStr = `${String(now.getHours()).padStart(2, '0')}00`;
-                const today = `${yyyy}${mm}${dd}`;
-                const current = sorted.find(f => f.date === today && f.time >= nowStr) || sorted[0];
+				const sorted = Object.values(grouped).sort((a, b) => a.date + a.time > b.date + b.time ? 1 : -1);
 
-                const currentData = current.data;
-                const currentTime = `${current.time.slice(0, 2)}시`;
-                const currentHour = parseInt(current.time.slice(0, 2));
+				// 현재 시점 예보 추출
+				const nowStr = `${String(now.getHours()).padStart(2, '0')}00`;
+				const today = `${yyyy}${mm}${dd}`;
+				const current = sorted.find(f => f.date === today && f.time >= nowStr) || sorted[0];
 
-                // 하늘 상태 (20시부터 05시까지는 밤 사진 씀)
-                let currentSkyImg;
-                if (currentData.SKY === '1' && (currentHour >= 20 || currentHour < 5)) {
-                    currentSkyImg = nightSkyImg;
-                } else {
-                    currentSkyImg = skyImgMap[currentData.SKY] || 'images/default.png';
-                }
+				const currentData = current.data;
+				const currentTime = `${current.time.slice(0, 2)}시`;
+				const currentHour = parseInt(current.time.slice(0, 2));
 
-                const currentPtyImg = ptyImgMap[currentData.PTY] || 'images/default.png';
+				// 배경 이미지 선택 (20시부터 05시까지는 밤 배경 사용)
+				let currentSkyImg;
+				if (currentData.SKY === '1' && (currentHour >= 20 || currentHour < 5)) {
+					currentSkyImg = nightSkyImg;
+				} else {
+					currentSkyImg = skyImgMap[currentData.SKY] || 'images/default.png';
+				}
 
-                // 메인 카드 렌더링
-                mainCard.innerHTML = `
-      <div class="main-card">
-        <h2>${cityName} 현재 (${currentTime}) 기준</h2>
-        <div>
-        <div class="value">${currentData.TMP}℃</div>
-<div style="width:245px; height:137px; position: relative;">
-    <img src="${currentSkyImg}" style="width:245px;height:137px;object-fit:cover;">
-    <img src="${currentPtyImg}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 70%; max-height: 70%;z-index: 9999;
-    object-fit: contain">
-</div>
-        <div>강수확률: ${currentData.POP}%</div>
-      </div>
-      </div>
-    `;
+				// 강수 형태 아이콘 선택
+				let currentPtyImg = ptyImgMap[currentData.PTY] || 'images/default.png';
+
+				// 밤 시간(20시 ~ 다음날 5시)이고, 강수형태가 없으면(PTY: 0), MOON 이미지 사용
+				if ((currentHour >= 20 || currentHour < 5) && currentData.PTY === '0') {
+					currentPtyImg = moonImg;
+				}
+
+				// 메인 카드 렌더링
+				mainCard.innerHTML = `
+	                                      <div class="main-card">
+	                                        <h2>${cityName} 현재 (${currentTime}) 기준</h2>
+	                                        <div>
+	                                        <div class="value">${currentData.TMP}℃</div>
+	                                <div style="width:245px; height:137px; position: relative;">
+	                                    <img src="${currentSkyImg}" style="width:245px;height:137px;object-fit:cover;">
+	                                    <img src="${currentPtyImg}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 70%; max-height: 70%;z-index: 9999;
+	                                    object-fit: contain">
+	                                </div>
+	                                        <div>강수확률: ${currentData.POP}%</div>
+	                                      </div>
+	                                      </div>
+	                                    `;
+
+				// 예보 카드 렌더링 (텍스트 그대로)
+				container.innerHTML = '';
+				let currentDate = '';
+				let rowDiv = null;
+
+				sorted.forEach(entry => {
+					if (entry.date !== currentDate) {
+						currentDate = entry.date;
+						const dayDiv = document.createElement('div');
+						dayDiv.className = 'forecast-day';
+
+						// 날짜별 최고 최저기온
+						const dayTemps = sorted
+							.filter(e => e.date === currentDate)
+							.map(e => parseFloat(e.data.TMP));
+						const maxTemp = Math.max(...dayTemps);
+						const minTemp = Math.min(...dayTemps);
+
+						dayDiv.innerHTML = `<h2>${entry.date.slice(0, 4)}-${entry.date.slice(4, 6)}-${entry.date.slice(6, 8)} (최고 ${maxTemp}℃ / 최저 ${minTemp}℃)</h2>`;
+
+						rowDiv = document.createElement('div');
+						rowDiv.className = 'forecast-row';
+						dayDiv.appendChild(rowDiv);
+						container.appendChild(dayDiv);
+					}
+
+					//예보카드 구성
+					const itemDiv = document.createElement('div');
+					itemDiv.className = 'forecast-item';
+
+					const time2 = `${entry.time.slice(0, 2)}`;
+					const time = `${entry.time.slice(0, 2)}시`;
+					const data = entry.data;
+
+					// 강수형태 이미지 (없으면 기본)
+					const ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
+
+					let skyImg;
+					if (data.SKY === '1' && (time2 >= 20 || time2 < 5)) {
+						skyImg = nightSkyImg;
+					} else {
+						skyImg = skyImgMap[data.SKY] || 'images/default.png';
+					}
+					
+					
+					// 이미지 영역 + 정보 영역
+					itemDiv.innerHTML = `
+	                        <div class="pty-icon" style="text-align:center;  margin-bottom:5px; width:100%; height:67px; background-image: url('${skyImg}');
+						background-size: cover;">
+	                      
+	                            <img src="${ptyImg}" style="max-width:100%; max-height:100%; object-fit: contain">
+	                        </div>
+	                        <div class="time">${time}</div>
+	                        <div class="desc">
+	                            <div>기온: ${data.TMP}℃</div>
+	                            <div>강수확률: ${data.POP}%</div>
+	                            <div>하늘상태: ${skyMap[data.SKY] || data.SKY}</div>
+	                        </div>
+	                    `;
+					rowDiv.appendChild(itemDiv);
+
+					let desc = '';
+					for (const cat of ['TMP', 'POP', 'SKY', 'PTY']) {
+						if (data[cat]) {
+							if (cat === 'PTY') {
+								const ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
+								desc += `<div>${categoryMap[cat]}: <img src="${ptyImg}" style="width:24px;height:24px;vertical-align:middle;"></div>`;
+							} else {
+								let val = data[cat];
+								if (cat === 'SKY') val = skyMap[val] || val;
+								desc += `<div>${categoryMap[cat]}: ${val}</div>`;
+							}
+						}
+					}
+				});
+			})
+			.catch(err => {
+				mainCard.innerHTML = '현재 기온 정보를 불러오지 못했습니다.';
+				container.innerHTML = '예보 정보를 불러오지 못했습니다.';
+// 				console.error(err);
+				console.error(`위치 정보를 가져오는 데 실패했습니다: ${err.message}`);
+			});
+	}
 
 
+	/**
+	 * 위도/경도를 기상청 nx, ny 좌표로 변환하는 함수
+	 * @param {number} lat - 위도
+	 * @param {number} lon - 경도
+	 * @returns {object} { nx, ny }
+	 */
+	function convertLatLonToGrid(lat, lon) {
+	    const RE = 6371.00877; // 지구 반경(km)
+	    const GRID = 5.0; // 격자 간격(km)
+	    const SLAT1 = 30.0; // 표준 위도1
+	    const SLAT2 = 60.0; // 표준 위도2
+	    const OLON = 126.0; // 기준 경도
+	    const OLAT = 38.0; // 기준 위도
+	    const XO = 43; // 기준점 X좌표
+	    const YO = 136; // 기준점 Y좌표
+	    
+	    const DEGRAD = Math.PI / 180.0;
+	    const RADDEG = 180.0 / Math.PI;
 
-                // 예보 카드 렌더링 (텍스트 그대로)
-                container.innerHTML = '';
-                let currentDate = '';
-                let rowDiv = null;
+	    const re = RE / GRID;
+	    const slat1 = SLAT1 * DEGRAD;
+	    const slat2 = SLAT2 * DEGRAD;
+	    const olon = OLON * DEGRAD;
+	    const olat = OLAT * DEGRAD;
 
-                sorted.forEach(entry => {
-                    if (entry.date !== currentDate) {
-                        currentDate = entry.date;
-                        const dayDiv = document.createElement('div');
-                        dayDiv.className = 'forecast-day';
+	    let sn = Math.tan(Math.PI * 0.25 + slat2 / 2) / Math.tan(Math.PI * 0.25 + slat1 / 2);
+	    sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+	    let sf = Math.tan(Math.PI * 0.25 + slat1 / 2);
+	    sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+	    let ro = Math.tan(Math.PI * 0.25 + olat / 2);
+	    ro = re * sf / Math.pow(ro, sn);
+	    let ra = Math.tan(Math.PI * 0.25 + lat * DEGRAD / 2);
+	    ra = re * sf / Math.pow(ra, sn);
 
-                        // 날짜별 최고 최저기온
-                        const dayTemps = sorted
-                            .filter(e => e.date === currentDate)
-                            .map(e => parseFloat(e.data.TMP));
-                        const maxTemp = Math.max(...dayTemps);
-                        const minTemp = Math.min(...dayTemps);
+	    let theta = lon * DEGRAD - olon;
+	    if (theta > Math.PI) theta -= 2.0 * Math.PI;
+	    if (theta < -Math.PI) theta += 2.0 * Math.PI;
+	    theta *= sn;
 
-                        dayDiv.innerHTML = `<h2>${entry.date.slice(0,4)}-${entry.date.slice(4,6)}-${entry.date.slice(6,8)} (최고 ${maxTemp}℃ / 최저 ${minTemp}℃)</h2>`;
+	    const nx = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+	    const ny = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
 
-                        rowDiv = document.createElement('div');
-                        rowDiv.className = 'forecast-row';
-                        dayDiv.appendChild(rowDiv);
-                        container.appendChild(dayDiv);
-                    }
+	    return { nx, ny };
+	}
+	/**
+	 * 두 격자 좌표 사이의 거리를 계산하는 함수
+	 * @param {object} pos1 - 첫 번째 좌표 { nx, ny }
+	 * @param {object} pos2 - 두 번째 좌표 { nx, ny }
+	 * @returns {number} 두 좌표 사이의 유클리드 거리
+	 */
+	function calculateDistance(pos1, pos2) {
+	    const dx = pos1.nx - pos2.nx;
+	    const dy = pos1.ny - pos2.ny;
+	    return Math.sqrt(dx * dx + dy * dy);
+	}
+	 
+	 /**
+	  * 현재 위치의 위도/경도를 기반으로 가장 가까운 도시를 찾는 함수
+	  * @param {object} currentPos - 현재 위치 { lat, lon }
+	  * @returns {object} 가장 가까운 도시 { name, nx, ny }
+	  */
+	 function findNearestCity(currentPos) {
+	     const currentGridPos = convertLatLonToGrid(currentPos.lat, currentPos.lon);
+	     
+	     let nearestCity = null;
+	     let minDistance = Infinity;
+	     
+	     for (const key in cityCoords) {
+	         const city = cityCoords[key];
+	         const distance = calculateDistance(currentGridPos, { nx: city.nx, ny: city.ny });
+	         
+	         if (distance < minDistance) {
+	             minDistance = distance;
+	             nearestCity = city;
+	         }
+	     }
+	     
+	     return nearestCity;
+	 }
 
-                    //예보카드 구성
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'forecast-item';
+	function success(position) {
+		const currentPos = {
+	            lat: position.coords.latitude,
+	            lon: position.coords.longitude
+	        };
+	        
+	        const nearestCity = findNearestCity(currentPos);
+	        
+	        if (nearestCity) {
+	        	
+	        	fetchForecast(nearestCity.nx, nearestCity.ny, nearestCity.name);
+// 	            console.log(`현재 위치에서 가장 가까운 도시는 ${nearestCity.name}입니다.`);
+// 	            console.log(`해당 도시의 좌표는 nx: ${nearestCity.nx}, ny: ${nearestCity.ny}입니다.`);
+	        } else {
+	            console.log("가장 가까운 도시를 찾을 수 없습니다.");
+	        }
+	}
 
-                    const time = `${entry.time.slice(0,2)}시`;
-                    const data = entry.data;
+	function error(err) {
+		console.error(`위치 정보를 가져오는 데 실패했습니다: ${err.message}`);
+		document.getElementById("city-select").value = "incheon";
+		const { nx, ny, name } = cityCoords["incheon"];
+		fetchForecast(nx, ny, name);
+	}
 
-// 강수형태 이미지 (없으면 기본)
-                    const ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
+	if ("geolocation" in navigator) {
+		navigator.geolocation.getCurrentPosition(success, error);
+	} else {
+		// Geolocation API를 사용할 수 없습니다.
+	}
 
-// 이미지 영역 + 정보 영역
-                    itemDiv.innerHTML = `<div class="pty-icon" style="text-align:center;  margin-bottom:5px; width:100%; height:60px;">
-        <img src="${ptyImg}" style="max-width:100%; max-height:100%; object-fit: contain">
-    </div>
-    <div class="time">${time}</div>
-    <div class="desc">
-        <div>기온: ${data.TMP}℃</div>
-        <div>강수확률: ${data.POP}%</div>
-        <div>하늘상태: ${skyMap[data.SKY] || data.SKY}</div>
-    </div>`;
-                    rowDiv.appendChild(itemDiv);
+// 	(async function() {
+// 		try {
+// 			const res = await fetch("https://ipapi.co/json/");
+// 			const { region } = await res.json();
+// 			console.log("IP 기반 위치:", region);
 
+// 			let matchedKey = null;
 
-                    let desc = '';
-                    for (const cat of ['TMP', 'POP', 'SKY', 'PTY']) {
-                        if (data[cat]) {
-                            if (cat === 'PTY') {
-                                const ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
-                                desc += `<div>${categoryMap[cat]}: <img src="${ptyImg}" style="width:24px;height:24px;vertical-align:middle;"></div>`;
-                            } else {
-                                let val = data[cat];
-                                if (cat === 'SKY') val = skyMap[val] || val;
-                                desc += `<div>${categoryMap[cat]}: ${val}</div>`;
-                            }
-                        }
-                    }
+// 			for (const key in cityCoords) {
+// 				if (key.toLowerCase() === region.toLowerCase()) {
+// 					matchedKey = key;
+// 					break;
+// 				}
+// 			}
 
-                });
-            })
-            .catch(err => {
-                mainCard.innerHTML = '현재 기온 정보를 불러오지 못했습니다.';
-                container.innerHTML = '예보 정보를 불러오지 못했습니다.';
-                console.error(err);
-            });
-    }
-
-    // 초기 로딩은 서울이 국룰
-    const defaultCity = 'seoul';
-    const { nx, ny, name } = cityCoords[defaultCity];
-    fetchForecast(nx, ny, name);
-</script>
-
+// 			if (matchedKey) {
+// 				const { nx, ny, name } = cityCoords[matchedKey];
+// 				document.getElementById("city-select").value = matchedKey;
+// 				fetchForecast(nx, ny, name);
+// 			} else {
+// 				console.warn("IP 기반 매칭 실패 → 인천으로 설정");
+// 				document.getElementById("city-select").value = "incheon";
+// 				const { nx, ny, name } = cityCoords["incheon"];
+// 				fetchForecast(nx, ny, name);
+// 			}
+// 		} catch (e) {
+// 			console.error("IP API 호출 실패:", e);
+// 			// 실패시 인천
+// 			document.getElementById("city-select").value = "incheon";
+// 			const { nx, ny, name } = cityCoords["incheon"];
+// 			fetchForecast(nx, ny, name);
+// 		}
+// 	})();
+	</script>
 </body>
 </html>

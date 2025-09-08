@@ -32,6 +32,26 @@ public class HomeController {
 		return "index";
 	}
 
+	@GetMapping(value = { "/w", "/weather" })
+	public String Weather() {
+		return "weather";
+	}
+
+	@GetMapping("/air")
+	public String aireview() {
+		return "aireview";
+	}
+
+	@GetMapping("/aim")
+	public String aimbti() {
+		return "aimbti";
+	}
+
+	@GetMapping(value = { "/admin/w", "/admin/weather", "/aw" })
+	public String adminWeather() {
+		return "admin/weather";
+	}
+
 	@GetMapping(value = { "/notice", "/notice/" })
 	public String notice() {
 		return "redirect:/notice/list";
