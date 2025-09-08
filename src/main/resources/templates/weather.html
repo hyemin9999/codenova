@@ -76,10 +76,10 @@ select {
 </style>
 </head>
 <body>
-	<h1>📅 도시별 3일치 날씨 예보</h1>
+<!-- 	<h1>📅 도시별 3일치 날씨 예보</h1> -->
 
-	<label for="city-select">도시 선택:</label>
-	<select id="city-select">
+<!-- 	<label for="city-select">도시 선택:</label> -->
+	<select id="city-select" hidden="hidden">
 		<option value="seoul">서울</option>
 		<option value="incheon">인천</option>
 		<option value="busan">부산</option>
@@ -156,12 +156,12 @@ select {
     // 밤에 맑을 때 달 아이콘
     const moonImg = 'weather/MOON.png';
 
-    // 도시 셀렉트바 변경 시
-    select.addEventListener('change', () => {
-        const selected = select.value;
-        const { nx, ny, name } = cityCoords[selected];
-        fetchForecast(nx, ny, name);
-    });
+//     // 도시 셀렉트바 변경 시
+//     select.addEventListener('change', () => {
+//         const selected = select.value;
+//         const { nx, ny, name } = cityCoords[selected];
+//         fetchForecast(nx, ny, name);
+//     });
 
     // 시간계산
     function getBaseTime() {

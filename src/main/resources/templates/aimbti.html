@@ -118,7 +118,7 @@
                 const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
                 document.getElementById('codeType').textContent = extractBetween(aiText, '|codetype|', '|codetype|');
-                document.getElementById('codeStatus').textContent = extractBetween(aiText, '|codestatus|', '|codestatus|');
+                document.getElementById('codeStatus').innerHTML = extractBetween(aiText, '|codestatus|', '|codestatus|');
                 document.getElementById('codeReview').innerHTML = extractBetween(aiText, '|codecontent|', '|codecontent|');
                 document.getElementById('codeImprovements').innerHTML = extractBetween(aiText, '|codeimprovements|', '|codeimprovements|');
 
