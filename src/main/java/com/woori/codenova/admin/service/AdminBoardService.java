@@ -129,6 +129,8 @@ public class AdminBoardService {
 				}
 			}
 		}
+
+		// TODO :: 게시글 내용에 있는 이미지 체크해서 없으면 지워버리기... - 오 새로 만들까 함수
 	}
 
 	// 검색

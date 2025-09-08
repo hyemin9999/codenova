@@ -19,6 +19,7 @@ import com.woori.codenova.admin.service.AdminBoardService;
 import com.woori.codenova.admin.service.AdminCategoryService;
 import com.woori.codenova.admin.service.AdminUserService;
 import com.woori.codenova.entity.Board;
+import com.woori.codenova.entity.Category;
 import com.woori.codenova.entity.Notice;
 import com.woori.codenova.entity.SiteUser;
 import com.woori.codenova.form.BoardForm;
@@ -66,7 +67,9 @@ public class AdminBoardController {
 			model.addAttribute("message", "존재하지 않는 게시글 입니다.");
 		} else {
 			// 게시판명 보여주기
-			model.addAttribute("menuName", item.getCategory().getName());
+			Category citem = item.getCategory();
+			model.addAttribute("menuName", citem.getName());
+			model.addAttribute("cid", citem.getId());
 
 			this.adminBoardService.setViewCount(item);
 			model.addAttribute("item", item);
