@@ -44,9 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:8080") // 뭔지 모름
@@ -118,7 +116,6 @@ public class SocialLoginController {
 
 		// 1. code 파라미터가 없는 비정상적인 접근인지 확인
 		if (authCode == null || authCode.isEmpty()) {
-			log.warn("인증 코드 없이 /callback에 직접 접근 시도됨.");
 			return new RedirectView("/"); // 코드가 없으면 메인 페이지로 리다이렉트
 		}
 
@@ -127,10 +124,6 @@ public class SocialLoginController {
 		String providerId = userInfo.getSub(); // 구글의 고유 식별 코드는 'sub' 입니다.
 		String email = userInfo.getEmail();
 		String nickname = userInfo.getName();
-
-		log.info("Email: {}", email);
-		log.info("User Unique ID (sub): {}", providerId);
-		log.info("Name: {}", nickname);
 
 		// 추출한 정보로 UserInfoResponse 객체를 생성합니다.
 //		GoogleUserinfoResponse userInfoResponse = new GoogleUserinfoResponse(email, sub, name);
@@ -150,7 +143,6 @@ public class SocialLoginController {
 
 		// 1. code 파라미터가 없는 비정상적인 접근인지 확인
 		if (authCode == null || authCode.isEmpty()) {
-			log.warn("인증 코드 없이 /callback에 직접 접근 시도됨.");
 			return new RedirectView("/"); // 코드가 없으면 메인 페이지로 리다이렉트
 		}
 
@@ -158,7 +150,6 @@ public class SocialLoginController {
 		String providerId = userInfo.getId().toString();
 		String email = userInfo.getKakaoAccount().getEmail();
 		String nickname = userInfo.getKakaoAccount().getProfile().getNickName();
-		log.info("체크체크");
 		return processSocialLogin(provider, providerId, email, nickname, session, request, response,
 				redirectAttributes);
 	}
@@ -167,7 +158,6 @@ public class SocialLoginController {
 	private RedirectView processSocialLogin(String provider, String providerId, String email, String nickname,
 			HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			RedirectAttributes redirectAttributes) {
-		log.info("[{}] 로그인 처리 시작. Provider ID: {}", provider.toUpperCase(), providerId);
 
 // 1. DB에서 providerId로 사용자 조회
 		Optional<SocialUser> userOptional = socialUserService.findByProviderId(providerId);
@@ -178,21 +168,17 @@ public class SocialLoginController {
 			SiteUser linkedSiteUser = socialUser.getSiteUser();
 
 			if (linkedSiteUser != null) {
-				log.info("[{} LOGIN] 기존 회원 로그인: {}", provider.toUpperCase(), linkedSiteUser.getUsername());
 				performLogin(linkedSiteUser, session, request, response);
 				return new RedirectView("/");
 			} else {
 // CASE B: 소셜 계정은 있으나 연동된 로컬 계정이 없는 경우
 				Optional<SiteUser> userByEmailOptional = userService.findByEmail(socialUser.getEmail());
 				if (userByEmailOptional.isPresent()) {
-					log.info("[{} LOGIN] 연동되지 않은 소셜 계정. 연동 확인 페이지로 리다이렉트합니다. Email: {}", provider.toUpperCase(),
-							socialUser.getEmail());
 					redirectAttributes.addFlashAttribute("provider", provider);
 					redirectAttributes.addFlashAttribute("providerId", providerId);
 					redirectAttributes.addFlashAttribute("email", socialUser.getEmail());
 					return new RedirectView("/user/Check/integration");
 				} else {
-					log.warn("[{} LOGIN] Orphan SocialUser 발견. 신규 가입으로 처리합니다.", provider.toUpperCase());
 					SiteUser newSiteUser = userService.createAndSaveSocialUser(nickname, email);
 					socialUser.setSiteUser(newSiteUser);
 					socialUserService.update(socialUser);
@@ -205,14 +191,11 @@ public class SocialLoginController {
 			Optional<SiteUser> userByEmailOptional = userService.findByEmail(email);
 			if (userByEmailOptional.isPresent()) {
 // CASE C-1: 이메일이 같은 로컬 회원이 이미 존재 -> 소셜 계정 생성 후 연동
-				log.info("DB에 이미 이메일 존재 확인 / 계정연동 필요 케이스 확인");
 				SiteUser existingSiteUser = userByEmailOptional.get();
-				log.info("DB에서 이메일 값 추출 {}.. 객체로 넘기겠음", existingSiteUser);
 				return createNewSocialUserAndLogin(provider, providerId, email, nickname, session, request, response,
 						existingSiteUser);
 			} else {
 // CASE C-2: 완전 신규 회원 -> 로컬 계정과 소셜 계정 모두 생성 후 연동
-				log.info("[{} LOGIN] New user. Redirecting to social signup page.", provider.toUpperCase());
 				return createNewUserAndLogin(provider, providerId, email, nickname, session, request, response);
 			}
 		}
@@ -221,7 +204,6 @@ public class SocialLoginController {
 	private void performLogin(SiteUser user, HttpSession session, HttpServletRequest request,
 			HttpServletResponse response) {
 		// 1. 사용자 정보를 기반으로 인증 토큰(Authentication) 생성
-		log.info("✅ 1. performLogin 메소드 시작: 사용자명 = {}", user.getUsername());
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
@@ -234,34 +216,26 @@ public class SocialLoginController {
 		// SecurityContext에 인증된 사용자 정보를 저장
 		// - 이 과정을 통해 사용자는 "공식적으로" 로그인 상태가 되며, 세션이 유지됩니다.
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		log.info("✅ 2. SecurityContextHolder에 인증 정보 저장 완료.");
 
 		Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
 		if (authenticatedUser != null && authenticatedUser.isAuthenticated()) {
-			log.info("✅ 3. 확인: SecurityContext에 사용자가 인증된 상태로 저장되었습니다. Principal: {}", authenticatedUser.getPrincipal());
 			SecurityContext context = SecurityContextHolder.getContext();
 			securityContextRepository.saveContext(context, request, response);
-			log.info("✅ 4. SecurityContext를 HttpSession에 강제 저장 완료.");
-		} else {
-			log.error("❌ 3. 확인: SecurityContext에 인증 정보가 제대로 저장되지 않았습니다!");
 		}
 	}
 
 	private RedirectView createNewSocialUserAndLogin(String provider, String providerId, String email, String nickname,
 			HttpSession session, HttpServletRequest request, HttpServletResponse response, SiteUser existingSiteUser) {
-		log.info("createNewSocial에 도착 이메일값 {}", existingSiteUser);
 		// 2. 신규 SocialUser 생성 및 저장
 		SocialUser newSocialUser = new SocialUser();
 		newSocialUser.setNickname(nickname);
 		newSocialUser.setEmail(email);
 		newSocialUser.setProvider(provider);
 		newSocialUser.setProviderId(providerId);
-		log.info("소셜 계정 생성전 로그체크중");
 		// ★★★ 중요: SiteUser와 SocialUser를 서로 연결
 		newSocialUser.setSiteUser(existingSiteUser);
 
 		socialUserService.create(newSocialUser); // 올바른 객체(newSocialUser)를 저장
-		log.info("[API NEW SIGNUP] 신규 SocialUser 저장 완료: {}", email);
 
 		// 3. 생성된 계정으로 즉시 로그인 처리
 		performLogin(existingSiteUser, session, request, response);
@@ -281,7 +255,6 @@ public class SocialLoginController {
 		// 소셜 로그인은 별도 비밀번호가 없으므로, socialCreate 같은 전용 메서드를 사용하는 것이 좋습니다.
 		// 이 메서드 내부에서는 임의의 값으로 비밀번호를 설정해야 Spring Security가 정상 작동합니다.
 		userService.Socialcreate(newSiteUser);
-		log.info("[API NEW SIGNUP] 신규 SiteUser 자동 가입 완료: {}", newSiteUser.getUsername());
 
 		// 2. 신규 SocialUser 생성 및 저장
 		SocialUser newSocialUser = new SocialUser();
@@ -294,7 +267,6 @@ public class SocialLoginController {
 		newSocialUser.setSiteUser(newSiteUser);
 
 		socialUserService.create(newSocialUser); // 올바른 객체(newSocialUser)를 저장
-		log.info("[API NEW SIGNUP] 신규 SocialUser 저장 완료: {}", email);
 
 		// 3. 생성된 계정으로 즉시 로그인 처리
 		performLogin(newSiteUser, session, request, response);
@@ -310,7 +282,6 @@ public class SocialLoginController {
 		// 1. 입장권(Flash Attribute) 검사
 		// callback을 거치지 않고 직접 URL로 들어오면 email 값은 null이 됩니다.
 		if (email == null || email.isEmpty()) {
-			log.warn("비정상적인 접근: 계정 연동 페이지 직접 접근 시도");
 			return "redirect:/"; // 입장권이 없으면 메인 페이지로 쫓아냄
 		}
 
@@ -341,8 +312,6 @@ public class SocialLoginController {
 		// 3. ★★★ SocialUser에 SiteUser를 연결(연동)합니다.
 		socialUser.setSiteUser(siteUser);
 		socialUserService.update(socialUser); // DB에 변경 사항 저장
-
-		log.info("[ACCOUNT LINK] 계정 연동 완료. User: {}, Provider: {}", siteUser.getEmail(), provider);
 
 		// 4. 연동 완료 후, 해당 계정으로 즉시 로그인 처리
 		performLogin(siteUser, session, request, response);

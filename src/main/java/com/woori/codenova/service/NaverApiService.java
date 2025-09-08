@@ -16,9 +16,7 @@ import com.google.gson.JsonParser;
 import com.woori.codenova.dto.NaverProfile;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Getter
 @Component(value = "naverApi")
 @Service
@@ -72,9 +70,7 @@ public class NaverApiService {
 
 		ResponseEntity<String> response = restTemplate.exchange(reqUrl, HttpMethod.GET, naverProfileRequest,
 				String.class);
-		System.out.println("네이버 API 응답: " + response.getBody());
 
-		System.out.println("response = " + response);
 		NaverProfile naverProfile = new NaverProfile(response.getBody());
 
 		return naverProfile;
