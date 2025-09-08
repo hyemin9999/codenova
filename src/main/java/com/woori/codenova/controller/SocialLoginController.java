@@ -48,7 +48,7 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://52.78.69.207:8080") // 뭔지 모름
+@CrossOrigin(origins = "http://localhost:8080") // 뭔지 모름
 public class SocialLoginController {
 
 	private final UserService userService;
