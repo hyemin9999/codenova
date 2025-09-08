@@ -77,25 +77,32 @@ if (delete_elements.length > 0) {
 
 const recommend_elements = document.getElementsByClassName("recommend");
 if (recommend_elements.length > 0) {
-	Array.from(recommend_elements).forEach(function(element) {
-		element.addEventListener('click', function() {
-			if (confirm("정말로 추천하시겠습니까?")) {
-				location.href = this.dataset.uri;
-			}
-		});
-	});
+    Array.from(recommend_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            const badge = this.querySelector(".badge");
+            const count = badge ? parseInt(badge.innerText, 10) : 0;
+
+            if (confirm(count > 0 ? "정말로 추천을 취소하시겠습니까?" : "정말로 추천하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            }
+        });
+    });
 }
 
 const favorite_elements = document.getElementsByClassName("favorite");
 if (favorite_elements.length > 0) {
-	Array.from(favorite_elements).forEach(function(element) {
-		element.addEventListener('click', function() {
-			if (confirm("정말로 즐겨찾기하시겠습니까?")) {
-				location.href = this.dataset.uri;
-			}
-		});
-	});
+    Array.from(favorite_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            // 안의 아이콘(⭐/☆) 보고 상태 구분
+            const isFavorited = this.innerText.includes("⭐");
+
+            if (confirm(isFavorited ? "정말로 즐겨찾기를 취소하시겠습니까?" : "정말로 즐겨찾기하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            }
+        });
+    });
 }
+
 
 /**
  * detail.html - editor
