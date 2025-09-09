@@ -283,7 +283,7 @@ select {
 					const data = entry.data;
 
 					// 강수형태 이미지 (없으면 기본)
-					const ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
+					let ptyImg = ptyImgMap[data.PTY] || 'images/default.png';
 
 					let skyImg;
 					if (data.SKY === '1' && (time2 >= 20 || time2 < 5)) {
@@ -292,12 +292,16 @@ select {
 						skyImg = skyImgMap[data.SKY] || 'images/default.png';
 					}
 					
+					// 밤 시간(20시 ~ 다음날 5시)이고, 강수형태가 없으면(PTY: 0), MOON 이미지 사용
+					if ((time2 >= 20 || time2 < 5) && data.PTY === '0') {
+						ptyImg = moonImg;
+					}
+					
 					
 					// 이미지 영역 + 정보 영역
 					itemDiv.innerHTML = `
 	                        <div class="pty-icon" style="text-align:center;  margin-bottom:5px; width:100%; height:67px; background-image: url('${skyImg}');
 						background-size: cover;">
-	                      
 	                            <img src="${ptyImg}" style="max-width:100%; max-height:100%; object-fit: contain">
 	                        </div>
 	                        <div class="time">${time}</div>
