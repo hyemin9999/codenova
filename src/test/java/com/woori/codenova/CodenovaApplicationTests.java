@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -192,7 +191,7 @@ class CodenovaApplicationTests {
 
 	// 테스트 데이터 300개 생성
 
-	@Test
+//	@Test
 	void testJpa_12() {
 		SiteUser u1 = userRepository.findByUsername("admin").orElse(null);
 
