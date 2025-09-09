@@ -2,11 +2,11 @@
 <html layout:decorate="~{layout/admin_layout}"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-	
+
 <main layout:fragment="content" class="container my-3">
 
 	<h5 class="border-bottom pb-2">공지사항 관리</h5>
-	
+
 	<div class="row">
 		<div class="col">
 			<div class="row my-2">
@@ -36,7 +36,7 @@
 				<thead class="table-info">
 					<tr class="text-center">
 						<th>번호</th>
-						<th>게시판</th>
+						<th>분류</th>
 						<th>제목</th>
 						<th>작성자</th>
 						<th>작성일</th>
@@ -49,7 +49,8 @@
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
-						<td><span>Java</span></td>
+						<td><span th:if="${item.category!= null}"
+							th:text="${item.category.name}"></span></td>
 						<td class="text-start"><a
 							th:href="@{|/admin/notice/detail/${item.id}|}"
 							th:text="${item.subject}"></a></td>
