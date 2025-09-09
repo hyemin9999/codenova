@@ -106,7 +106,7 @@
 				<textarea sec:authorize="isAuthenticated()" th:field="*{contents}"
 					class="form-control" rows="6" required></textarea>
 				<input type="submit" value="저장" class="btn btn-info my-2"> <a
-					th:href="@{/board/list/}" class="btn btn-info my-2">목록</a>
+					th:href="@{|/board/list/${cid}|}" class="btn btn-info my-2">목록</a>
 			</form>
 
 			<!-- 댓글 페이지 이동 -->

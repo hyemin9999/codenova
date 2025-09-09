@@ -30,7 +30,7 @@
 				<thead class="table-info">
 					<tr class="text-center">
 						<th>번호</th>
-						<th>게시판</th>
+						<th>분류</th>
 						<th>제목</th>
 						<th>작성자</th>
 						<th>작성일</th>
@@ -42,7 +42,8 @@
 						th:each="item, loop : ${paging}">
 						<td
 							th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
-						<td></td>
+						<td><span th:if="${item.category!= null}"
+							th:text="${item.category.name}"></span></td>
 						<td class="text-start"><a
 							th:href="@{|/notice/detail/${item.id}|}"
 							th:text="${item.subject}"></a></td>
@@ -53,7 +54,7 @@
 						<td th:text="${item.viewCount}"></td>
 					</tr>
 					<tr class="text-center" th:if="${paging.isEmpty()}">
-						<td colspan="5">공지사항이 존재하지 않습니다.</td>
+						<td colspan="6">공지사항이 존재하지 않습니다.</td>
 					</tr>
 				</tbody>
 			</table>
